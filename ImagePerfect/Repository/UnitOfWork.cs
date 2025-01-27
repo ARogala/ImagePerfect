@@ -9,9 +9,12 @@ namespace ImagePerfect.Repository
     public class UnitOfWork : IUnitOfWork
     {
         private readonly MySqlConnection _connection;
+
+        public IFolderRepository Folder { get; private set; }
         public UnitOfWork(MySqlConnection db)
         {
             _connection = db;
+            Folder = new FolderRepository(_connection);
 
         }
     }
