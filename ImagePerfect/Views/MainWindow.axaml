@@ -15,6 +15,11 @@
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-    
+	<Grid ColumnDefinitions="*" RowDefinitions="Auto,*">
+		<Button Grid.Row="0" Margin="20">Add Root Folder</Button>
+		<ScrollViewer Grid.Row="1">
+			
+		</ScrollViewer>
+	</Grid>
 
 </Window>
