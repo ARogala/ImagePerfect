@@ -2,6 +2,6 @@
 {
     public class MainWindowViewModel : ViewModelBase
     {
-      
+        public PickRootFolderViewModel PickRootFolder{ get; } = new PickRootFolderViewModel();
     }
 }
