@@ -1,6 +1,8 @@
 ﻿using MySqlConnector;
 using ImagePerfect.Models;
 using ImagePerfect.Repository.IRepository;
+using System.Threading.Tasks;
+using Dapper;
 
 namespace ImagePerfect.Repository
 {
@@ -13,5 +15,23 @@ namespace ImagePerfect.Repository
             _connection = db;
         }
         //any Folder model specific database methods here
+        public async Task<bool> AddFolderCsv(string filePath)
+        {
+            int rowsEffected = 0;
+            var bulkLoader = new MySqlBulkLoader(_connection)
+            {
+                FileName = filePath,
+                TableName = "folders",
+                CharacterSet = "UTF8",
+                NumberOfLinesToSkip = 1,
+                FieldTerminator = ",",
+                FieldQuotationCharacter = '"',
+                FieldQuotationOptional = true,
+                Local = true,
+            };
+            rowsEffected = await bulkLoader.LoadAsync();
+            await _connection.CloseAsync();
+            return rowsEffected > 0 ? true : false;
+        }
     }
 }
