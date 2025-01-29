@@ -5,6 +5,7 @@ using System.Reactive;
 using System.Threading.Tasks;
 using ReactiveUI;
 using System.Diagnostics;
+using ImagePerfect.Models;
 
 namespace ImagePerfect.ViewModels
 {
@@ -27,8 +28,9 @@ namespace ImagePerfect.ViewModels
         {
             _RootFolderPath = await _SelectFolderInteraction.Handle("Select Root Library Folder");
             //pass root folder path to model method for processing
-            Debug.WriteLine(_RootFolderPath[0]);
-            Debug.WriteLine(_RootFolderPath[0].Replace(@"file:///", "").Replace("/","//"));
+            //build csv
+            bool csvIsSet = await FolderCsvMethods.BuildFolderTreeCsv(_RootFolderPath[0]);
+            //write csv to database
         }
     }
 }
