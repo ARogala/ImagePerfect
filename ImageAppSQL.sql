@@ -59,6 +59,8 @@ https://bugs.mysql.com/bug.php?id=91872
 https://stackoverflow.com/questions/37343336/how-to-save-file-path-in-the-mysql-database-using-string-in-c-sharp
 
 https://mysqlconnector.net/troubleshooting/load-data-local-infile/
+
+SET PERSIST local_infile = 1;
 */
 LOAD DATA LOCAL INFILE "C:/Users/arogala/Documents/CSharp/DirectoryApp/folders.csv" INTO TABLE folders
 FIELDS TERMINATED BY ',' 

@@ -1,6 +1,7 @@
 ﻿using Avalonia.Metadata;
 using Avalonia.Rendering.Composition;
 using CsvHelper;
+using ImagePerfect.Repository.IRepository;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,9 +13,21 @@ using System.Threading.Tasks;
 
 namespace ImagePerfect.Models
 {
-    public static class FolderCsvMethods
+    public class FolderCsvMethods
     {
         private static string appDirectory = Directory.GetCurrentDirectory();
+        private readonly IUnitOfWork _unitOfWork;
+
+        public FolderCsvMethods(IUnitOfWork unitOfWork) 
+        {
+            _unitOfWork = unitOfWork;
+        }
+        public async Task<bool> AddFolderCsv()
+        {
+            string filePath = GetCsvPath("folders.csv");
+            return await _unitOfWork.Folder.AddFolderCsv(filePath);
+        }
+
         public static async Task<bool> BuildFolderTreeCsv(string rootFolderPath)
         {
             rootFolderPath = rootFolderPath.Replace(@"file:///", "");
