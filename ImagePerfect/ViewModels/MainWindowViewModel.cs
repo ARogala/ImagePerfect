@@ -1,16 +1,24 @@
-﻿using ImagePerfect.Repository.IRepository;
+﻿using ImagePerfect.Models;
+using ImagePerfect.Repository.IRepository;
+using System.Collections.ObjectModel;
 
 namespace ImagePerfect.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase
     {
         private readonly IUnitOfWork _unitOfWork;
-        private PickRootFolderViewModel _pickRootFolderViewModel;
+        public MainWindowViewModel() { }
         public MainWindowViewModel(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
-            _pickRootFolderViewModel = new PickRootFolderViewModel(_unitOfWork);
         }
-        public PickRootFolderViewModel PickRootFolder { get => _pickRootFolderViewModel; }
+        public PickRootFolderViewModel PickRootFolder { get => new PickRootFolderViewModel(_unitOfWork); }
+
+        public ObservableCollection<Folder> LibraryFolders { get; } = new ObservableCollection<Folder>();
+
+        private async void GetAllLibraryFolders()
+        {
+
+        }
     }
 }
