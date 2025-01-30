@@ -16,9 +16,15 @@
 
 	<Grid ColumnDefinitions="*" RowDefinitions="Auto,*">
 		<v:PickRootFolderView Margin="10" DataContext="{Binding PickRootFolder}" Grid.Row="0"/>
-		<ScrollViewer Grid.Row="1">
-			
-		</ScrollViewer>
+		<StackPanel Grid.Row="1">
+			<TextBlock MaxWidth="600" Text="{Binding RootFolder.FolderName}"/>
+			<Image MaxWidth="600" Source="{Binding RootFolder.CoverImagePath}" />
+			<TextBlock MaxWidth="600" Text="{Binding RootFolder.FolderDescription}"/>
+			<TextBlock MaxWidth="600" Text="{Binding RootFolder.FolderTags}"/>
+			<Grid RowDefinitions="Auto" ColumnDefinitions="*,*" MaxWidth="600">
+				<Button Grid.Row="0" Grid.Column="0" HorizontalAlignment="Right">Back</Button>
+				<Button Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left">Next</Button>
+			</Grid>
+		</StackPanel>
 	</Grid>
-
 </Window>
