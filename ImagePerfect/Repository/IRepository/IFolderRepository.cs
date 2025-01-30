@@ -7,5 +7,6 @@ namespace ImagePerfect.Repository.IRepository
     {
         //any Folder model specific database methods here
         Task<bool> AddFolderCsv(string filePath);
+        Task<Folder> GetRootFolder();
     }
 }
