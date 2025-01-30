@@ -22,7 +22,7 @@ public partial class PickRootFolderView : ReactiveUserControl<PickRootFolderView
     private async Task InteractionHandler(IInteractionContext<string, List<string>?> context)
     {
         // Get our parent top level control in order to get the needed service (in our sample the storage provider. Can also be the clipboard etc.)
-        TopLevel topLevel = TopLevel.GetTopLevel(this);
+        TopLevel? topLevel = TopLevel.GetTopLevel(this);
 
         var storageFolder = await topLevel!.StorageProvider.OpenFolderPickerAsync(
                 new FolderPickerOpenOptions()
