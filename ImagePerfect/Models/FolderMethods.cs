@@ -23,5 +23,10 @@ namespace ImagePerfect.Models
         {
             return await _unitOfWork.Folder.GetRootFolder();
         }
+
+        public async Task<List<Folder>> NextFolder(string directoryPath)
+        {
+            return await _unitOfWork.Folder.GetFoldersInDirectory(directoryPath);
+        }
     }
 }

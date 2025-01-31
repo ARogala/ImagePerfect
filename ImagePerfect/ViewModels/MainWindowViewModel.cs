@@ -51,10 +51,53 @@ namespace ImagePerfect.ViewModels
             LibraryFolders.Add(rootFolderVm);
         }
 
-        private void NextFolder(FolderViewModel currentFolder)
+        private async void NextFolder(FolderViewModel currentFolder)
         {
             Debug.WriteLine("Get next folder");
-            Debug.WriteLine(currentFolder.FolderPath);
+            Debug.WriteLine(currentFolder.FolderPath.Replace(@"\", @"\\\\") + @"\\\\[^\\\\]+\\\\?$");
+            List<Folder> folders;
+            bool hasChildren = currentFolder.HasChildren;
+            bool hasFiles = currentFolder.HasFiles;
+            //two boolean varibale 4 combos TF TT FT and FF
+            if (hasChildren == true && hasFiles == false) 
+            {
+                folders = await _folderMethods.NextFolder(currentFolder.FolderPath.Replace(@"\", @"\\\\") + @"\\\\[^\\\\]+\\\\?$");
+            }
+            else if (hasChildren == true && hasFiles == true)
+            {
+                folders = await _folderMethods.NextFolder(currentFolder.FolderPath.Replace(@"\", @"\\\\") + @"\\\\[^\\\\]+\\\\?$");
+                //also get images
+            }
+            else if(hasChildren == false && hasFiles == true)
+            {
+                //get images
+                return;
+            }
+            else
+            {
+                return;
+            }
+     
+            Debug.WriteLine(folders.Count);
+            LibraryFolders.Clear();
+            foreach (Folder folder in folders) 
+            {
+                FolderViewModel folderViewModel = new()
+                {
+                    FolderId = folder.FolderId,
+                    FolderName = folder.FolderName,
+                    FolderPath = folder.FolderPath,
+                    HasChildren = folder.HasChildren,
+                    CoverImagePath = folder.CoverImagePath == "" ? ImageHelper.LoadFromResource(new Uri("avares://ImagePerfect/Assets/icons8-folder-600.png")) : ImageHelper.LoadFromFileSystem(folder.CoverImagePath),
+                    FolderDescription = folder.FolderDescription,
+                    FolderTags = folder.FolderTags,
+                    FolderRating = folder.FolderRating,
+                    HasFiles = folder.HasFiles,
+                    IsRoot = folder.IsRoot,
+                    FolderContentMetaDataScanned = folder.FolderContentMetaDataScanned,
+                };
+                LibraryFolders.Add(folderViewModel);
+            }
         }
         private async void GetAllFolders()
         {

@@ -3,6 +3,7 @@ using ImagePerfect.Models;
 using ImagePerfect.Repository.IRepository;
 using System.Threading.Tasks;
 using Dapper;
+using System.Collections.Generic;
 
 namespace ImagePerfect.Repository
 {
@@ -37,6 +38,13 @@ namespace ImagePerfect.Repository
             rowsEffected = await bulkLoader.LoadAsync();
             await _connection.CloseAsync();
             return rowsEffected > 0 ? true : false;
+        }
+
+        public async Task<List<Folder>> GetFoldersInDirectory(string directoryPath)
+        {
+            string sql = @"SELECT * FROM folders WHERE REGEXP_LIKE(FolderPath, '" + directoryPath + "');";
+            List<Folder> folders = (List<Folder>)await _connection.QueryAsync<Folder>(sql);
+            return folders;
         }
     }
 }
