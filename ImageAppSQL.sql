@@ -71,3 +71,23 @@ IGNORE 1 LINES;
 DELETE FROM folders;
 
 ALTER TABLE folders AUTO_INCREMENT = 1;
+/*https://stackoverflow.com/questions/32155447/mysql-regexp-matching-only-subdirectories-of-given-directory  
+	No clue how the hell that works but it produces the needed result (gets all folders in SamplePictures but no sub directories)
+*/
+SELECT * FROM folders WHERE REGEXP_LIKE(FolderPath, 'C:\\\\Users\\\\arogala\\\\Documents\\\\CSharp\\\\SamplePictures\\\\[^\\\\]+\\\\?$');
+
+
+
+SELECT * FROM folders WHERE MATCH (`FolderName`,`FolderPath`,`FolderDescription`,`FolderTags`) AGAINST ('C:\\\\Users\\\\arogala\\\\Documents\\\\CSharp\\\\SamplePictures\\\\' IN BOOLEAN MODE);
+
+SELECT * FROM folders WHERE FolderPath LIKE 'C:\\\\Users\\\\arogala\\\\Documents\\\\CSharp\\\\SamplePictures\\\\space%';
+
+SELECT * FROM folders WHERE FolderPath LIKE 'C:\\\\Users\\\\arogala\\\\Documents\\\\CSharp\\\\SamplePictures\\\\%';
+
+SELECT * FROM folders WHERE REGEXP_LIKE(FolderPath, 'C:\\\\Users\\\\arogala\\\\Documents\\\\CSharp\\\\SamplePictures\\\\[a-z]\\\\*');
+
+SELECT * FROM folders WHERE REGEXP_LIKE(FolderPath, 'C:\\\\Users\\\\arogala\\\\Documents\\\\CSharp\\\\SamplePictures\\\\');
+
+SELECT * FROM folders WHERE REGEXP_LIKE(FolderPath, 'C:\\\\Users\\\\arogala\\\\Documents\\\\CSharp\\\\SamplePictures\\\\[^\\\\]+\\\\?$');
+
+SELECT * FROM folders WHERE REGEXP_LIKE(FolderPath, 'C:\\\\Users\\\\arogala\\\\Documents\\\\CSharp\\\\SamplePictures\\\\space');

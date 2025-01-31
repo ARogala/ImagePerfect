@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Reactive;
 
 namespace ImagePerfect.ViewModels
 {
@@ -13,27 +14,27 @@ namespace ImagePerfect.ViewModels
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly FolderMethods _folderMethods;
-        private FolderViewModel _rootFolder;
+
         public MainWindowViewModel() { }
         public MainWindowViewModel(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
             _folderMethods = new FolderMethods(_unitOfWork);
+
+            NextFolderCommand = ReactiveCommand.Create((FolderViewModel currentFolder) => {
+                NextFolder(currentFolder);
+            });
             GetRootFolder();
         }
         public PickRootFolderViewModel PickRootFolder { get => new PickRootFolderViewModel(_unitOfWork); }
 
-        public FolderViewModel RootFolder 
-        {
-            get => _rootFolder;
-            set => this.RaiseAndSetIfChanged(ref _rootFolder, value);   
-        }
         public ObservableCollection<FolderViewModel> LibraryFolders { get; } = new ObservableCollection<FolderViewModel>();
 
+        public ReactiveCommand<FolderViewModel, Unit> NextFolderCommand { get; }
         private async void GetRootFolder()
         {
             Folder rootFolder = await _folderMethods.GetRootFolder();
-            RootFolder = new() 
+            FolderViewModel rootFolderVm = new() 
             {
                 FolderId = rootFolder.FolderId,
                 FolderName = rootFolder.FolderName,
@@ -47,9 +48,13 @@ namespace ImagePerfect.ViewModels
                 IsRoot = rootFolder.IsRoot,
                 FolderContentMetaDataScanned = rootFolder.FolderContentMetaDataScanned,
             };
+            LibraryFolders.Add(rootFolderVm);
+        }
 
-            Debug.WriteLine(RootFolder.CoverImagePath);
-       
+        private void NextFolder(FolderViewModel currentFolder)
+        {
+            Debug.WriteLine("Get next folder");
+            Debug.WriteLine(currentFolder.FolderPath);
         }
         private async void GetAllFolders()
         {

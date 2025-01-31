@@ -14,8 +14,34 @@
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-	<Grid ColumnDefinitions="*" RowDefinitions="Auto,*">
+	<Grid ColumnDefinitions="*" RowDefinitions="Auto,*" x:Name="Root">
 		<v:PickRootFolderView Margin="10" DataContext="{Binding PickRootFolder}" Grid.Row="0"/>
+
+		<ScrollViewer Grid.Row="1" >
+			<ItemsControl ItemsSource="{Binding LibraryFolders}">
+				<ItemsControl.ItemTemplate>
+					<DataTemplate DataType="vm:FolderViewModel">
+						<StackPanel>
+							<TextBlock MaxWidth="600" Text="{Binding FolderName}"/>
+							<Image MaxWidth="600" Source="{Binding CoverImagePath}" />
+							<TextBlock MaxWidth="600" Text="{Binding FolderDescription}"/>
+							<TextBlock MaxWidth="600" Text="{Binding FolderTags}"/>
+							<Grid RowDefinitions="Auto" ColumnDefinitions="*,*" MaxWidth="600">
+								<Button Grid.Row="0" Grid.Column="0" HorizontalAlignment="Right" IsVisible="{Binding !IsRoot}">Back</Button>
+								<Button Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" 
+										Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).NextFolderCommand}"
+										CommandParameter="{Binding}">
+									Next
+								</Button>
+							</Grid>
+						</StackPanel>
+					</DataTemplate>
+				</ItemsControl.ItemTemplate>
+			</ItemsControl>
+			
+		</ScrollViewer>
+
+		<!--
 		<StackPanel Grid.Row="1">
 			<TextBlock MaxWidth="600" Text="{Binding RootFolder.FolderName}"/>
 			<Image MaxWidth="600" Source="{Binding RootFolder.CoverImagePath}" />
@@ -26,5 +52,6 @@
 				<Button Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left">Next</Button>
 			</Grid>
 		</StackPanel>
+		-->
 	</Grid>
 </Window>
