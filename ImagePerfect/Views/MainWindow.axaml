@@ -39,7 +39,7 @@
 									Next
 								</Button>
 							</Grid>
-							<Button HorizontalAlignment="Center" IsVisible="{Binding HasFiles}">Add Images To Database</Button>
+							<Button HorizontalAlignment="Center" IsVisible="{Binding HasFiles}">Import Images</Button>
 						</StackPanel>
 					</DataTemplate>
 				</ItemsControl.ItemTemplate>
