@@ -21,11 +21,9 @@ namespace ImagePerfect.Models
             _unitOfWork = unitOfWork;
         }
 
-        public static async Task<bool> BuildImageCsv(string imageFolderPath)
+        public static async Task<bool> BuildImageCsv(string imageFolderPath, int imageFolderId)
         {
-            imageFolderPath = imageFolderPath.Replace(@"file:///", "");
-            imageFolderPath = imageFolderPath.Remove(imageFolderPath.Length - 1);
-            imageFolderPath = imageFolderPath.Replace(@"/", @"\");
+            
             Debug.WriteLine(imageFolderPath);
             string imageCsvPath = GetCsvPath("images.csv");
 
@@ -45,11 +43,37 @@ namespace ImagePerfect.Models
 
             DirectoryInfo imageFolderInfo = new DirectoryInfo(imageFolderPath);
             IEnumerable<string> imageFolderFiles = Directory.EnumerateFiles(imageFolderPath).Where(s => s.ToLower().EndsWith(".jpeg") || s.ToLower().EndsWith(".jpg") || s.ToLower().EndsWith(".png") || s.ToLower().EndsWith(".gif"));
-            foreach (string image in imageFolderFiles)
+            List<ImageCsv> images = new List<ImageCsv>();
+            foreach (string imagePath in imageFolderFiles)
             {
-                Debug.WriteLine(image);
+                images.Add(
+                    new ImageCsv 
+                    { 
+                        ImageId = 0,
+                        ImagePath = imagePath.Replace(@"\",@"\\"),
+                        ImageTags = null,
+                        ImageRating = 0,
+                        ImageFolderPath = imageFolderPath.Replace(@"\", @"\\"),
+                        ImageMetaDataScanned = 0,
+                        FolderId = imageFolderId,
+                    }    
+                );
+                Debug.WriteLine(imagePath);
             }
-            return true;
+            bool hasImages = images.Any();
+            if (hasImages) 
+            { 
+                using(StreamWriter writer = new StreamWriter(imageCsvPath))
+                using(CsvWriter csv = new CsvWriter(writer, CultureInfo.InvariantCulture)) 
+                { 
+                    await csv.WriteRecordsAsync(images); 
+                }
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
         private static string GetCsvPath(string fileName)
         {

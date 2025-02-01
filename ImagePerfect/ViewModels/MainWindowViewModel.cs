@@ -14,15 +14,21 @@ namespace ImagePerfect.ViewModels
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly FolderMethods _folderMethods;
+        private readonly ImageCsvMethods _imageCsvMethods;
 
         public MainWindowViewModel() { }
         public MainWindowViewModel(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
             _folderMethods = new FolderMethods(_unitOfWork);
+            _imageCsvMethods = new ImageCsvMethods(_unitOfWork);    
 
             NextFolderCommand = ReactiveCommand.Create((FolderViewModel currentFolder) => {
                 NextFolder(currentFolder);
+            });
+            ImportImagesCommand = ReactiveCommand.Create((FolderViewModel imageFolder) => {
+           
+                ImportImages(imageFolder.FolderPath, imageFolder.FolderId);
             });
             GetRootFolder();
         }
@@ -31,6 +37,8 @@ namespace ImagePerfect.ViewModels
         public ObservableCollection<FolderViewModel> LibraryFolders { get; } = new ObservableCollection<FolderViewModel>();
 
         public ReactiveCommand<FolderViewModel, Unit> NextFolderCommand { get; }
+
+        public ReactiveCommand<FolderViewModel, Unit> ImportImagesCommand { get; }
         private async void GetRootFolder()
         {
             Folder rootFolder = await _folderMethods.GetRootFolder();
@@ -51,6 +59,10 @@ namespace ImagePerfect.ViewModels
             LibraryFolders.Add(rootFolderVm);
         }
 
+        private async void ImportImages(string imageFolderPath, int imageFolderId)
+        {
+            await ImageCsvMethods.BuildImageCsv(imageFolderPath, imageFolderId);
+        }
         private async void NextFolder(FolderViewModel currentFolder)
         {
             Debug.WriteLine("Get next folder");
