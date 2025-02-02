@@ -61,12 +61,17 @@ namespace ImagePerfect.ViewModels
 
         private async void ImportImages(string imageFolderPath, int imageFolderId)
         {
-            await ImageCsvMethods.BuildImageCsv(imageFolderPath, imageFolderId);
+            //build csv
+            bool csvIsSet = await ImageCsvMethods.BuildImageCsv(imageFolderPath, imageFolderId);
+            //write csv to database
+            if (csvIsSet) 
+            {
+                await _imageCsvMethods.AddImageCsv();
+            }
+            //need a way to notify UI processing and finished etc..
         }
         private async void NextFolder(FolderViewModel currentFolder)
         {
-            Debug.WriteLine("Get next folder");
-            Debug.WriteLine(currentFolder.FolderPath.Replace(@"\", @"\\\\") + @"\\\\[^\\\\]+\\\\?$");
             List<Folder> folders;
             bool hasChildren = currentFolder.HasChildren;
             bool hasFiles = currentFolder.HasFiles;
@@ -89,8 +94,6 @@ namespace ImagePerfect.ViewModels
             {
                 return;
             }
-     
-            Debug.WriteLine(folders.Count);
             LibraryFolders.Clear();
             foreach (Folder folder in folders) 
             {

@@ -9,5 +9,6 @@ namespace ImagePerfect.Repository.IRepository
     public interface IUnitOfWork
     {
         IFolderRepository Folder { get; }
+        IImageRepository Image { get; }
     }
 }

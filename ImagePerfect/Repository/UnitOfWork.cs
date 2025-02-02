@@ -11,11 +11,12 @@ namespace ImagePerfect.Repository
         private readonly MySqlConnection _connection;
 
         public IFolderRepository Folder { get; private set; }
+        public IImageRepository Image { get; private set; }
         public UnitOfWork(MySqlConnection db)
         {
             _connection = db;
             Folder = new FolderRepository(_connection);
-
+            Image = new ImageRepository(_connection);
         }
     }
 }

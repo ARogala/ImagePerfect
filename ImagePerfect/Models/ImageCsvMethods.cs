@@ -21,10 +21,13 @@ namespace ImagePerfect.Models
             _unitOfWork = unitOfWork;
         }
 
+        public async Task<bool> AddImageCsv()
+        {
+            string filePath = GetCsvPath("images.csv");
+            return await _unitOfWork.Image.AddImageCsv(filePath);
+        }
         public static async Task<bool> BuildImageCsv(string imageFolderPath, int imageFolderId)
         {
-            
-            Debug.WriteLine(imageFolderPath);
             string imageCsvPath = GetCsvPath("images.csv");
 
             //1st empty the csv
@@ -58,7 +61,6 @@ namespace ImagePerfect.Models
                         FolderId = imageFolderId,
                     }    
                 );
-                Debug.WriteLine(imagePath);
             }
             bool hasImages = images.Any();
             if (hasImages) 
