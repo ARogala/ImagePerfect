@@ -15,13 +15,15 @@ namespace ImagePerfect.ViewModels
         private readonly IUnitOfWork _unitOfWork;
         private readonly FolderMethods _folderMethods;
         private readonly ImageCsvMethods _imageCsvMethods;
+        private readonly ImageMethods _imageMethods;
 
         public MainWindowViewModel() { }
         public MainWindowViewModel(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
             _folderMethods = new FolderMethods(_unitOfWork);
-            _imageCsvMethods = new ImageCsvMethods(_unitOfWork);    
+            _imageCsvMethods = new ImageCsvMethods(_unitOfWork);   
+            _imageMethods = new ImageMethods(_unitOfWork);
 
             NextFolderCommand = ReactiveCommand.Create((FolderViewModel currentFolder) => {
                 NextFolder(currentFolder);
@@ -35,6 +37,8 @@ namespace ImagePerfect.ViewModels
         public PickRootFolderViewModel PickRootFolder { get => new PickRootFolderViewModel(_unitOfWork); }
 
         public ObservableCollection<FolderViewModel> LibraryFolders { get; } = new ObservableCollection<FolderViewModel>();
+
+        public ObservableCollection<ImageViewModel> Images { get; } = new ObservableCollection<ImageViewModel>();
 
         public ReactiveCommand<FolderViewModel, Unit> NextFolderCommand { get; }
 
@@ -72,7 +76,8 @@ namespace ImagePerfect.ViewModels
         }
         private async void NextFolder(FolderViewModel currentFolder)
         {
-            List<Folder> folders;
+            List<Folder> folders = new List<Folder>();
+            List<Image> images = new List<Image>();
             bool hasChildren = currentFolder.HasChildren;
             bool hasFiles = currentFolder.HasFiles;
             //two boolean varibale 4 combos TF TT FT and FF
@@ -82,19 +87,22 @@ namespace ImagePerfect.ViewModels
             }
             else if (hasChildren == true && hasFiles == true)
             {
+                //get folders and images
                 folders = await _folderMethods.NextFolder(currentFolder.FolderPath.Replace(@"\", @"\\\\") + @"\\\\[^\\\\]+\\\\?$");
-                //also get images
+                images = await _imageMethods.GetAllImagesInFolder(currentFolder.FolderId);
+                
             }
             else if(hasChildren == false && hasFiles == true)
             {
                 //get images
-                return;
+                images = await _imageMethods.GetAllImagesInFolder(currentFolder.FolderId);
             }
             else
             {
                 return;
             }
             LibraryFolders.Clear();
+            Images.Clear();
             foreach (Folder folder in folders) 
             {
                 FolderViewModel folderViewModel = new()
@@ -112,6 +120,20 @@ namespace ImagePerfect.ViewModels
                     FolderContentMetaDataScanned = folder.FolderContentMetaDataScanned,
                 };
                 LibraryFolders.Add(folderViewModel);
+            }
+            foreach(Image image in images)
+            {
+                ImageViewModel imageViewModel = new() 
+                { 
+                    ImageId = image.ImageId,
+                    ImagePath = ImageHelper.LoadFromFileSystem(image.ImagePath),
+                    ImageTags = image.ImageTags,
+                    ImageRating = image.ImageRating,
+                    ImageFolderPath = image.ImageFolderPath,
+                    ImageMetaDataScanned = image.ImageMetaDataScanned,
+                    FolderId = image.FolderId,
+                };
+                Images.Add(imageViewModel);
             }
         }
         private async void GetAllFolders()
