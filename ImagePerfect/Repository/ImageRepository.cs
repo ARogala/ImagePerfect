@@ -1,4 +1,5 @@
-﻿using ImagePerfect.Models;
+﻿using Dapper;
+using ImagePerfect.Models;
 using ImagePerfect.Repository.IRepository;
 using MySqlConnector;
 using System;
@@ -16,6 +17,12 @@ namespace ImagePerfect.Repository
         public ImageRepository(MySqlConnection db) : base(db) 
         { 
             _connection = db;
+        }
+        //any Image model specific database methods here
+        public async Task<List<Image>> GetAllImagesInFolder(int folderId)
+        {
+            string sql = @"SELECT * FROM images WHERE FolderId = @folderId";
+            return (List<Image>)await _connection.QueryAsync<Image>(sql, new { folderId });
         }
 
         public async Task<bool> AddImageCsv(string filePath)

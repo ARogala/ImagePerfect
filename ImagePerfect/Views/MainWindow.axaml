@@ -17,37 +17,55 @@
 	<Grid ColumnDefinitions="*" RowDefinitions="Auto,*" x:Name="Root">
 		<v:PickRootFolderView Margin="10" DataContext="{Binding PickRootFolder}" Grid.Row="0"/>
 
-		<ScrollViewer Grid.Row="1">	
-			<ItemsControl ItemsSource="{Binding LibraryFolders}">
-				<ItemsControl.ItemsPanel>
-					<ItemsPanelTemplate>
-						<WrapPanel HorizontalAlignment="Center" />
-					</ItemsPanelTemplate>
-				</ItemsControl.ItemsPanel>
-				<ItemsControl.ItemTemplate>
-					<DataTemplate DataType="vm:FolderViewModel">
-						<StackPanel Margin="10">
-							<TextBlock MaxWidth="600" Text="{Binding FolderName}"/>
-							<Image MaxWidth="600" Source="{Binding CoverImagePath}" />
-							<TextBlock MaxWidth="600" Text="{Binding FolderDescription}"/>
-							<TextBlock MaxWidth="600" Text="{Binding FolderTags}"/>
-							<Grid RowDefinitions="Auto" ColumnDefinitions="*,*" MaxWidth="600">
-								<Button Grid.Row="0" Grid.Column="0" HorizontalAlignment="Right" IsVisible="{Binding !IsRoot}">Back</Button>
-								<Button Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left"
-										Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).NextFolderCommand}"
+		<ScrollViewer Grid.Row="1">
+			<StackPanel>
+				<ItemsControl ItemsSource="{Binding LibraryFolders}">
+					<ItemsControl.ItemsPanel>
+						<ItemsPanelTemplate>
+							<WrapPanel HorizontalAlignment="Center" />
+						</ItemsPanelTemplate>
+					</ItemsControl.ItemsPanel>
+					<ItemsControl.ItemTemplate>
+						<DataTemplate DataType="vm:FolderViewModel">
+							<StackPanel Margin="10">
+								<TextBlock MaxWidth="600" Text="{Binding FolderName}"/>
+								<Image MaxWidth="600" Source="{Binding CoverImagePath}" />
+								<TextBlock MaxWidth="600" Text="{Binding FolderDescription}"/>
+								<TextBlock MaxWidth="600" Text="{Binding FolderTags}"/>
+								<Grid RowDefinitions="Auto" ColumnDefinitions="*,*" MaxWidth="600">
+									<Button Grid.Row="0" Grid.Column="0" HorizontalAlignment="Right" IsVisible="{Binding !IsRoot}">Back</Button>
+									<Button Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left"
+											Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).NextFolderCommand}"
+											CommandParameter="{Binding}">
+										Next
+									</Button>
+								</Grid>
+								<Button HorizontalAlignment="Center" IsVisible="{Binding HasFiles}"
+										Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).ImportImagesCommand}"
 										CommandParameter="{Binding}">
-									Next
+									Import Images
 								</Button>
-							</Grid>
-							<Button HorizontalAlignment="Center" IsVisible="{Binding HasFiles}"
-									Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).ImportImagesCommand}"
-									CommandParameter="{Binding}">
-								Import Images
-							</Button>
-						</StackPanel>
-					</DataTemplate>
-				</ItemsControl.ItemTemplate>
-			</ItemsControl>
+							</StackPanel>
+						</DataTemplate>
+					</ItemsControl.ItemTemplate>
+				</ItemsControl>
+				<ItemsControl ItemsSource="{Binding Images}">
+					<ItemsControl.ItemsPanel>
+						<ItemsPanelTemplate>
+							<WrapPanel HorizontalAlignment="Center" />
+						</ItemsPanelTemplate>
+					</ItemsControl.ItemsPanel>
+					<ItemsControl.ItemTemplate>
+						<DataTemplate DataType="vm:ImageViewModel">
+							<StackPanel Margin="10">
+								<Image MaxWidth="600" Source="{Binding ImagePath}" />
+								<TextBlock MaxWidth="600" Text="{Binding ImageTags}"/>
+								<TextBlock MaxWidth="600" Text="{Binding ImageRating}"/>
+							</StackPanel>
+						</DataTemplate>
+					</ItemsControl.ItemTemplate>
+				</ItemsControl>
+			</StackPanel>
 		</ScrollViewer>
 	</Grid>
 </Window>
