@@ -1,4 +1,5 @@
-﻿using ImagePerfect.Helpers;
+﻿using Avalonia.Media.Imaging;
+using ImagePerfect.Helpers;
 using ImagePerfect.Models;
 using ImagePerfect.Repository.IRepository;
 using ReactiveUI;
@@ -6,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
 using System.Reactive;
 
 namespace ImagePerfect.ViewModels
@@ -111,7 +113,7 @@ namespace ImagePerfect.ViewModels
                     FolderName = folder.FolderName,
                     FolderPath = folder.FolderPath,
                     HasChildren = folder.HasChildren,
-                    CoverImagePath = folder.CoverImagePath == "" ? ImageHelper.LoadFromResource(new Uri("avares://ImagePerfect/Assets/icons8-folder-600.png")) : ImageHelper.LoadFromFileSystem(folder.CoverImagePath),
+                    CoverImagePath = folder.CoverImagePath == "" ? ImageHelper.LoadFromResource(new Uri("avares://ImagePerfect/Assets/icons8-folder-600.png")) : await ImageHelper.FormatImage(folder.CoverImagePath),
                     FolderDescription = folder.FolderDescription,
                     FolderTags = folder.FolderTags,
                     FolderRating = folder.FolderRating,
@@ -123,10 +125,11 @@ namespace ImagePerfect.ViewModels
             }
             foreach(Image image in images)
             {
+                //Bitmap imgBitmap = await ImageHelper.FormatImage(image.ImagePath);
                 ImageViewModel imageViewModel = new() 
                 { 
                     ImageId = image.ImageId,
-                    ImagePath = ImageHelper.LoadFromFileSystem(image.ImagePath),
+                    ImagePath = await ImageHelper.FormatImage(image.ImagePath),
                     ImageTags = image.ImageTags,
                     ImageRating = image.ImageRating,
                     ImageFolderPath = image.ImageFolderPath,

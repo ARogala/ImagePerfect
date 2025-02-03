@@ -1,7 +1,11 @@
 ﻿using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
+using SkiaSharp;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -36,6 +40,24 @@ namespace ImagePerfect.Helpers
             {
                 Console.WriteLine($"An error occurred while downloading image '{url}' : {ex.Message}");
                 return null;
+            }
+        }
+
+        //need to rotate portrait images and resize for screen
+        public static async Task<Bitmap> FormatImage(string path)
+        {
+            using(MemoryStream ms = new MemoryStream())
+            using (var image = await Image.LoadAsync(path))
+            {
+                image.Mutate(x => { 
+                    x.AutoOrient();
+                    x.Resize(600, 0);
+                });
+                await image.SaveAsBmpAsync(ms);
+                //set stream to begining after writing
+                ms.Seek(0, SeekOrigin.Begin);
+                Bitmap img = new Bitmap(ms);
+                return img;
             }
         }
     }
