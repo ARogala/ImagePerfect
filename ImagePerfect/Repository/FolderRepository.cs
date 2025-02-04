@@ -16,10 +16,10 @@ namespace ImagePerfect.Repository
             _connection = db;
         }
         //any Folder model specific database methods here
-        public async Task<Folder> GetRootFolder()
+        public async Task<Folder?> GetRootFolder()
         {
             string sql = @"SELECT * FROM folders WHERE IsRoot = True";
-            return await _connection.QuerySingleAsync<Folder>(sql);
+            return await _connection.QuerySingleOrDefaultAsync<Folder>(sql);
         }
         public async Task<bool> AddFolderCsv(string filePath)
         {

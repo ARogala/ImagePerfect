@@ -19,7 +19,7 @@ namespace ImagePerfect.Models
             return (List<Folder>)await _unitOfWork.Folder.GetAll();
         }
 
-        public async Task<Folder> GetRootFolder()
+        public async Task<Folder?> GetRootFolder()
         {
             return await _unitOfWork.Folder.GetRootFolder();
         }
