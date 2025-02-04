@@ -12,6 +12,7 @@ using ImagePerfect.Helpers;
 using Avalonia;
 using MsBox.Avalonia.Enums;
 using MsBox.Avalonia;
+using ImagePerfect.ObjectMappers;
 
 namespace ImagePerfect.ViewModels
 {
@@ -75,22 +76,7 @@ namespace ImagePerfect.ViewModels
                 rootFolder = await _folderMethods.GetRootFolder();
                 if (rootFolder != null)
                 {
-                    FolderViewModel rootFolderVm = new()
-                    {
-                        FolderId = rootFolder.FolderId,
-                        FolderName = rootFolder.FolderName,
-                        FolderPath = rootFolder.FolderPath,
-                        HasChildren = rootFolder.HasChildren,
-                        CoverImagePath = rootFolder.CoverImagePath == "" ? ImageHelper.LoadFromResource(new Uri("avares://ImagePerfect/Assets/icons8-folder-600.png")) : await ImageHelper.FormatImage(rootFolder.CoverImagePath),
-                        FolderDescription = rootFolder.FolderDescription,
-                        FolderTags = rootFolder.FolderTags,
-                        FolderRating = rootFolder.FolderRating,
-                        HasFiles = rootFolder.HasFiles,
-                        IsRoot = rootFolder.IsRoot,
-                        FolderContentMetaDataScanned = rootFolder.FolderContentMetaDataScanned,
-                        AreImagesImported = rootFolder.AreImagesImported,
-                        ShowImportImagesButton = rootFolder.HasFiles == true && rootFolder.AreImagesImported == false ? true : false,
-                    };
+                    FolderViewModel rootFolderVm = await FolderMapper.GetFolderVm(rootFolder);
                     _libraryFolders.Add(rootFolderVm);
                 }
             }
