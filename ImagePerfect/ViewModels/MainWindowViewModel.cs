@@ -2,6 +2,8 @@
 using ImagePerfect.Helpers;
 using ImagePerfect.Models;
 using ImagePerfect.Repository.IRepository;
+using MsBox.Avalonia.Enums;
+using MsBox.Avalonia;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
@@ -34,6 +36,9 @@ namespace ImagePerfect.ViewModels
            
                 ImportImages(imageFolder.FolderPath, imageFolder.FolderId);
             });
+            DeleteLibraryCommand = ReactiveCommand.Create(() => {
+                DeleteLibrary();
+            });
             GetRootFolder();
         }
         public PickRootFolderViewModel PickRootFolder { get => new PickRootFolderViewModel(_unitOfWork, LibraryFolders); }
@@ -45,6 +50,8 @@ namespace ImagePerfect.ViewModels
         public ReactiveCommand<FolderViewModel, Unit> NextFolderCommand { get; }
 
         public ReactiveCommand<FolderViewModel, Unit> ImportImagesCommand { get; }
+
+        public ReactiveCommand<Unit, Unit> DeleteLibraryCommand { get; }
         private async void GetRootFolder()
         {
             Folder? rootFolder = await _folderMethods.GetRootFolder();
@@ -67,7 +74,6 @@ namespace ImagePerfect.ViewModels
                 LibraryFolders.Add(rootFolderVm);
             }
         }
-
         private async void ImportImages(string imageFolderPath, int imageFolderId)
         {
             //build csv
@@ -140,6 +146,20 @@ namespace ImagePerfect.ViewModels
                     FolderId = image.FolderId,
                 };
                 Images.Add(imageViewModel);
+            }
+        }
+        private async void DeleteLibrary()
+        {
+            var box = MessageBoxManager.GetMessageBoxStandard("Delete Library", "Are you sure you want to delete your library? The images on the file system will remain.", ButtonEnum.YesNo);
+            var result = await box.ShowAsync();
+
+            if (result == ButtonResult.Yes)
+            {
+                //remove all folder and image rows
+            }
+            else 
+            {
+                return;
             }
         }
         private async void GetAllFolders()
