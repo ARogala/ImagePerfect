@@ -39,5 +39,8 @@ namespace ImagePerfect.Models
 
         [Column("FolderContentMetaDataScanned")]
         public bool FolderContentMetaDataScanned { get; set; }
+
+        [Column("AreImagesImported")]
+        public bool AreImagesImported { get; set; }
     }
 }

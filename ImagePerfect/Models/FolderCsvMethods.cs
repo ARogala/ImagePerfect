@@ -69,7 +69,8 @@ namespace ImagePerfect.Models
                     FolderRating = 0,
                     HasFiles = rootFiles.Any() == true ? 1 : 0,
                     IsRoot = 1,
-                    FolderContentMetaDataScanned = 0
+                    FolderContentMetaDataScanned = 0,
+                    AreImagesImported = 0
 
                 }
             };
@@ -92,7 +93,8 @@ namespace ImagePerfect.Models
                         FolderRating = 0,
                         HasFiles = files.Any() == true ? 1 : 0,
                         IsRoot = 0,
-                        FolderContentMetaDataScanned = 0
+                        FolderContentMetaDataScanned = 0,
+                        AreImagesImported = 0
                     }
                 );
             }

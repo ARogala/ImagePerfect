@@ -88,6 +88,8 @@ namespace ImagePerfect.ViewModels
                         HasFiles = rootFolder.HasFiles,
                         IsRoot = rootFolder.IsRoot,
                         FolderContentMetaDataScanned = rootFolder.FolderContentMetaDataScanned,
+                        AreImagesImported = rootFolder.AreImagesImported,
+                        ShowImportImagesButton = rootFolder.HasFiles == true && rootFolder.AreImagesImported == false ? true : false,
                     };
                     _libraryFolders.Add(rootFolderVm);
                 }

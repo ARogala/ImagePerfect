@@ -21,10 +21,10 @@ namespace ImagePerfect.Models
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<bool> AddImageCsv()
+        public async Task<bool> AddImageCsv(int imageFolderId)
         {
             string filePath = GetCsvPath("images.csv");
-            return await _unitOfWork.Image.AddImageCsv(filePath);
+            return await _unitOfWork.Image.AddImageCsv(filePath, imageFolderId);
         }
         public static async Task<bool> BuildImageCsv(string imageFolderPath, int imageFolderId)
         {

@@ -23,6 +23,7 @@ CREATE TABLE `folders` (
   `HasFiles` Bool,
   `IsRoot` Bool,
   `FolderContentMetaDataScanned` Bool,
+  `AreImagesImported` Bool,
 	PRIMARY KEY (`FolderId`),
 	FULLTEXT KEY `fulltext` (`FolderName`,`FolderPath`, `FolderDescription`, `FolderTags`)
 );
