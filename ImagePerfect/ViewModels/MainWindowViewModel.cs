@@ -20,7 +20,7 @@ namespace ImagePerfect.ViewModels
         private readonly FolderMethods _folderMethods;
         private readonly ImageCsvMethods _imageCsvMethods;
         private readonly ImageMethods _imageMethods;
-       
+        private bool _showLoading;
         public MainWindowViewModel() { }
         public MainWindowViewModel(IUnitOfWork unitOfWork)
         {
@@ -28,6 +28,7 @@ namespace ImagePerfect.ViewModels
             _folderMethods = new FolderMethods(_unitOfWork);
             _imageCsvMethods = new ImageCsvMethods(_unitOfWork);   
             _imageMethods = new ImageMethods(_unitOfWork);
+            _showLoading = false;
 
             NextFolderCommand = ReactiveCommand.Create((FolderViewModel currentFolder) => {
                 NextFolder(currentFolder);
@@ -40,6 +41,11 @@ namespace ImagePerfect.ViewModels
                 DeleteLibrary();
             });
             GetRootFolder();
+        }
+        public bool ShowLoading
+        {
+            get => _showLoading;
+            set => this.RaiseAndSetIfChanged(ref _showLoading, value);
         }
         public PickRootFolderViewModel PickRootFolder { get => new PickRootFolderViewModel(_unitOfWork, LibraryFolders); }
 
@@ -76,14 +82,15 @@ namespace ImagePerfect.ViewModels
         }
         private async void ImportImages(string imageFolderPath, int imageFolderId)
         {
+            ShowLoading = true;
             //build csv
             bool csvIsSet = await ImageCsvMethods.BuildImageCsv(imageFolderPath, imageFolderId);
             //write csv to database
             if (csvIsSet) 
             {
                 await _imageCsvMethods.AddImageCsv();
+                ShowLoading = false;
             }
-            //need a way to notify UI processing and finished etc..
         }
         private async void NextFolder(FolderViewModel currentFolder)
         {
@@ -160,6 +167,7 @@ namespace ImagePerfect.ViewModels
                 if (success) 
                 { 
                     LibraryFolders.Clear();
+                    Images.Clear();
                 }
             }
             else 
