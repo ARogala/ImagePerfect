@@ -155,7 +155,12 @@ namespace ImagePerfect.ViewModels
 
             if (result == ButtonResult.Yes)
             {
-                //remove all folder and image rows
+                //remove all folders -- this will drop images as well. 
+                bool success = await _folderMethods.DeleteAllFolders();
+                if (success) 
+                { 
+                    LibraryFolders.Clear();
+                }
             }
             else 
             {

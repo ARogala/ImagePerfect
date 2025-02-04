@@ -28,5 +28,10 @@ namespace ImagePerfect.Models
         {
             return await _unitOfWork.Folder.GetFoldersInDirectory(directoryPath);
         }
+
+        public async Task<bool> DeleteAllFolders()
+        {
+            return await _unitOfWork.Folder.DeleteAll();
+        }
     }
 }
