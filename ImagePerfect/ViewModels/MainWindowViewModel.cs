@@ -18,7 +18,7 @@ namespace ImagePerfect.ViewModels
         private readonly FolderMethods _folderMethods;
         private readonly ImageCsvMethods _imageCsvMethods;
         private readonly ImageMethods _imageMethods;
-
+       
         public MainWindowViewModel() { }
         public MainWindowViewModel(IUnitOfWork unitOfWork)
         {
@@ -36,7 +36,7 @@ namespace ImagePerfect.ViewModels
             });
             GetRootFolder();
         }
-        public PickRootFolderViewModel PickRootFolder { get => new PickRootFolderViewModel(_unitOfWork); }
+        public PickRootFolderViewModel PickRootFolder { get => new PickRootFolderViewModel(_unitOfWork, LibraryFolders); }
 
         public ObservableCollection<FolderViewModel> LibraryFolders { get; } = new ObservableCollection<FolderViewModel>();
 
@@ -47,22 +47,25 @@ namespace ImagePerfect.ViewModels
         public ReactiveCommand<FolderViewModel, Unit> ImportImagesCommand { get; }
         private async void GetRootFolder()
         {
-            Folder rootFolder = await _folderMethods.GetRootFolder();
-            FolderViewModel rootFolderVm = new() 
+            Folder? rootFolder = await _folderMethods.GetRootFolder();
+            if (rootFolder != null) 
             {
-                FolderId = rootFolder.FolderId,
-                FolderName = rootFolder.FolderName,
-                FolderPath = rootFolder.FolderPath,
-                HasChildren = rootFolder.HasChildren,
-                CoverImagePath = rootFolder.CoverImagePath == "" ? ImageHelper.LoadFromResource(new Uri("avares://ImagePerfect/Assets/icons8-folder-600.png")) : ImageHelper.LoadFromFileSystem(rootFolder.CoverImagePath),
-                FolderDescription = rootFolder.FolderDescription,
-                FolderTags = rootFolder.FolderTags,
-                FolderRating = rootFolder.FolderRating,
-                HasFiles = rootFolder.HasFiles,
-                IsRoot = rootFolder.IsRoot,
-                FolderContentMetaDataScanned = rootFolder.FolderContentMetaDataScanned,
-            };
-            LibraryFolders.Add(rootFolderVm);
+                FolderViewModel rootFolderVm = new()
+                {
+                    FolderId = rootFolder.FolderId,
+                    FolderName = rootFolder.FolderName,
+                    FolderPath = rootFolder.FolderPath,
+                    HasChildren = rootFolder.HasChildren,
+                    CoverImagePath = rootFolder.CoverImagePath == "" ? ImageHelper.LoadFromResource(new Uri("avares://ImagePerfect/Assets/icons8-folder-600.png")) : await ImageHelper.FormatImage(rootFolder.CoverImagePath),
+                    FolderDescription = rootFolder.FolderDescription,
+                    FolderTags = rootFolder.FolderTags,
+                    FolderRating = rootFolder.FolderRating,
+                    HasFiles = rootFolder.HasFiles,
+                    IsRoot = rootFolder.IsRoot,
+                    FolderContentMetaDataScanned = rootFolder.FolderContentMetaDataScanned,
+                };
+                LibraryFolders.Add(rootFolderVm);
+            }
         }
 
         private async void ImportImages(string imageFolderPath, int imageFolderId)
@@ -150,7 +153,7 @@ namespace ImagePerfect.ViewModels
                     FolderName = folder.FolderName,
                     FolderPath = folder.FolderPath,
                     HasChildren = folder.HasChildren,
-                    CoverImagePath = folder.CoverImagePath == "" ? ImageHelper.LoadFromResource(new Uri("avares://ImagePerfect/Assets/icons8-folder-600.png")) : ImageHelper.LoadFromFileSystem(folder.CoverImagePath),
+                    CoverImagePath = folder.CoverImagePath == "" ? ImageHelper.LoadFromResource(new Uri("avares://ImagePerfect/Assets/icons8-folder-600.png")) : await ImageHelper.FormatImage(folder.CoverImagePath),
                     FolderDescription = folder.FolderDescription,
                     FolderTags = folder.FolderTags,
                     FolderRating = folder.FolderRating,
