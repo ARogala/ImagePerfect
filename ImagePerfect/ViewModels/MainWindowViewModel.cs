@@ -11,6 +11,8 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Reactive;
 using ImagePerfect.ObjectMappers;
+using System.Linq;
+using DynamicData;
 
 namespace ImagePerfect.ViewModels
 {
@@ -32,6 +34,9 @@ namespace ImagePerfect.ViewModels
 
             NextFolderCommand = ReactiveCommand.Create((FolderViewModel currentFolder) => {
                 NextFolder(currentFolder);
+            });
+            BackFolderCommand = ReactiveCommand.Create((FolderViewModel currentFolder) => {
+                BackFolder(currentFolder); 
             });
             ImportImagesCommand = ReactiveCommand.Create((FolderViewModel imageFolder) => {
            
@@ -55,6 +60,8 @@ namespace ImagePerfect.ViewModels
 
         public ReactiveCommand<FolderViewModel, Unit> NextFolderCommand { get; }
 
+        public ReactiveCommand<FolderViewModel,Unit> BackFolderCommand { get; }
+
         public ReactiveCommand<FolderViewModel, Unit> ImportImagesCommand { get; }
 
         public ReactiveCommand<Unit, Unit> DeleteLibraryCommand { get; }
@@ -77,6 +84,45 @@ namespace ImagePerfect.ViewModels
             {
                 await _imageCsvMethods.AddImageCsv(imageFolderId);
                 ShowLoading = false;
+            }
+        }
+        private async void BackFolder(FolderViewModel currentFolder)
+        {
+            /*
+                tough to see but basically you need to remove two folders to build the regexp string
+                example if you are in /pictures/hiking/bearmountian and bearmountain folder has another folder saturday_2025_05_25
+                you will be clicking on the back button of folder /pictures/hiking/bearmountian/saturday_2025_05_25 -- that wil be the FolderPath
+                but you want to go back to hiking so you must remove two folders to get /pictures/hiking/
+             */
+            List<Folder> folders = new List<Folder>();
+            Debug.WriteLine(currentFolder.FolderPath);
+            string[] strArray = currentFolder.FolderPath.Split(@"\");
+            Debug.WriteLine(strArray.Count());
+            string newPath = string.Empty;
+            for (int i = 0; i < strArray.Length - 2; i++ )
+            {
+                Debug.WriteLine(strArray[i]);
+                if (i < strArray.Length - 3)
+                {
+                    newPath = newPath + strArray[i] + @"\";
+                }
+                else
+                {
+                    newPath = newPath + strArray[i];
+                }
+                
+            }
+            Debug.WriteLine(newPath);
+            Debug.WriteLine(newPath.Replace(@"\", @"\\\\") + @"\\\\[^\\\\]+\\\\?$");
+            Debug.WriteLine(newPath);
+            folders = await _folderMethods.NextFolder(newPath.Replace(@"\", @"\\\\") + @"\\\\[^\\\\]+\\\\?$");
+            LibraryFolders.Clear();
+            Images.Clear();
+            //also have to check newPath for images and fetch them
+            foreach (Folder folder in folders)
+            {
+                FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(folder);
+                LibraryFolders.Add(folderViewModel);
             }
         }
         private async void NextFolder(FolderViewModel currentFolder)
