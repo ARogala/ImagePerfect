@@ -25,23 +25,37 @@ namespace ImagePerfect.Repository
             return (List<Image>)await _connection.QueryAsync<Image>(sql, new { folderId });
         }
 
-        public async Task<bool> AddImageCsv(string filePath)
+        public async Task<bool> AddImageCsv(string filePath, int folderId)
         {
-            int rowsEffected = 0;
-            var bulkLoader = new MySqlBulkLoader(_connection) 
+            int rowsEffectedA = 0;
+            int rowsEffectedB = 0;
+            await _connection.OpenAsync();
+            using (MySqlTransaction txn = await _connection.BeginTransactionAsync())
             {
-                FileName = filePath,
-                TableName = "images",
-                CharacterSet = "UTF8",
-                NumberOfLinesToSkip = 1,
-                FieldTerminator = ",",
-                FieldQuotationCharacter = '"',
-                FieldQuotationOptional = true,
-                Local = true,
-            };
-            rowsEffected = await bulkLoader.LoadAsync();
-            await _connection.CloseAsync();
-            return rowsEffected > 0 ? true : false;
+                MySqlBulkLoader bulkLoader = new MySqlBulkLoader(_connection)
+                {
+                    FileName = filePath,
+                    TableName = "images",
+                    CharacterSet = "UTF8",
+                    NumberOfLinesToSkip = 1,
+                    FieldTerminator = ",",
+                    FieldQuotationCharacter = '"',
+                    FieldQuotationOptional = true,
+                    Local = true,
+                };
+                rowsEffectedA = await bulkLoader.LoadAsync();
+                string sql = @"UPDATE folders SET AreImagesImported = true WHERE FolderId = @folderId";
+                rowsEffectedB = await _connection.ExecuteAsync(sql, new { folderId }, transaction: txn);
+                if (rowsEffectedA > 0 && rowsEffectedB > 0)
+                {
+                    await txn.CommitAsync();
+                    await _connection.CloseAsync();
+                    return true;
+                }
+                await txn.RollbackAsync();
+                await _connection.CloseAsync();
+                return false;
+            }
         }
     }
 }

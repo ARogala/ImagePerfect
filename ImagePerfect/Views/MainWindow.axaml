@@ -43,7 +43,7 @@
 										Next
 									</Button>
 								</Grid>
-								<Button HorizontalAlignment="Center" IsVisible="{Binding HasFiles}"
+								<Button HorizontalAlignment="Center" IsVisible="{Binding ShowImportImagesButton}"
 										Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).ImportImagesCommand}"
 										CommandParameter="{Binding}">
 									Import Images

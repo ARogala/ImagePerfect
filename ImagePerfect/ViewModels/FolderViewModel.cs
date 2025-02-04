@@ -16,6 +16,8 @@ namespace ImagePerfect.ViewModels
 		private bool _hasFiles;
 		private bool _isRoot;
 		private bool _folderContentMetaDataScanned;
+		private bool _areImagesImported;
+		private bool _showImportImagesButton;
 
 		public int FolderId 
 		{
@@ -72,6 +74,17 @@ namespace ImagePerfect.ViewModels
 		{
 			get => _folderContentMetaDataScanned;
 			set => this.RaiseAndSetIfChanged(ref _folderContentMetaDataScanned, value);
+		}
+
+		public bool AreImagesImported
+		{
+			get => _areImagesImported;
+			set => this.RaiseAndSetIfChanged(ref _areImagesImported, value);
+		}
+		public bool ShowImportImagesButton
+		{
+			get => _showImportImagesButton;
+			set => this.RaiseAndSetIfChanged(ref _showImportImagesButton, value);
 		}
 	}
 }

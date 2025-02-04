@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.IO;
 using System.Reactive;
 
 namespace ImagePerfect.ViewModels
@@ -76,6 +75,8 @@ namespace ImagePerfect.ViewModels
                     HasFiles = rootFolder.HasFiles,
                     IsRoot = rootFolder.IsRoot,
                     FolderContentMetaDataScanned = rootFolder.FolderContentMetaDataScanned,
+                    AreImagesImported = rootFolder.AreImagesImported,
+                    ShowImportImagesButton = rootFolder.HasFiles == true && rootFolder.AreImagesImported == false ? true : false,
                 };
                 LibraryFolders.Add(rootFolderVm);
             }
@@ -88,7 +89,7 @@ namespace ImagePerfect.ViewModels
             //write csv to database
             if (csvIsSet) 
             {
-                await _imageCsvMethods.AddImageCsv();
+                await _imageCsvMethods.AddImageCsv(imageFolderId);
                 ShowLoading = false;
             }
         }
@@ -136,12 +137,13 @@ namespace ImagePerfect.ViewModels
                     HasFiles = folder.HasFiles,
                     IsRoot = folder.IsRoot,
                     FolderContentMetaDataScanned = folder.FolderContentMetaDataScanned,
+                    AreImagesImported = folder.AreImagesImported,
+                    ShowImportImagesButton = folder.HasFiles == true && folder.AreImagesImported == false ? true : false,
                 };
                 LibraryFolders.Add(folderViewModel);
             }
             foreach(Image image in images)
             {
-                //Bitmap imgBitmap = await ImageHelper.FormatImage(image.ImagePath);
                 ImageViewModel imageViewModel = new() 
                 { 
                     ImageId = image.ImageId,
@@ -193,6 +195,8 @@ namespace ImagePerfect.ViewModels
                     HasFiles = folder.HasFiles,
                     IsRoot = folder.IsRoot,
                     FolderContentMetaDataScanned = folder.FolderContentMetaDataScanned,
+                    AreImagesImported = folder.AreImagesImported,
+                    ShowImportImagesButton = folder.HasFiles == true && folder.AreImagesImported == false ? true : false,
                 };
                 LibraryFolders.Add(folderViewModel);
             }
