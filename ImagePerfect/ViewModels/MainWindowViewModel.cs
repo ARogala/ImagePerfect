@@ -45,6 +45,9 @@ namespace ImagePerfect.ViewModels
            
                 ImportImages(imageFolder);
             });
+            AddFolderDescriptionCommand = ReactiveCommand.Create((FolderViewModel folderVm) => { 
+                AddFolderDescription(folderVm);
+            });
             DeleteLibraryCommand = ReactiveCommand.Create(() => {
                 DeleteLibrary();
             });
@@ -68,6 +71,8 @@ namespace ImagePerfect.ViewModels
         public ReactiveCommand<ImageViewModel, Unit> BackFolderFromImageCommand { get; }
 
         public ReactiveCommand<FolderViewModel, Unit> ImportImagesCommand { get; }
+
+        public ReactiveCommand<FolderViewModel, Unit> AddFolderDescriptionCommand { get; }
 
         public ReactiveCommand<Unit, Unit> DeleteLibraryCommand { get; }
         private async void GetRootFolder()
@@ -229,6 +234,10 @@ namespace ImagePerfect.ViewModels
             {
                 return;
             }
+        }
+        private async void AddFolderDescription(FolderViewModel folderVm)
+        {
+            Debug.WriteLine(folderVm.FolderDescription);
         }
         private async void GetAllFolders()
         {
