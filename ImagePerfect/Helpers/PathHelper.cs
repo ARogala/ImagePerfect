@@ -29,7 +29,24 @@ namespace ImagePerfect.Helpers
                     newPath = newPath + strArray[i];
                 }
             }
-            Debug.WriteLine("Removed one folder " + newPath);
+            return newPath;
+        }
+
+        public static string RemoveTwoFoldersFromPath(string path)
+        {
+            string[] strArray = path.Split(@"\");
+            string newPath = string.Empty;
+            for (int i = 0; i < strArray.Length - 2; i++)
+            {
+                if (i < strArray.Length - 3)
+                {
+                    newPath = newPath + strArray[i] + @"\";
+                }
+                else
+                {
+                    newPath = newPath + strArray[i];
+                }
+            }
             return newPath;
         }
     }

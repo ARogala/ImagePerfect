@@ -150,20 +150,7 @@ namespace ImagePerfect.ViewModels
              */
             List<Folder> folders = new List<Folder>();
             List<Image> images = new List<Image>();
-         
-            string[] strArray = currentFolder.FolderPath.Split(@"\");
-            string newPath = string.Empty;
-            for (int i = 0; i < strArray.Length - 2; i++ )
-            {
-                if (i < strArray.Length - 3)
-                {
-                    newPath = newPath + strArray[i] + @"\";
-                }
-                else
-                {
-                    newPath = newPath + strArray[i];
-                }
-            }
+            string newPath = PathHelper.RemoveTwoFoldersFromPath(currentFolder.FolderPath);
 
             folders = await _folderMethods.GetFoldersInDirectory(PathHelper.GetRegExpString(newPath));
             //folder may or may not have images but will just be an empty list if none.
