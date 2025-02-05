@@ -31,9 +31,7 @@ namespace ImagePerfect.Models
 
         public static async Task<bool> BuildFolderTreeCsv(string rootFolderPath)
         {
-            rootFolderPath = rootFolderPath.Replace(@"file:///", "");
-            rootFolderPath = rootFolderPath.Remove(rootFolderPath.Length - 1);
-            rootFolderPath = rootFolderPath.Replace(@"/", @"\");
+            rootFolderPath = PathHelper.FormatPathFromFolderPicker(rootFolderPath);
        
             string folderCsvPath = GetCsvPath("folders.csv");
 
