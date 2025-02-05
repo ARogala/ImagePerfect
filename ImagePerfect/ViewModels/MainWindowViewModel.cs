@@ -111,6 +111,7 @@ namespace ImagePerfect.ViewModels
                 }
             }
             folders = await _folderMethods.NextFolder(newPath.Replace(@"\", @"\\\\") + @"\\\\[^\\\\]+\\\\?$");
+            //folder may or may not have images but will just be an empty list if none.
             images = await _imageMethods.GetAllImagesInFolder(newPath);
             LibraryFolders.Clear();
             Images.Clear();
@@ -150,6 +151,8 @@ namespace ImagePerfect.ViewModels
             }
             else
             {
+                var box = MessageBoxManager.GetMessageBoxStandard("Empty Folder", "There are no Images in this folder.", ButtonEnum.Ok);
+                await box.ShowAsync();
                 return;
             }
             LibraryFolders.Clear();
