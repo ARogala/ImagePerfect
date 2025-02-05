@@ -49,5 +49,10 @@ namespace ImagePerfect.Helpers
             }
             return newPath;
         }
+
+        public static string FormatPathForDbStorage(string path)
+        {
+            return path.Replace(@"\", @"\\");
+        }
     }
 }

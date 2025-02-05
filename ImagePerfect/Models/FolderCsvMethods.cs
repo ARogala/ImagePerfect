@@ -1,6 +1,7 @@
 ﻿using Avalonia.Metadata;
 using Avalonia.Rendering.Composition;
 using CsvHelper;
+using ImagePerfect.Helpers;
 using ImagePerfect.Repository.IRepository;
 using System;
 using System.Collections.Generic;
@@ -61,7 +62,7 @@ namespace ImagePerfect.Models
                 {
                     FolderId = 0,
                     FolderName = rootInfo.Name,
-                    FolderPath = rootFolderPath.Replace(@"\", @"\\"),
+                    FolderPath = PathHelper.FormatPathForDbStorage(rootFolderPath),
                     HasChildren = Directory.GetDirectories(rootFolderPath).Any() == true ? 1 : 0,
                     CoverImagePath = null,
                     FolderDescription = null,
@@ -85,7 +86,7 @@ namespace ImagePerfect.Models
                     {
                         FolderId = 0,
                         FolderName = info.Name,
-                        FolderPath = libraryDirectory.Replace(@"\", @"\\"),
+                        FolderPath = PathHelper.FormatPathForDbStorage(libraryDirectory),
                         HasChildren = Directory.GetDirectories(libraryDirectory).Any() == true ? 1 : 0,
                         CoverImagePath = null,
                         FolderDescription = null,

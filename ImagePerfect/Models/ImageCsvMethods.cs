@@ -1,4 +1,5 @@
 ﻿using CsvHelper;
+using ImagePerfect.Helpers;
 using ImagePerfect.Repository.IRepository;
 using System;
 using System.Collections.Generic;
@@ -53,10 +54,10 @@ namespace ImagePerfect.Models
                     new ImageCsv 
                     { 
                         ImageId = 0,
-                        ImagePath = imagePath.Replace(@"\",@"\\"),
+                        ImagePath = PathHelper.FormatPathForDbStorage(imagePath),
                         ImageTags = null,
                         ImageRating = 0,
-                        ImageFolderPath = imageFolderPath.Replace(@"\", @"\\"),
+                        ImageFolderPath = PathHelper.FormatPathForDbStorage(imageFolderPath),
                         ImageMetaDataScanned = 0,
                         FolderId = imageFolderId,
                     }    
