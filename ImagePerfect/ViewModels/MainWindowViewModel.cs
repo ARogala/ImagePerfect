@@ -97,7 +97,7 @@ namespace ImagePerfect.ViewModels
             {
                 await _imageCsvMethods.AddImageCsv(imageFolderId);
                 ShowLoading = false;
-                
+                //remove one folder from path
                 for (int i = 0; i < strArray.Length - 1; i++)
                 {
                     if (i < strArray.Length - 2)
@@ -110,7 +110,7 @@ namespace ImagePerfect.ViewModels
                     }
                 }
 
-                folders = await _folderMethods.GetFoldersInDirectory(newPath.Replace(@"\", @"\\\\") + @"\\\\[^\\\\]+\\\\?$");
+                folders = await _folderMethods.GetFoldersInDirectory(PathHelper.GetRegExpString(newPath));
                 //folder may or may not have images but will just be an empty list if none.
                 images = await _imageMethods.GetAllImagesInFolder(newPath);
                 LibraryFolders.Clear();
@@ -151,7 +151,7 @@ namespace ImagePerfect.ViewModels
                 }
             }
 
-            folders = await _folderMethods.GetFoldersInDirectory(newPath.Replace(@"\", @"\\\\") + @"\\\\[^\\\\]+\\\\?$");
+            folders = await _folderMethods.GetFoldersInDirectory(PathHelper.GetRegExpString(newPath));
             //folder may or may not have images but will just be an empty list if none.
             images = await _imageMethods.GetAllImagesInFolder(newPath);
             LibraryFolders.Clear();
@@ -191,7 +191,8 @@ namespace ImagePerfect.ViewModels
                     newPath = newPath + strArray[i];
                 }
             }
-            folders = await _folderMethods.GetFoldersInDirectory(newPath.Replace(@"\", @"\\\\") + @"\\\\[^\\\\]+\\\\?$");
+
+            folders = await _folderMethods.GetFoldersInDirectory(PathHelper.GetRegExpString(newPath));
             //folder may or may not have images but will just be an empty list if none.
             images = await _imageMethods.GetAllImagesInFolder(newPath);
             LibraryFolders.Clear();
@@ -216,12 +217,12 @@ namespace ImagePerfect.ViewModels
             //two boolean varibale 4 combos TF TT FT and FF
             if (hasChildren == true && hasFiles == false) 
             {
-                folders = await _folderMethods.GetFoldersInDirectory(currentFolder.FolderPath.Replace(@"\", @"\\\\") + @"\\\\[^\\\\]+\\\\?$");
+                folders = await _folderMethods.GetFoldersInDirectory(PathHelper.GetRegExpString(currentFolder.FolderPath));
             }
             else if (hasChildren == true && hasFiles == true)
             {
                 //get folders and images
-                folders = await _folderMethods.GetFoldersInDirectory(currentFolder.FolderPath.Replace(@"\", @"\\\\") + @"\\\\[^\\\\]+\\\\?$");
+                folders = await _folderMethods.GetFoldersInDirectory(PathHelper.GetRegExpString(currentFolder.FolderPath));
                 images = await _imageMethods.GetAllImagesInFolder(currentFolder.FolderId);
                 
             }
