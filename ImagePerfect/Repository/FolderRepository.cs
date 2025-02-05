@@ -19,7 +19,9 @@ namespace ImagePerfect.Repository
         public async Task<Folder?> GetRootFolder()
         {
             string sql = @"SELECT * FROM folders WHERE IsRoot = True";
-            return await _connection.QuerySingleOrDefaultAsync<Folder>(sql);
+            Folder? rootFolder = await _connection.QuerySingleOrDefaultAsync<Folder>(sql);
+            await _connection.CloseAsync();
+            return rootFolder;
         }
         public async Task<bool> AddFolderCsv(string filePath)
         {
@@ -44,6 +46,7 @@ namespace ImagePerfect.Repository
         {
             string sql = @"SELECT * FROM folders WHERE REGEXP_LIKE(FolderPath, '" + directoryPath + "');";
             List<Folder> folders = (List<Folder>)await _connection.QueryAsync<Folder>(sql);
+            await _connection.CloseAsync();
             return folders;
         }
     }
