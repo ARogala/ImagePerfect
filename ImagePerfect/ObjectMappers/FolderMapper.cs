@@ -29,5 +29,13 @@ namespace ImagePerfect.ObjectMappers
             };
             return folderViewModel;
         }
+
+        //public static Folder GetFolderFromVm(FolderViewModel folderVm)
+        //{
+        //    Folder folder = new()
+        //    {
+        //        CoverImagePath = folderVm.CoverImagePath
+        //    }
+        //}
     }
 }

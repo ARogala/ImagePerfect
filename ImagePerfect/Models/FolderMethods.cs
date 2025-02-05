@@ -1,4 +1,5 @@
 ﻿using ImagePerfect.Repository.IRepository;
+using ImagePerfect.ViewModels;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -33,5 +34,10 @@ namespace ImagePerfect.Models
         {
             return await _unitOfWork.Folder.DeleteAll();
         }
+
+        //public async Task<bool> AddFolderDescription(FolderViewModel folderVm)
+        //{
+        //    return await _unitOfWork.Folder.Update();
+        //}
     }
 }
