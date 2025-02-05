@@ -24,7 +24,7 @@ namespace ImagePerfect.Models
             return await _unitOfWork.Folder.GetRootFolder();
         }
 
-        public async Task<List<Folder>> NextFolder(string directoryPath)
+        public async Task<List<Folder>> GetFoldersInDirectory(string directoryPath)
         {
             return await _unitOfWork.Folder.GetFoldersInDirectory(directoryPath);
         }
