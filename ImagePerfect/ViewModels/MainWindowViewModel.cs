@@ -95,13 +95,12 @@ namespace ImagePerfect.ViewModels
                 but you want to go back to hiking so you must remove two folders to get /pictures/hiking/
              */
             List<Folder> folders = new List<Folder>();
-            Debug.WriteLine(currentFolder.FolderPath);
+            List<Image> images = new List<Image>();
+         
             string[] strArray = currentFolder.FolderPath.Split(@"\");
-            Debug.WriteLine(strArray.Count());
             string newPath = string.Empty;
             for (int i = 0; i < strArray.Length - 2; i++ )
             {
-                Debug.WriteLine(strArray[i]);
                 if (i < strArray.Length - 3)
                 {
                     newPath = newPath + strArray[i] + @"\";
@@ -110,19 +109,20 @@ namespace ImagePerfect.ViewModels
                 {
                     newPath = newPath + strArray[i];
                 }
-                
             }
-            Debug.WriteLine(newPath);
-            Debug.WriteLine(newPath.Replace(@"\", @"\\\\") + @"\\\\[^\\\\]+\\\\?$");
-            Debug.WriteLine(newPath);
             folders = await _folderMethods.NextFolder(newPath.Replace(@"\", @"\\\\") + @"\\\\[^\\\\]+\\\\?$");
+            images = await _imageMethods.GetAllImagesInFolder(newPath);
             LibraryFolders.Clear();
             Images.Clear();
-            //also have to check newPath for images and fetch them
             foreach (Folder folder in folders)
             {
                 FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(folder);
                 LibraryFolders.Add(folderViewModel);
+            }
+            foreach(Image image in images)
+            {
+                ImageViewModel imageViewModel = await ImageMapper.GetImageVm(image);
+                Images.Add(imageViewModel);
             }
         }
         private async void NextFolder(FolderViewModel currentFolder)
@@ -161,8 +161,8 @@ namespace ImagePerfect.ViewModels
             }
             foreach(Image image in images)
             {
-                ImageViewModel imageVm = await ImageMapper.GetImageVm(image);
-                Images.Add(imageVm);
+                ImageViewModel imageViewModel = await ImageMapper.GetImageVm(image);
+                Images.Add(imageViewModel);
             }
         }
         private async void DeleteLibrary()
