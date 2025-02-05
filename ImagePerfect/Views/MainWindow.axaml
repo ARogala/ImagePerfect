@@ -44,7 +44,7 @@
 									<Button Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" IsVisible="{Binding !ShowImportImagesButton}"
 											Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).NextFolderCommand}"
 											CommandParameter="{Binding}">
-										Next
+										Open
 									</Button>
 								</Grid>
 								<Button HorizontalAlignment="Center" IsVisible="{Binding ShowImportImagesButton}"
