@@ -27,6 +27,14 @@ namespace ImagePerfect.Repository
             return allImagesInFolder;
         }
 
+        public async Task<List<Image>> GetAllImagesInFolder(string folderPath)
+        {
+            string sql = @"SELECT * FROM images WHERE ImageFolderPath = @folderPath";
+            List<Image> allImagesInFolder = (List<Image>)await _connection.QueryAsync<Image>(sql, new { folderPath });
+            await _connection.CloseAsync();
+            return allImagesInFolder;
+        }
+
         public async Task<bool> AddImageCsv(string filePath, int folderId)
         {
             int rowsEffectedA = 0;
