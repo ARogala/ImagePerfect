@@ -38,6 +38,9 @@ namespace ImagePerfect.ViewModels
             BackFolderCommand = ReactiveCommand.Create((FolderViewModel currentFolder) => {
                 BackFolder(currentFolder); 
             });
+            BackFolderFromImageCommand = ReactiveCommand.Create((ImageViewModel imageVm) => { 
+                BackFolderFromImage(imageVm);
+            });
             ImportImagesCommand = ReactiveCommand.Create((FolderViewModel imageFolder) => {
            
                 ImportImages(imageFolder.FolderPath, imageFolder.FolderId);
@@ -62,6 +65,8 @@ namespace ImagePerfect.ViewModels
 
         public ReactiveCommand<FolderViewModel,Unit> BackFolderCommand { get; }
 
+        public ReactiveCommand<ImageViewModel, Unit> BackFolderFromImageCommand { get; }
+
         public ReactiveCommand<FolderViewModel, Unit> ImportImagesCommand { get; }
 
         public ReactiveCommand<Unit, Unit> DeleteLibraryCommand { get; }
@@ -84,6 +89,45 @@ namespace ImagePerfect.ViewModels
             {
                 await _imageCsvMethods.AddImageCsv(imageFolderId);
                 ShowLoading = false;
+            }
+        }
+        private async void BackFolderFromImage(ImageViewModel imageVm)
+        {
+            /*
+                Similar to Back folders except these buttons are on the image and we only need to remove one folder
+                Not every folder has a folder so this is the quickest way for now to back out of a folder that only has images
+             */
+            List<Folder> folders = new List<Folder>();
+            List<Image> images = new List<Image>();
+     
+            string[] strArray = imageVm.ImageFolderPath.Split(@"\");
+            string newPath = string.Empty;
+            for (int i = 0; i < strArray.Length - 1; i++) 
+            {
+                if (i < strArray.Length - 2)
+                {
+                    newPath = newPath + strArray[i] + @"\";
+                }
+                else
+                {
+                    newPath = newPath + strArray[i];
+                }
+            }
+
+            folders = await _folderMethods.NextFolder(newPath.Replace(@"\", @"\\\\") + @"\\\\[^\\\\]+\\\\?$");
+            //folder may or may not have images but will just be an empty list if none.
+            images = await _imageMethods.GetAllImagesInFolder(newPath);
+            LibraryFolders.Clear();
+            Images.Clear();
+            foreach (Folder folder in folders)
+            {
+                FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(folder);
+                LibraryFolders.Add(folderViewModel);
+            }
+            foreach (Image image in images)
+            {
+                ImageViewModel imageViewModel = await ImageMapper.GetImageVm(image);
+                Images.Add(imageViewModel);
             }
         }
         private async void BackFolder(FolderViewModel currentFolder)
