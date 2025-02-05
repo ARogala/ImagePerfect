@@ -43,7 +43,7 @@ namespace ImagePerfect.ViewModels
             });
             ImportImagesCommand = ReactiveCommand.Create((FolderViewModel imageFolder) => {
            
-                ImportImages(imageFolder.FolderPath, imageFolder.FolderId);
+                ImportImages(imageFolder);
             });
             DeleteLibraryCommand = ReactiveCommand.Create(() => {
                 DeleteLibrary();
@@ -79,16 +79,20 @@ namespace ImagePerfect.ViewModels
                 LibraryFolders.Add(rootFolderVm);
             }
         }
-        private async void ImportImages(string imageFolderPath, int imageFolderId)
+        private async void ImportImages(FolderViewModel imageFolder)
         {
+            string imageFolderPath = imageFolder.FolderPath;
+            int imageFolderId = imageFolder.FolderId;
             ShowLoading = true;
             //build csv
             bool csvIsSet = await ImageCsvMethods.BuildImageCsv(imageFolderPath, imageFolderId);
-            //write csv to database
+            //write csv to database and nav into folder -- this is so the import button will go away
+            //either nav into folder or load folders at this locaion again. 
             if (csvIsSet) 
             {
                 await _imageCsvMethods.AddImageCsv(imageFolderId);
                 ShowLoading = false;
+                NextFolder(imageFolder);
             }
         }
         private async void BackFolderFromImage(ImageViewModel imageVm)
@@ -114,7 +118,7 @@ namespace ImagePerfect.ViewModels
                 }
             }
 
-            folders = await _folderMethods.NextFolder(newPath.Replace(@"\", @"\\\\") + @"\\\\[^\\\\]+\\\\?$");
+            folders = await _folderMethods.GetFoldersInDirectory(newPath.Replace(@"\", @"\\\\") + @"\\\\[^\\\\]+\\\\?$");
             //folder may or may not have images but will just be an empty list if none.
             images = await _imageMethods.GetAllImagesInFolder(newPath);
             LibraryFolders.Clear();
@@ -154,7 +158,7 @@ namespace ImagePerfect.ViewModels
                     newPath = newPath + strArray[i];
                 }
             }
-            folders = await _folderMethods.NextFolder(newPath.Replace(@"\", @"\\\\") + @"\\\\[^\\\\]+\\\\?$");
+            folders = await _folderMethods.GetFoldersInDirectory(newPath.Replace(@"\", @"\\\\") + @"\\\\[^\\\\]+\\\\?$");
             //folder may or may not have images but will just be an empty list if none.
             images = await _imageMethods.GetAllImagesInFolder(newPath);
             LibraryFolders.Clear();
@@ -179,12 +183,12 @@ namespace ImagePerfect.ViewModels
             //two boolean varibale 4 combos TF TT FT and FF
             if (hasChildren == true && hasFiles == false) 
             {
-                folders = await _folderMethods.NextFolder(currentFolder.FolderPath.Replace(@"\", @"\\\\") + @"\\\\[^\\\\]+\\\\?$");
+                folders = await _folderMethods.GetFoldersInDirectory(currentFolder.FolderPath.Replace(@"\", @"\\\\") + @"\\\\[^\\\\]+\\\\?$");
             }
             else if (hasChildren == true && hasFiles == true)
             {
                 //get folders and images
-                folders = await _folderMethods.NextFolder(currentFolder.FolderPath.Replace(@"\", @"\\\\") + @"\\\\[^\\\\]+\\\\?$");
+                folders = await _folderMethods.GetFoldersInDirectory(currentFolder.FolderPath.Replace(@"\", @"\\\\") + @"\\\\[^\\\\]+\\\\?$");
                 images = await _imageMethods.GetAllImagesInFolder(currentFolder.FolderId);
                 
             }
