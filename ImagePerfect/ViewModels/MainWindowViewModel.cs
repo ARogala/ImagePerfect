@@ -83,9 +83,7 @@ namespace ImagePerfect.ViewModels
         {
             List<Folder> folders = new List<Folder>();
             List<Image> images = new List<Image>();
-            string[] strArray = imageFolder.FolderPath.Split(@"\");
             string newPath = string.Empty;
-
             string imageFolderPath = imageFolder.FolderPath;
             int imageFolderId = imageFolder.FolderId;
             ShowLoading = true;
@@ -98,18 +96,7 @@ namespace ImagePerfect.ViewModels
                 await _imageCsvMethods.AddImageCsv(imageFolderId);
                 ShowLoading = false;
                 //remove one folder from path
-                for (int i = 0; i < strArray.Length - 1; i++)
-                {
-                    if (i < strArray.Length - 2)
-                    {
-                        newPath = newPath + strArray[i] + @"\";
-                    }
-                    else
-                    {
-                        newPath = newPath + strArray[i];
-                    }
-                }
-
+                newPath = PathHelper.RemoveOneFolderFromPath(imageFolderPath);
                 folders = await _folderMethods.GetFoldersInDirectory(PathHelper.GetRegExpString(newPath));
                 //folder may or may not have images but will just be an empty list if none.
                 images = await _imageMethods.GetAllImagesInFolder(newPath);
@@ -136,21 +123,7 @@ namespace ImagePerfect.ViewModels
              */
             List<Folder> folders = new List<Folder>();
             List<Image> images = new List<Image>();
-     
-            string[] strArray = imageVm.ImageFolderPath.Split(@"\");
-            string newPath = string.Empty;
-            for (int i = 0; i < strArray.Length - 1; i++) 
-            {
-                if (i < strArray.Length - 2)
-                {
-                    newPath = newPath + strArray[i] + @"\";
-                }
-                else
-                {
-                    newPath = newPath + strArray[i];
-                }
-            }
-
+            string newPath = PathHelper.RemoveOneFolderFromPath(imageVm.ImageFolderPath);
             folders = await _folderMethods.GetFoldersInDirectory(PathHelper.GetRegExpString(newPath));
             //folder may or may not have images but will just be an empty list if none.
             images = await _imageMethods.GetAllImagesInFolder(newPath);
