@@ -81,18 +81,51 @@ namespace ImagePerfect.ViewModels
         }
         private async void ImportImages(FolderViewModel imageFolder)
         {
+            List<Folder> folders = new List<Folder>();
+            List<Image> images = new List<Image>();
+            string[] strArray = imageFolder.FolderPath.Split(@"\");
+            string newPath = string.Empty;
+
             string imageFolderPath = imageFolder.FolderPath;
             int imageFolderId = imageFolder.FolderId;
             ShowLoading = true;
             //build csv
             bool csvIsSet = await ImageCsvMethods.BuildImageCsv(imageFolderPath, imageFolderId);
-            //write csv to database and nav into folder -- this is so the import button will go away
-            //either nav into folder or load folders at this locaion again. 
+            //write csv to database and load folders and images at the location again
+            //load again so the import button will go away
             if (csvIsSet) 
             {
                 await _imageCsvMethods.AddImageCsv(imageFolderId);
                 ShowLoading = false;
-                NextFolder(imageFolder);
+                
+                for (int i = 0; i < strArray.Length - 1; i++)
+                {
+                    if (i < strArray.Length - 2)
+                    {
+                        newPath = newPath + strArray[i] + @"\";
+                    }
+                    else
+                    {
+                        newPath = newPath + strArray[i];
+                    }
+                }
+
+                folders = await _folderMethods.GetFoldersInDirectory(newPath.Replace(@"\", @"\\\\") + @"\\\\[^\\\\]+\\\\?$");
+                //folder may or may not have images but will just be an empty list if none.
+                images = await _imageMethods.GetAllImagesInFolder(newPath);
+                LibraryFolders.Clear();
+                Images.Clear();
+                foreach (Folder folder in folders)
+                {
+                    FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(folder);
+                    LibraryFolders.Add(folderViewModel);
+                }
+                foreach (Image image in images)
+                {
+                    ImageViewModel imageViewModel = await ImageMapper.GetImageVm(image);
+                    Images.Add(imageViewModel);
+                }
+
             }
         }
         private async void BackFolderFromImage(ImageViewModel imageVm)
