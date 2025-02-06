@@ -9,7 +9,8 @@ namespace ImagePerfect.ViewModels
 		private string _folderName;
 		private string _folderPath;
 		private bool _hasChildren;
-		private Bitmap? _coverImagePath;
+		private Bitmap? _coverImageBitmap;
+		private string? _coverImagePath;
 		private string? _folderDescription;
 		private string? _folderTags;
 		private int _folderRating;
@@ -40,10 +41,15 @@ namespace ImagePerfect.ViewModels
 			get => _hasChildren;
 			set => this.RaiseAndSetIfChanged(ref _hasChildren, value);
 		}
-		public Bitmap? CoverImagePath
+		public Bitmap? CoverImageBitmap
+		{
+			get => _coverImageBitmap;
+			set => this.RaiseAndSetIfChanged(ref _coverImageBitmap, value);	
+		}
+		public string? CoverImagePath
 		{
 			get => _coverImagePath;
-			set => this.RaiseAndSetIfChanged(ref _coverImagePath, value);	
+			set => this.RaiseAndSetIfChanged(ref _coverImagePath, value);
 		}
 		public string? FolderDescription
 		{

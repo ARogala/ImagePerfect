@@ -237,7 +237,20 @@ namespace ImagePerfect.ViewModels
         }
         private async void AddFolderDescription(FolderViewModel folderVm)
         {
-            Debug.WriteLine(folderVm.FolderDescription);
+            Folder folder = FolderMapper.GetFolderFromVm(folderVm);
+            bool success = await _folderMethods.AddFolderDescription(folder);
+            if (success) 
+            {
+                var box = MessageBoxManager.GetMessageBoxStandard("Add Description", "Folder Description updated successfully.", ButtonEnum.Ok);
+                await box.ShowAsync();
+                return;
+            }
+            else
+            {
+                var box = MessageBoxManager.GetMessageBoxStandard("Add Description", "Folder Description update error. Try again.", ButtonEnum.Ok);
+                await box.ShowAsync();
+                return;
+            }
         }
         private async void GetAllFolders()
         {

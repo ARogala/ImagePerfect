@@ -35,9 +35,9 @@ namespace ImagePerfect.Models
             return await _unitOfWork.Folder.DeleteAll();
         }
 
-        //public async Task<bool> AddFolderDescription(FolderViewModel folderVm)
-        //{
-        //    return await _unitOfWork.Folder.Update();
-        //}
+        public async Task<bool> AddFolderDescription(Folder folder)
+        {
+            return await _unitOfWork.Folder.Update(folder);
+        }
     }
 }

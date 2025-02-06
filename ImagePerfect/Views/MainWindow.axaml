@@ -33,7 +33,7 @@
 						<DataTemplate DataType="vm:FolderViewModel">
 							<StackPanel Margin="10">
 								<TextBlock MaxWidth="600" Text="{Binding FolderName}"/>
-								<Image MaxWidth="600" Source="{Binding CoverImagePath}" />
+								<Image MaxWidth="600" Source="{Binding CoverImageBitmap}" />
 								<Grid RowDefinitions="Auto" ColumnDefinitions="*,*,*,*" MaxWidth="600">
 									<Button Grid.Row="0" Grid.Column="0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="2" IsEnabled="{Binding !IsRoot}"
 											Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).BackFolderCommand}"

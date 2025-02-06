@@ -17,7 +17,8 @@ namespace ImagePerfect.ObjectMappers
                 FolderName = folder.FolderName,
                 FolderPath = folder.FolderPath,
                 HasChildren = folder.HasChildren,
-                CoverImagePath = folder.CoverImagePath == "" ? ImageHelper.LoadFromResource(new Uri("avares://ImagePerfect/Assets/icons8-folder-600.png")) : await ImageHelper.FormatImage(folder.CoverImagePath),
+                CoverImageBitmap = folder.CoverImagePath == "" ? ImageHelper.LoadFromResource(new Uri("avares://ImagePerfect/Assets/icons8-folder-600.png")) : await ImageHelper.FormatImage(folder.CoverImagePath),
+                CoverImagePath = folder.CoverImagePath,
                 FolderDescription = folder.FolderDescription,
                 FolderTags = folder.FolderTags,
                 FolderRating = folder.FolderRating,
@@ -30,12 +31,24 @@ namespace ImagePerfect.ObjectMappers
             return folderViewModel;
         }
 
-        //public static Folder GetFolderFromVm(FolderViewModel folderVm)
-        //{
-        //    Folder folder = new()
-        //    {
-        //        CoverImagePath = folderVm.CoverImagePath
-        //    }
-        //}
+        public static Folder GetFolderFromVm(FolderViewModel folderVm)
+        {
+            Folder folder = new()
+            {
+                FolderId = folderVm.FolderId,
+                FolderName = folderVm.FolderName,
+                FolderPath = folderVm.FolderPath,
+                HasChildren = folderVm.HasChildren,
+                CoverImagePath = folderVm.CoverImagePath,
+                FolderDescription = folderVm.FolderDescription,
+                FolderTags = folderVm.FolderTags,
+                FolderRating = folderVm.FolderRating,
+                HasFiles = folderVm.HasFiles,
+                IsRoot = folderVm.IsRoot,
+                FolderContentMetaDataScanned= folderVm.FolderContentMetaDataScanned,
+                AreImagesImported= folderVm.AreImagesImported,
+            };
+            return folder;
+        }
     }
 }
