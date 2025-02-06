@@ -44,5 +44,10 @@ namespace ImagePerfect.Models
         {
             return await _unitOfWork.Folder.Update(folder);
         }
+
+        public async Task<bool> AddFolderRating(Folder folder)
+        {
+            return await _unitOfWork.Folder.Update(folder);
+        }
     }
 }
