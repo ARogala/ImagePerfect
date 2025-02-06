@@ -51,6 +51,9 @@ namespace ImagePerfect.ViewModels
             AddFolderTagsCommand = ReactiveCommand.Create((FolderViewModel folderVm) => { 
                 AddFolderTags(folderVm);
             });
+            AddFolderRatingCommand = ReactiveCommand.Create((FolderViewModel folderVm) => { 
+                AddFolderRating(folderVm);
+            });
             DeleteLibraryCommand = ReactiveCommand.Create(() => {
                 DeleteLibrary();
             });
@@ -78,6 +81,8 @@ namespace ImagePerfect.ViewModels
         public ReactiveCommand<FolderViewModel, Unit> AddFolderDescriptionCommand { get; }
 
         public ReactiveCommand<FolderViewModel, Unit> AddFolderTagsCommand { get; }
+
+        public ReactiveCommand<FolderViewModel, Unit> AddFolderRatingCommand { get; }
 
         public ReactiveCommand<Unit, Unit> DeleteLibraryCommand { get; }
         private async void GetRootFolder()
@@ -270,6 +275,24 @@ namespace ImagePerfect.ViewModels
             else
             {
                 var box = MessageBoxManager.GetMessageBoxStandard("Add Tags", "Folder Tags update error. Try again.", ButtonEnum.Ok);
+                await box.ShowAsync();
+                return;
+            }
+        }
+
+        private async void AddFolderRating(FolderViewModel folderVm)
+        {
+            Folder folder = FolderMapper.GetFolderFromVm(folderVm);
+            bool success = await _folderMethods.AddFolderRating(folder);
+            if (success)
+            {
+                var box = MessageBoxManager.GetMessageBoxStandard("Add Rating", "Folder Rating updated successfully.", ButtonEnum.Ok);
+                await box.ShowAsync();
+                return;
+            }
+            else
+            {
+                var box = MessageBoxManager.GetMessageBoxStandard("Add Rating", "Folder Rating update error. Try again.", ButtonEnum.Ok);
                 await box.ShowAsync();
                 return;
             }

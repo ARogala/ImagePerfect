@@ -69,7 +69,11 @@
 										Submit
 									</Button>
 									<NumericUpDown Grid.Row="2" Grid.Column="0" Maximum="10" Minimum="0" Margin="5" Value="{Binding FolderRating}"  />
-									<Button Grid.Row="2" Grid.Column="1">Submit</Button>
+									<Button Grid.Row="2" Grid.Column="1"
+											Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).AddFolderRatingCommand}"
+											CommandParameter="{Binding}">
+										Submit
+									</Button>
 								</Grid>
 							</StackPanel>
 						</DataTemplate>
