@@ -16,7 +16,8 @@ namespace ImagePerfect.ObjectMappers
             ImageViewModel imageVm = new()
             {
                 ImageId = image.ImageId,
-                ImagePath = await ImageHelper.FormatImage(image.ImagePath),
+                ImageBitmap = await ImageHelper.FormatImage(image.ImagePath),
+                ImagePath = image.ImagePath,
                 ImageTags = image.ImageTags,
                 ImageRating = image.ImageRating,
                 ImageFolderPath = image.ImageFolderPath,
@@ -26,6 +27,19 @@ namespace ImagePerfect.ObjectMappers
             return imageVm;
         }
 
-        //public static Image GetImageFromVm(ImageViewModel imageVm) { }
+        public static Image GetImageFromVm(ImageViewModel imageVm) 
+        {
+            Image image = new() 
+            { 
+                ImageId= imageVm.ImageId,
+                ImagePath = imageVm.ImagePath,
+                ImageTags = imageVm.ImageTags,
+                ImageRating = imageVm.ImageRating,
+                ImageFolderPath = imageVm.ImageFolderPath,
+                ImageMetaDataScanned = imageVm.ImageMetaDataScanned,
+                FolderId = imageVm.FolderId,
+            };
+            return image;
+        }
     }
 }
