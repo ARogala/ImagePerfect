@@ -103,7 +103,11 @@
 										Submit
 									</Button>
 									<NumericUpDown Grid.Row="1" Grid.Column="0" Maximum="5" Minimum="0" Margin="5" Value="{Binding ImageRating}"/>
-									<Button Grid.Row="1" Grid.Column="1">Submit</Button>
+									<Button Grid.Row="1" Grid.Column="1"
+											Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).AddImageRatingCommand}"
+											CommandParameter="{Binding}">
+										Submit
+									</Button>
 								</Grid>
 							</StackPanel>
 						</DataTemplate>
