@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using ImagePerfect.Models;
 using ImagePerfect.Repository.IRepository;
 using ReactiveUI;
 
@@ -13,14 +14,15 @@ namespace ImagePerfect.ViewModels
     public class PickFolderCoverImageViewModel : ViewModelBase
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly FolderMethods _folderMethods;
         private ObservableCollection<FolderViewModel> _libraryFolders;
         public PickFolderCoverImageViewModel(IUnitOfWork unitOfWork, ObservableCollection<FolderViewModel> LibraryFolders)
         {
             _unitOfWork = unitOfWork;
             _libraryFolders = LibraryFolders;
-
+            _folderMethods = new FolderMethods(_unitOfWork);
             _SelectCoverImageInteraction = new Interaction<string, List<string>?>();
-            SelectCoverImageCommand = ReactiveCommand.CreateFromTask(SelectCoverImage);
+            SelectCoverImageCommand = ReactiveCommand.CreateFromTask((FolderViewModel folderVm) => SelectCoverImage(folderVm));
         }
 
         private List<String>? _CoverImagePath;
@@ -29,9 +31,9 @@ namespace ImagePerfect.ViewModels
 
         public Interaction<string, List<string>?> SelectCoverImageInteraction { get { return _SelectCoverImageInteraction; } }
 
-        public ReactiveCommand<Unit, Unit> SelectCoverImageCommand { get; }
+        public ReactiveCommand<FolderViewModel, Unit> SelectCoverImageCommand { get; }
 
-        private async Task SelectCoverImage()
+        private async Task SelectCoverImage(FolderViewModel folderVm)
         {
             _CoverImagePath = await _SelectCoverImageInteraction.Handle("Select Folder Cover Image");
             //list will be empty if Cancel is pressed exit method
@@ -40,6 +42,7 @@ namespace ImagePerfect.ViewModels
                 return;
             }
             Debug.WriteLine(_CoverImagePath[0]);
+            Debug.WriteLine(folderVm.FolderId);
         }
     }
 }
