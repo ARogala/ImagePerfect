@@ -7,6 +7,7 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using ImagePerfect.Helpers;
 using ImagePerfect.Models;
+using ImagePerfect.ObjectMappers;
 using ImagePerfect.Repository.IRepository;
 using ReactiveUI;
 
@@ -42,9 +43,20 @@ namespace ImagePerfect.ViewModels
             { 
                 return;
             }
-            Debug.WriteLine(PathHelper.FormatPathFromFilePicker(_CoverImagePath[0]));
-            Debug.WriteLine(folderVm.FolderId);
-            await _folderMethods.UpdateCoverImage(PathHelper.FormatPathFromFilePicker(_CoverImagePath[0]), folderVm.FolderId);
+           
+            bool success = await _folderMethods.UpdateCoverImage(PathHelper.FormatPathFromFilePicker(_CoverImagePath[0]), folderVm.FolderId);
+            //update lib folders to show the new cover !!
+            if (success)
+            {
+                _libraryFolders.Clear();
+                string foldersDirectoryPath = PathHelper.RemoveOneFolderFromPath(folderVm.FolderPath);
+                List<Folder> folders = await _folderMethods.GetFoldersInDirectory(PathHelper.GetRegExpString(foldersDirectoryPath));
+                foreach (Folder folder in folders) 
+                {
+                    FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(folder);
+                    _libraryFolders.Add(folderViewModel);
+                }
+            }
         }
     }
 }
