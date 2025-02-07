@@ -45,17 +45,20 @@ namespace ImagePerfect.ViewModels
            
                 ImportImages(imageFolder);
             });
-            AddFolderDescriptionCommand = ReactiveCommand.Create((FolderViewModel folderVm) => { 
-                AddFolderDescription(folderVm);
+            AddFolderDescriptionCommand = ReactiveCommand.Create((FolderViewModel folderVm) => {
+                UpdateFolder(folderVm, "Description");
             });
-            AddFolderTagsCommand = ReactiveCommand.Create((FolderViewModel folderVm) => { 
-                AddFolderTags(folderVm);
+            AddFolderTagsCommand = ReactiveCommand.Create((FolderViewModel folderVm) => {
+                UpdateFolder(folderVm, "Tags");
             });
-            AddFolderRatingCommand = ReactiveCommand.Create((FolderViewModel folderVm) => { 
-                AddFolderRating(folderVm);
+            AddFolderRatingCommand = ReactiveCommand.Create((FolderViewModel folderVm) => {
+                UpdateFolder(folderVm, "Rating");
             });
-            AddImageTagsCommand = ReactiveCommand.Create((ImageViewModel imageVm) => { 
-                AddImageTags(imageVm);
+            AddImageTagsCommand = ReactiveCommand.Create((ImageViewModel imageVm) => {
+                UpdateImage(imageVm, "Tags");
+            });
+            AddImageRatingCommand = ReactiveCommand.Create((ImageViewModel imageVm) => {
+                UpdateImage(imageVm, "Rating");
             });
             DeleteLibraryCommand = ReactiveCommand.Create(() => {
                 DeleteLibrary();
@@ -88,6 +91,8 @@ namespace ImagePerfect.ViewModels
         public ReactiveCommand<FolderViewModel, Unit> AddFolderRatingCommand { get; }
 
         public ReactiveCommand<ImageViewModel, Unit> AddImageTagsCommand { get; }
+
+        public ReactiveCommand<ImageViewModel, Unit> AddImageRatingCommand { get; }
 
         public ReactiveCommand<Unit, Unit> DeleteLibraryCommand { get; }
         private async void GetRootFolder()
@@ -250,75 +255,32 @@ namespace ImagePerfect.ViewModels
                 return;
             }
         }
-        private async void AddFolderDescription(FolderViewModel folderVm)
-        {
-            Folder folder = FolderMapper.GetFolderFromVm(folderVm);
-            bool success = await _folderMethods.UpdateFolder(folder);
-            if (success) 
-            {
-                var box = MessageBoxManager.GetMessageBoxStandard("Add Description", "Folder Description updated successfully.", ButtonEnum.Ok);
-                await box.ShowAsync();
-                return;
-            }
-            else
-            {
-                var box = MessageBoxManager.GetMessageBoxStandard("Add Description", "Folder Description update error. Try again.", ButtonEnum.Ok);
-                await box.ShowAsync();
-                return;
-            }
-        }
-        private async void AddFolderTags(FolderViewModel folderVm)
-        {
-            Folder folder = FolderMapper.GetFolderFromVm(folderVm);
-            bool success = await _folderMethods.UpdateFolder(folder);
-            if (success)
-            {
-                var box = MessageBoxManager.GetMessageBoxStandard("Add Tags", "Folder Tags updated successfully.", ButtonEnum.Ok);
-                await box.ShowAsync();
-                return;
-            }
-            else
-            {
-                var box = MessageBoxManager.GetMessageBoxStandard("Add Tags", "Folder Tags update error. Try again.", ButtonEnum.Ok);
-                await box.ShowAsync();
-                return;
-            }
-        }
 
-        private async void AddFolderRating(FolderViewModel folderVm)
+        private async void UpdateFolder(FolderViewModel folderVm, string fieldUpdated)
         {
             Folder folder = FolderMapper.GetFolderFromVm(folderVm);
             bool success = await _folderMethods.UpdateFolder(folder);
-            if (success)
+            if (!success)
             {
-                var box = MessageBoxManager.GetMessageBoxStandard("Add Rating", "Folder Rating updated successfully.", ButtonEnum.Ok);
-                await box.ShowAsync();
-                return;
-            }
-            else
-            {
-                var box = MessageBoxManager.GetMessageBoxStandard("Add Rating", "Folder Rating update error. Try again.", ButtonEnum.Ok);
+                var box = MessageBoxManager.GetMessageBoxStandard($"Add {fieldUpdated}", $"Folder {fieldUpdated} update error. Try again.", ButtonEnum.Ok);
                 await box.ShowAsync();
                 return;
             }
         }
-        private async void AddImageTags(ImageViewModel imageVm)
+        
+        private async void UpdateImage(ImageViewModel imageVm, string fieldUpdated)
         {
             Image image = ImageMapper.GetImageFromVm(imageVm);
             bool success = await _imageMethods.UpdateImage(image);
-            if (success)
+            if (!success)
             {
-                var box = MessageBoxManager.GetMessageBoxStandard("Add Tags", "Image Tags updated successfully.", ButtonEnum.Ok);
+                var box = MessageBoxManager.GetMessageBoxStandard($"Add {fieldUpdated}", $"Image {fieldUpdated} update error. Try again.", ButtonEnum.Ok);
                 await box.ShowAsync();
-                return;
+                return;     
             }
-            else
-            {
-                var box = MessageBoxManager.GetMessageBoxStandard("Add Tags", "Image Tags update error. Try again.", ButtonEnum.Ok);
-                await box.ShowAsync();
-                return;
-            }
+           
         }
+
         private async void GetAllFolders()
         {
             List<Folder> allFolders = await _folderMethods.GetAllFolders();
