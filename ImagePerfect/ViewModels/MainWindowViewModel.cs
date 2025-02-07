@@ -304,7 +304,20 @@ namespace ImagePerfect.ViewModels
         }
         private async void AddImageTags(ImageViewModel imageVm)
         {
-
+            Image image = ImageMapper.GetImageFromVm(imageVm);
+            bool success = await _imageMethods.UpdateImage(image);
+            if (success)
+            {
+                var box = MessageBoxManager.GetMessageBoxStandard("Add Tags", "Image Tags updated successfully.", ButtonEnum.Ok);
+                await box.ShowAsync();
+                return;
+            }
+            else
+            {
+                var box = MessageBoxManager.GetMessageBoxStandard("Add Tags", "Image Tags update error. Try again.", ButtonEnum.Ok);
+                await box.ShowAsync();
+                return;
+            }
         }
         private async void GetAllFolders()
         {

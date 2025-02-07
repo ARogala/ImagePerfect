@@ -25,5 +25,10 @@ namespace ImagePerfect.Models
         {
             return await _unitOfWork.Image.GetAllImagesInFolder(folderPath);
         }
+
+        public async Task<bool> UpdateImage(Image image)
+        {
+            return await _unitOfWork.Image.Update(image);
+        }
     }
 }
