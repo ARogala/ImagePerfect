@@ -35,17 +35,7 @@ namespace ImagePerfect.Models
             return await _unitOfWork.Folder.DeleteAll();
         }
 
-        public async Task<bool> AddFolderDescription(Folder folder)
-        {
-            return await _unitOfWork.Folder.Update(folder);
-        }
-
-        public async Task<bool> AddFolderTags(Folder folder)
-        {
-            return await _unitOfWork.Folder.Update(folder);
-        }
-
-        public async Task<bool> AddFolderRating(Folder folder)
+        public async Task<bool> UpdateFolder(Folder folder)
         {
             return await _unitOfWork.Folder.Update(folder);
         }
