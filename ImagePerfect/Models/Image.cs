@@ -14,13 +14,13 @@ namespace ImagePerfect.Models
         public string ImagePath { get; set; }
 
         [Column("ImageTags")]
-        public string ImageTags { get; set; } = string.Empty;
+        public string? ImageTags { get; set; }
 
         [Column("ImageRating")]
         public int ImageRating { get; set; }
 
         [Column("ImageFolderPath")]
-        public string ImageFolderPath { get; set; }
+        public string ImageFolderPath { get; set; } = string.Empty;
 
         [Column("ImageMetaDataScanned")]
         public bool ImageMetaDataScanned { get; set; }

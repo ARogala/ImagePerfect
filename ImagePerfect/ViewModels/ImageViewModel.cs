@@ -6,7 +6,8 @@ namespace ImagePerfect.ViewModels
 	public class ImageViewModel : ViewModelBase
 	{
 		private int _imageId;
-		private Bitmap _imagePath;
+		private Bitmap _imageBitmap;
+		private string _imagePath;
 		private string? _imageTags;
 		private int _imageRating;
 		private string _imageFolderPath;
@@ -19,7 +20,12 @@ namespace ImagePerfect.ViewModels
 			set => this.RaiseAndSetIfChanged(ref _imageId, value);
 		}
 
-		public Bitmap ImagePath
+		public Bitmap ImageBitmap
+		{
+			get => _imageBitmap;
+			set => this.RaiseAndSetIfChanged(ref _imageBitmap, value);
+		}
+		public string ImagePath
 		{
 			get => _imagePath;
 			set => this.RaiseAndSetIfChanged(ref _imagePath, value);
