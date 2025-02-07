@@ -253,7 +253,7 @@ namespace ImagePerfect.ViewModels
         private async void AddFolderDescription(FolderViewModel folderVm)
         {
             Folder folder = FolderMapper.GetFolderFromVm(folderVm);
-            bool success = await _folderMethods.AddFolderDescription(folder);
+            bool success = await _folderMethods.UpdateFolder(folder);
             if (success) 
             {
                 var box = MessageBoxManager.GetMessageBoxStandard("Add Description", "Folder Description updated successfully.", ButtonEnum.Ok);
@@ -270,7 +270,7 @@ namespace ImagePerfect.ViewModels
         private async void AddFolderTags(FolderViewModel folderVm)
         {
             Folder folder = FolderMapper.GetFolderFromVm(folderVm);
-            bool success = await _folderMethods.AddFolderTags(folder);
+            bool success = await _folderMethods.UpdateFolder(folder);
             if (success)
             {
                 var box = MessageBoxManager.GetMessageBoxStandard("Add Tags", "Folder Tags updated successfully.", ButtonEnum.Ok);
@@ -288,7 +288,7 @@ namespace ImagePerfect.ViewModels
         private async void AddFolderRating(FolderViewModel folderVm)
         {
             Folder folder = FolderMapper.GetFolderFromVm(folderVm);
-            bool success = await _folderMethods.AddFolderRating(folder);
+            bool success = await _folderMethods.UpdateFolder(folder);
             if (success)
             {
                 var box = MessageBoxManager.GetMessageBoxStandard("Add Rating", "Folder Rating updated successfully.", ButtonEnum.Ok);
