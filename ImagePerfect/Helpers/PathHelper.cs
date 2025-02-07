@@ -62,5 +62,12 @@ namespace ImagePerfect.Helpers
             path = path.Replace(@"/", @"\");
             return path;
         }
+
+        public static string FormatPathFromFilePicker(string path)
+        {
+            path = path.Replace(@"file:///", "");
+            path = path.Replace(@"/", @"\");
+            return path;
+        }
     }
 }

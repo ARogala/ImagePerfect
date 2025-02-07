@@ -7,7 +7,8 @@
 			 x:DataType="vm:PickFolderCoverImageViewModel"
              x:Class="ImagePerfect.Views.PickFolderCoverImageView">
 	<Button HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
-			Command="{Binding SelectCoverImageCommand}">
+			Command="{Binding SelectCoverImageCommand}"
+			CommandParameter="{Binding $parent[StackPanel].DataContext}">
 		Add Cover Image
 	</Button>
 </UserControl>
