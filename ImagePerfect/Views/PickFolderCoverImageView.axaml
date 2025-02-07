@@ -3,6 +3,11 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="ImagePerfect.PickFolderCoverImageView">
-  Welcome to Avalonia!
+			 xmlns:vm="using:ImagePerfect.ViewModels"
+			 x:DataType="vm:PickFolderCoverImageViewModel"
+             x:Class="ImagePerfect.Views.PickFolderCoverImageView">
+	<Button HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+			Command="{Binding SelectCoverImageCommand}">
+		Add Cover Image
+	</Button>
 </UserControl>

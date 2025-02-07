@@ -50,9 +50,7 @@
 										CommandParameter="{Binding}">
 										Import Images
 									</Button>
-									<Button Grid.Row="0" Grid.Column="3" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" >
-										Add Cover Image
-									</Button>
+									<v:PickFolderCoverImageView Grid.Row="0" Grid.Column="3" DataContext="{Binding #Root.((vm:MainWindowViewModel)DataContext).PickCoverImage}"/>
 								</Grid>
 								
 								<Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto" MaxWidth="600">
