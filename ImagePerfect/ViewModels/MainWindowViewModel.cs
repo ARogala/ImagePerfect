@@ -54,6 +54,9 @@ namespace ImagePerfect.ViewModels
             AddFolderRatingCommand = ReactiveCommand.Create((FolderViewModel folderVm) => { 
                 AddFolderRating(folderVm);
             });
+            AddImageTagsCommand = ReactiveCommand.Create((ImageViewModel imageVm) => { 
+                AddImageTags(imageVm);
+            });
             DeleteLibraryCommand = ReactiveCommand.Create(() => {
                 DeleteLibrary();
             });
@@ -83,6 +86,8 @@ namespace ImagePerfect.ViewModels
         public ReactiveCommand<FolderViewModel, Unit> AddFolderTagsCommand { get; }
 
         public ReactiveCommand<FolderViewModel, Unit> AddFolderRatingCommand { get; }
+
+        public ReactiveCommand<ImageViewModel, Unit> AddImageTagsCommand { get; }
 
         public ReactiveCommand<Unit, Unit> DeleteLibraryCommand { get; }
         private async void GetRootFolder()
@@ -296,6 +301,10 @@ namespace ImagePerfect.ViewModels
                 await box.ShowAsync();
                 return;
             }
+        }
+        private async void AddImageTags(ImageViewModel imageVm)
+        {
+
         }
         private async void GetAllFolders()
         {

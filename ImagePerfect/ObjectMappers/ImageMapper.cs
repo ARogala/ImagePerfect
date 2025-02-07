@@ -25,5 +25,7 @@ namespace ImagePerfect.ObjectMappers
             };
             return imageVm;
         }
+
+        //public static Image GetImageFromVm(ImageViewModel imageVm) { }
     }
 }
