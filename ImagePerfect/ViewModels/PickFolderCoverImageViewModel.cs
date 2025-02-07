@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using ImagePerfect.Helpers;
 using ImagePerfect.Models;
 using ImagePerfect.Repository.IRepository;
 using ReactiveUI;
@@ -41,8 +42,9 @@ namespace ImagePerfect.ViewModels
             { 
                 return;
             }
-            Debug.WriteLine(_CoverImagePath[0]);
+            Debug.WriteLine(PathHelper.FormatPathFromFilePicker(_CoverImagePath[0]));
             Debug.WriteLine(folderVm.FolderId);
+            await _folderMethods.UpdateCoverImage(PathHelper.FormatPathFromFilePicker(_CoverImagePath[0]), folderVm.FolderId);
         }
     }
 }

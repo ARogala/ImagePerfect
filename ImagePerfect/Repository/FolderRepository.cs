@@ -49,5 +49,14 @@ namespace ImagePerfect.Repository
             await _connection.CloseAsync();
             return folders;
         }
+
+        public async Task<bool> AddCoverImage(string coverImagePath, int folderId)
+        {
+            int rowsEffected = 0;
+            string sql = @"UPDATE folders SET CoverImagePath = @coverImagePath WHERE FolderId = @folderId";
+            rowsEffected = await _connection.ExecuteAsync(sql, new { coverImagePath, folderId });
+            await _connection.CloseAsync();
+            return rowsEffected > 0 ? true : false;
+        }
     }
 }

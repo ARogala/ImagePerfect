@@ -10,5 +10,6 @@ namespace ImagePerfect.Repository.IRepository
         Task<bool> AddFolderCsv(string filePath);
         Task<Folder?> GetRootFolder();
         Task<List<Folder>> GetFoldersInDirectory(string directoryPath);
+        Task<bool> AddCoverImage(string coverImagePath, int folderId);
     }
 }
