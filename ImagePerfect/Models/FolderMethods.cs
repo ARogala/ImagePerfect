@@ -39,5 +39,10 @@ namespace ImagePerfect.Models
         {
             return await _unitOfWork.Folder.Update(folder);
         }
+
+        public async Task<bool> UpdateCoverImage(string coverImagePath, int folderId)
+        {
+            return await _unitOfWork.Folder.AddCoverImage(coverImagePath, folderId);
+        }
     }
 }
