@@ -21,7 +21,7 @@
 				<MenuItem Header="_File" IsSubMenuOpen="True">
 					<v:PickRootFolderView DataContext="{Binding PickRootFolder}" x:Name="PickRootFolder"/>
 					<Button Margin="0" Width="150" HorizontalContentAlignment="Center" Command="{Binding DeleteLibraryCommand}">Delete Library</Button>
-					<Button Margin="0" Width="150" HorizontalContentAlignment="Center" >Add New Folders</Button>
+					<v:PickNewFoldersView DataContext="{Binding PickNewFolders}"/>
 				</MenuItem>
 			</Menu>
 			<ProgressBar Margin="10" IsIndeterminate="True" IsVisible="{Binding #PickRootFolder((vm:PickRootFolderViewModel)DataContext).ShowLoading}"/>

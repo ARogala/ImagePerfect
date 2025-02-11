@@ -72,6 +72,8 @@ namespace ImagePerfect.ViewModels
         }
         public PickRootFolderViewModel PickRootFolder { get => new PickRootFolderViewModel(_unitOfWork, LibraryFolders); }
 
+        public PickNewFoldersViewModel PickNewFolders { get => new PickNewFoldersViewModel(); }
+
         public PickFolderCoverImageViewModel PickCoverImage { get => new PickFolderCoverImageViewModel(_unitOfWork, LibraryFolders); }
 
         public ObservableCollection<FolderViewModel> LibraryFolders { get; } = new ObservableCollection<FolderViewModel>();
