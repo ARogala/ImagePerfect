@@ -48,7 +48,7 @@ namespace ImagePerfect.ViewModels
                 await box.ShowAsync();
                 return;
             }
-            
+
             _NewFolders = await _SelectNewFoldersInteraction.Handle("Select New Folders");
 			//list will be empty if Cancel is pressed exit method
 			if (_NewFolders.Count == 0) 
@@ -64,7 +64,7 @@ namespace ImagePerfect.ViewModels
                 return;
             }
             //build csv
-            bool csvIsSet = await FolderCsvMethods.AddNewFoldersCsv(_NewFolders);
+            bool csvIsSet = await FolderCsvMethods.AddNewFoldersCsv(_NewFolders, false);
             //write csv to database
             if (csvIsSet) 
             {

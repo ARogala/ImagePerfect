@@ -67,7 +67,7 @@ namespace ImagePerfect.ViewModels
             
             ShowLoading = true;
             //build csv
-            bool csvIsSet = await FolderCsvMethods.BuildFolderTreeCsv(_RootFolderPath[0]);
+            bool csvIsSet = await FolderCsvMethods.AddNewFoldersCsv(_RootFolderPath, true);
             //write csv to database
             if (csvIsSet) 
             {
