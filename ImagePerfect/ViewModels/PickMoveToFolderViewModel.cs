@@ -70,31 +70,23 @@ namespace ImagePerfect.ViewModels
             }
             //move folder in db
             string newFolderPath = PathHelper.FormatPathFromFolderPicker(_MoveToFolderPath[0]);
-            //Debug.WriteLine("root folder path " + rootFolder.FolderPath);
+           
             Debug.WriteLine("current folder path " + folderVm.FolderPath);
-            //Debug.WriteLine("picked folder path " + newFolderPath);
-            //newFolderPath = newFolderPath + @"\" + folderVm.FolderName;
-            //Debug.WriteLine($"New folder path {newFolderPath}");
-            //Console.WriteLine(folderVm.CoverImagePath);
+            Debug.WriteLine("picked folder path " + newFolderPath);
             Debug.WriteLine(PathHelper.GetRegExpStringForSubDirectories(folderVm.FolderPath));
 
             //pull current folder and sub folders from db
             List<Folder> folders = await _folderMethods.GetFoldersInDirectory(PathHelper.GetRegExpStringForSubDirectories(folderVm.FolderPath));
             List<Image> images = await _imageMethods.GetImagesInDirectory(PathHelper.GetRegExpStringForSubDirectories(folderVm.FolderPath));
-            foreach(Folder folder in folders)
-            {
-                Debug.WriteLine(folder.FolderPath);
-            }
-            Debug.WriteLine("----------------------");
-            foreach (Image image in images) 
-            { 
-                Debug.WriteLine(image.ImageFolderPath);
-            }
+           
             //modify folder path and folder, cover image path, and images
+            folders = PathHelper.ModifyFolderPathsForFolderMove(folders, folderVm.FolderName, newFolderPath);
+            images = PathHelper.ModifyImagePathsForFolderMove(images, folderVm.FolderName, newFolderPath);
+
 
             //build sql string and update db
-
-            //move images in db same basic idea as folders do both in a transaction
+            PathHelper.BuildFolderSqlForFolderMove(folders);
+            //move images in db same basic idea as folders do both in a transaction -- maybe even move the pull colder and image from db to txn?
 
             //move folder in filesystem if db move is successfull
         }
