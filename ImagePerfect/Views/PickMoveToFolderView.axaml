@@ -6,5 +6,9 @@
 			 xmlns:vm="using:ImagePerfect.ViewModels"
 			 x:DataType="vm:PickMoveToFolderViewModel"
              x:Class="ImagePerfect.Views.PickMoveToFolderView">
-	<Button HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="2" Command="{Binding SelectMoveToFolderCommand}">Move Folder</Button>
+	<Button HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="2" 
+			Command="{Binding SelectMoveToFolderCommand}"
+			CommandParameter="{Binding $parent[StackPanel].DataContext}">
+		Move Folder
+	</Button>
 </UserControl>

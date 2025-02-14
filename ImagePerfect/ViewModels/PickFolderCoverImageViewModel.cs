@@ -9,6 +9,8 @@ using ImagePerfect.Helpers;
 using ImagePerfect.Models;
 using ImagePerfect.ObjectMappers;
 using ImagePerfect.Repository.IRepository;
+using MsBox.Avalonia.Enums;
+using MsBox.Avalonia;
 using ReactiveUI;
 
 namespace ImagePerfect.ViewModels
@@ -43,7 +45,17 @@ namespace ImagePerfect.ViewModels
             { 
                 return;
             }
-           
+            //add check to make sure user is picking cover image directly in the folder
+            //the move operation is complex and best to ensure each cover image is an image from its own folder only
+            string pathCheck = PathHelper.FormatPathFromFolderPicker(_CoverImagePath[0]);
+            //pathCheck is now the selected image folder path.
+            pathCheck = PathHelper.RemoveOneFolderFromPath(pathCheck);
+            if (pathCheck != folderVm.FolderPath)
+            {
+                var box = MessageBoxManager.GetMessageBoxStandard("Cover Image", "You can only select a cover image that is within its own folder.", ButtonEnum.Ok);
+                await box.ShowAsync();
+                return;
+            }
             bool success = await _folderMethods.UpdateCoverImage(PathHelper.FormatPathFromFilePicker(_CoverImagePath[0]), folderVm.FolderId);
             //update lib folders to show the new cover !!
             if (success)
