@@ -35,6 +35,14 @@ namespace ImagePerfect.Repository
             return allImagesInFolder;
         }
 
+        public async Task<List<Image>> GetImagesInDirectory(string directoryPath)
+        {
+            string sql = @"SELECT * FROM images WHERE REGEXP_LIKE(ImageFolderPath, '" + directoryPath + "');";
+            List<Image> images = (List<Image>)await _connection.QueryAsync<Image>(sql);
+            await _connection.CloseAsync();
+            return images;
+        }
+
         public async Task<bool> AddImageCsv(string filePath, int folderId)
         {
             int rowsEffectedA = 0;

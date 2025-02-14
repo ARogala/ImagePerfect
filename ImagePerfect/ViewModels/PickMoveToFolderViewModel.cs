@@ -18,10 +18,12 @@ namespace ImagePerfect.ViewModels
 	{
         private readonly IUnitOfWork _unitOfWork;
         private readonly FolderMethods _folderMethods;
+        private readonly ImageMethods _imageMethods;
         public PickMoveToFolderViewModel(IUnitOfWork unitOfWork) 
 		{
             _unitOfWork = unitOfWork;
             _folderMethods = new FolderMethods(_unitOfWork);
+            _imageMethods = new ImageMethods(_unitOfWork);
 
             _SelectMoveToFolderInteration = new Interaction<string, List<string>?>();
 			SelectMoveToFolderCommand = ReactiveCommand.CreateFromTask((FolderViewModel folderVm) => SelectMoveToFolder(folderVm));
@@ -68,15 +70,27 @@ namespace ImagePerfect.ViewModels
             }
             //move folder in db
             string newFolderPath = PathHelper.FormatPathFromFolderPicker(_MoveToFolderPath[0]);
-            Debug.WriteLine("root folder path " + rootFolder.FolderPath);
+            //Debug.WriteLine("root folder path " + rootFolder.FolderPath);
             Debug.WriteLine("current folder path " + folderVm.FolderPath);
-            Debug.WriteLine("picked folder path " + newFolderPath);
-            newFolderPath = newFolderPath + @"\" + folderVm.FolderName;
-            Debug.WriteLine($"New folder path {newFolderPath}");
-            Console.WriteLine(folderVm.CoverImagePath);
-            //pull current folder and sub folders from db
+            //Debug.WriteLine("picked folder path " + newFolderPath);
+            //newFolderPath = newFolderPath + @"\" + folderVm.FolderName;
+            //Debug.WriteLine($"New folder path {newFolderPath}");
+            //Console.WriteLine(folderVm.CoverImagePath);
+            Debug.WriteLine(PathHelper.GetRegExpStringForSubDirectories(folderVm.FolderPath));
 
-            //modify folder path and folder cover image path
+            //pull current folder and sub folders from db
+            List<Folder> folders = await _folderMethods.GetFoldersInDirectory(PathHelper.GetRegExpStringForSubDirectories(folderVm.FolderPath));
+            List<Image> images = await _imageMethods.GetImagesInDirectory(PathHelper.GetRegExpStringForSubDirectories(folderVm.FolderPath));
+            foreach(Folder folder in folders)
+            {
+                Debug.WriteLine(folder.FolderPath);
+            }
+            Debug.WriteLine("----------------------");
+            foreach (Image image in images) 
+            { 
+                Debug.WriteLine(image.ImageFolderPath);
+            }
+            //modify folder path and folder, cover image path, and images
 
             //build sql string and update db
 
