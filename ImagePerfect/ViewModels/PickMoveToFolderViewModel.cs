@@ -85,7 +85,7 @@ namespace ImagePerfect.ViewModels
 
 
             //build sql string and update db
-            PathHelper.BuildFolderSqlForFolderMove(folders);
+            SqlStringBuilder.BuildFolderSqlForFolderMove(folders);
             //move images in db same basic idea as folders do both in a transaction -- maybe even move the pull colder and image from db to txn?
 
             //move folder in filesystem if db move is successfull
