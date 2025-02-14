@@ -92,3 +92,24 @@ SELECT * FROM folders WHERE REGEXP_LIKE(FolderPath, 'C:\\\\Users\\\\arogala\\\\D
 SELECT * FROM folders WHERE REGEXP_LIKE(FolderPath, 'C:\\\\Users\\\\arogala\\\\Documents\\\\CSharp\\\\SamplePictures\\\\[^\\\\]+\\\\?$');
 
 SELECT * FROM folders WHERE REGEXP_LIKE(FolderPath, 'C:\\\\Users\\\\arogala\\\\Documents\\\\CSharp\\\\SamplePictures\\\\space');
+
+/*
+https://stackoverflow.com/questions/12754470/mysql-update-case-when-then-else
+https://stackoverflow.com/questions/13673890/mysql-case-to-update-multiple-columns
+*/
+
+UPDATE folders SET FolderPath = CASE 
+	WHEN FolderId = 11 THEN 'C:\\Users\\arogala\\Documents\\CSharp\\SamplePictures\\Dad\\space'
+	WHEN FolderId = 13 THEN 'C:\\Users\\arogala\\Documents\\CSharp\\SamplePictures\\Dad\\space\\fav1'
+	WHEN folderId = 14 THEN 'C:\\Users\\arogala\\Documents\\CSharp\\SamplePictures\\Dad\\space\\fav1\\OtherStuff'
+	WHEN folderId = 15 THEN 'C:\\Users\\arogala\\Documents\\CSharp\\SamplePictures\\Dad\\space\\fav1\\OtherStuff\\OtherStuffTwo'
+	ELSE FolderPath
+  END,
+CoverImagePath = CASE
+	WHEN FolderId = 11 THEN 'C:\\Users\\arogala\\Documents\\CSharp\\SamplePictures\\Dad\\space\\hs-1995-01-a-1280_wallpaper.jpg'
+	WHEN FolderId = 13 THEN 'C:\\Users\\arogala\\Documents\\CSharp\\SamplePictures\\Dad\\space\\fav1\\ryan-hutton-37733-unsplash.jpg'
+	WHEN folderId = 14 THEN 'C:\\Users\\arogala\\Documents\\CSharp\\SamplePictures\\Dad\\space\\fav1\\OtherStuff\\wp5.jpg'
+	WHEN folderId = 15 THEN 'C:\\Users\\arogala\\Documents\\CSharp\\SamplePictures\\Dad\\space\\fav1\\OtherStuff\\OtherStuffTwo\\robson-hatsukami-morgan-296510-unsplash.jpg'
+  ELSE CoverImagePath
+  END
+WHERE FolderId IN (11,13,14,15);
