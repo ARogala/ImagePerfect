@@ -8,7 +8,8 @@
              x:Class="ImagePerfect.Views.PickMoveToFolderView">
 	<Button HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="2" 
 			Command="{Binding SelectMoveToFolderCommand}"
-			CommandParameter="{Binding $parent[StackPanel].DataContext}">
+			CommandParameter="{Binding $parent[StackPanel].DataContext}"
+			IsEnabled="{Binding !$parent[StackPanel].((vm:FolderViewModel)DataContext).IsRoot}">
 		Move Folder
 	</Button>
 </UserControl>
