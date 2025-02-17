@@ -112,7 +112,7 @@ namespace ImagePerfect.ViewModels
                         _libraryFolders.Add(folderViewModel);
                     }
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     var box = MessageBoxManager.GetMessageBoxStandard("Move Folder", "Sorry something went wrong", ButtonEnum.Ok);
                     await box.ShowAsync();
