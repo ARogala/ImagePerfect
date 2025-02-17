@@ -1,9 +1,7 @@
 ﻿using ImagePerfect.Models;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+
 
 namespace ImagePerfect.Helpers
 {
@@ -24,7 +22,7 @@ namespace ImagePerfect.Helpers
                     sb.Append($"WHEN FolderId = {folder.FolderId} THEN '{PathHelper.FormatPathForDbStorage(folder.CoverImagePath)}' ");
                 }
             }
-            sb.Append("ELSE CoverImagePath END WHERE FolderId In (");
+            sb.Append("ELSE CoverImagePath END WHERE FolderId IN (");
             for (int i = 0; i < folders.Count; i++)
             {
                 if (i < folders.Count - 1)
@@ -34,6 +32,34 @@ namespace ImagePerfect.Helpers
                 else
                 {
                     sb.Append($"{folders[i].FolderId}");
+                }
+            }
+            sb.Append(");");
+            return sb.ToString();
+        }
+
+        public static string BuildImageSqlForFolderMove(List<Image> images)
+        {
+            StringBuilder sb = new StringBuilder("UPDATE images SET ImagePath = CASE ");
+            foreach (Image image in images) 
+            {
+                sb.Append($"WHEN ImageId = {image.ImageId} THEN '{PathHelper.FormatPathForDbStorage(image.ImagePath)}' ");
+            }
+            sb.Append("ELSE ImagePath END, ImageFolderPath = CASE ");
+            foreach (Image image in images)
+            {
+                sb.Append($"WHEN ImageId = {image.ImageId} THEN '{PathHelper.FormatPathForDbStorage(image.ImageFolderPath)}' ");
+            }
+            sb.Append("ELSE ImageFolderPath END WHERE ImageId IN (");
+            for(int i = 0; i < images.Count; i++)
+            {
+                if(i < images.Count - 1)
+                {
+                    sb.Append($"{images[i].ImageId},");
+                }
+                else
+                {
+                    sb.Append($"{images[i].ImageId}");
                 }
             }
             sb.Append(");");

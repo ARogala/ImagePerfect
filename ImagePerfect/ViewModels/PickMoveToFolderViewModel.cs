@@ -85,9 +85,10 @@ namespace ImagePerfect.ViewModels
 
 
             //build sql string and update db
-            SqlStringBuilder.BuildFolderSqlForFolderMove(folders);
+            string folderMoveSql = SqlStringBuilder.BuildFolderSqlForFolderMove(folders);
+            string imageMoveSql = SqlStringBuilder.BuildImageSqlForFolderMove(images);
             //move images in db same basic idea as folders do both in a transaction -- maybe even move the pull colder and image from db to txn?
-
+            bool success = await _folderMethods.MoveFolder(folderMoveSql, imageMoveSql);
             //move folder in filesystem if db move is successfull
         }
     }
