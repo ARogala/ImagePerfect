@@ -20,6 +20,10 @@ namespace ImagePerfect.Helpers
         {
             return path.Replace(@"\",@"\\\\");
         }
+        public static string AddNewFolderNameToPathForDirectoryMoveFolder(string newFolderPath, string newFolderName)
+        {
+            return newFolderPath + @"\" + newFolderName;
+        }
         /*
             say for example you want to move C:\Users\arogala\Documents\CSharp\SamplePictures\space 
             to C:\Users\arogala\Documents\CSharp\SamplePictures\Dad
