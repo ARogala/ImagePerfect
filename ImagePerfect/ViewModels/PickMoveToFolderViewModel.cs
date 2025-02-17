@@ -11,6 +11,7 @@ using ImagePerfect.Models;
 using ImagePerfect.Repository.IRepository;
 using ImagePerfect.Repository;
 using System.Diagnostics;
+using System.IO;
 
 namespace ImagePerfect.ViewModels
 {
@@ -70,11 +71,13 @@ namespace ImagePerfect.ViewModels
             }
             //move folder in db
             string newFolderPath = PathHelper.FormatPathFromFolderPicker(_MoveToFolderPath[0]);
-           
-            Debug.WriteLine("current folder path " + folderVm.FolderPath);
-            Debug.WriteLine("picked folder path " + newFolderPath);
-            Debug.WriteLine(PathHelper.GetRegExpStringForSubDirectories(folderVm.FolderPath));
-
+            if (PathHelper.AddNewFolderNameToPathForDirectoryMoveFolder(newFolderPath, folderVm.FolderName) == folderVm.FolderPath)
+            {
+                var box = MessageBoxManager.GetMessageBoxStandard("Move Folder", "The folder is already in this location.", ButtonEnum.Ok);
+                await box.ShowAsync();
+                return;
+            }
+          
             //pull current folder and sub folders from db
             List<Folder> folders = await _folderMethods.GetFoldersInDirectory(PathHelper.GetRegExpStringForSubDirectories(folderVm.FolderPath));
             List<Image> images = await _imageMethods.GetImagesInDirectory(PathHelper.GetRegExpStringForSubDirectories(folderVm.FolderPath));
@@ -87,9 +90,28 @@ namespace ImagePerfect.ViewModels
             //build sql string and update db
             string folderMoveSql = SqlStringBuilder.BuildFolderSqlForFolderMove(folders);
             string imageMoveSql = SqlStringBuilder.BuildImageSqlForFolderMove(images);
-            //move images in db same basic idea as folders do both in a transaction -- maybe even move the pull colder and image from db to txn?
+            //move images and folders in db do both in a transaction
             bool success = await _folderMethods.MoveFolder(folderMoveSql, imageMoveSql);
             //move folder in filesystem if db move is successfull
+            if (success)
+            {
+                try
+                {
+                    Directory.Move(folderVm.FolderPath, PathHelper.AddNewFolderNameToPathForDirectoryMoveFolder(newFolderPath, folderVm.FolderName));
+                }
+                catch(Exception e)
+                {
+                    var box = MessageBoxManager.GetMessageBoxStandard("Move Folder", "Sorry something went wrong", ButtonEnum.Ok);
+                    await box.ShowAsync();
+                    return;
+                }
+            }
+            else
+            {
+                var box = MessageBoxManager.GetMessageBoxStandard("Move Folder", "Sorry something went wrong", ButtonEnum.Ok);
+                await box.ShowAsync();
+                return;
+            }
         }
     }
 }
