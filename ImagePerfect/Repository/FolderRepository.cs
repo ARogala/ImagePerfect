@@ -58,5 +58,18 @@ namespace ImagePerfect.Repository
             await _connection.CloseAsync();
             return rowsEffected > 0 ? true : false;
         }
+
+        public async Task<bool> MoveFolder(string folderMoveSql, string imageMoveSql)
+        {
+            int rowsEffectedA = 0;
+            int rowsEffectedB = 0;  
+            await _connection.OpenAsync();
+            MySqlTransaction txn = await _connection.BeginTransactionAsync();
+            rowsEffectedA = await _connection.ExecuteAsync(folderMoveSql, transaction: txn);
+            rowsEffectedB = await _connection.ExecuteAsync(imageMoveSql, transaction: txn);
+            await txn.CommitAsync();
+            await _connection.CloseAsync();
+            return rowsEffectedA > 0 && rowsEffectedB >= 0 ? true : false;
+        }
     }
 }

@@ -44,5 +44,10 @@ namespace ImagePerfect.Models
         {
             return await _unitOfWork.Folder.AddCoverImage(coverImagePath, folderId);
         }
+
+        public async Task<bool> MoveFolder(string folderMoveSql, string imageMoveSql)
+        {
+            return await _unitOfWork.Folder.MoveFolder(folderMoveSql, imageMoveSql);
+        }
     }
 }
