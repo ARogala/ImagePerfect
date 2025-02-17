@@ -46,19 +46,27 @@ namespace ImagePerfect.Helpers
         //need to rotate portrait images and resize for screen
         public static async Task<Bitmap> FormatImage(string path)
         {
-            using(MemoryStream ms = new MemoryStream())
-            using (var image = await Image.LoadAsync(path))
+            if (File.Exists(path))
             {
-                image.Mutate(x => { 
-                    x.AutoOrient();
-                    x.Resize(600, 0);
-                });
-                await image.SaveAsBmpAsync(ms);
-                //set stream to begining after writing
-                ms.Seek(0, SeekOrigin.Begin);
-                Bitmap img = new Bitmap(ms);
-                return img;
+                using (MemoryStream ms = new MemoryStream())
+                using (var image = await Image.LoadAsync(path))
+                {
+                    image.Mutate(x => {
+                        x.AutoOrient();
+                        x.Resize(600, 0);
+                    });
+                    await image.SaveAsBmpAsync(ms);
+                    //set stream to begining after writing
+                    ms.Seek(0, SeekOrigin.Begin);
+                    Bitmap img = new Bitmap(ms);
+                    return img;
+                }
             }
+            else
+            {
+                return LoadFromResource(new Uri("avares://ImagePerfect/Assets/missing_image.png"));
+            }
+            
         }
     }
 }
