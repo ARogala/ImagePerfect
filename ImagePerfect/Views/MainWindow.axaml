@@ -106,11 +106,20 @@
 						<DataTemplate DataType="vm:ImageViewModel">
 							<StackPanel Margin="10">
 								<Image MaxWidth="600" Source="{Binding ImageBitmap}" />
-								<Button HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="2"
+								<Grid RowDefinitions="Auto" ColumnDefinitions="*,*,*" MaxWidth="600">
+									<Button Grid.Row="0" Grid.Column="0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="2"
 									Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).BackFolderFromImageCommand}"
 									CommandParameter="{Binding}">
-									Back
-								</Button>
+										Back
+									</Button>
+									<Button Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="2">
+										Open
+									</Button>
+									<Button Grid.Row="0" Grid.Column="2" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="2">
+										Delete
+									</Button>
+								</Grid>
+								
 								<Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*,Auto">
 									<TextBox Grid.Row="0" Grid.Column="0" Watermark="Add Tags Comma Separated" Margin="5" MaxLength="2000" Text="{Binding ImageTags}"/>
 									<Button Grid.Row="0" Grid.Column="1"
