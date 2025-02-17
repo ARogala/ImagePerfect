@@ -12,6 +12,8 @@ using ImagePerfect.Repository.IRepository;
 using ImagePerfect.Repository;
 using System.Diagnostics;
 using System.IO;
+using System.Collections.ObjectModel;
+using ImagePerfect.ObjectMappers;
 
 namespace ImagePerfect.ViewModels
 {
@@ -20,9 +22,11 @@ namespace ImagePerfect.ViewModels
         private readonly IUnitOfWork _unitOfWork;
         private readonly FolderMethods _folderMethods;
         private readonly ImageMethods _imageMethods;
-        public PickMoveToFolderViewModel(IUnitOfWork unitOfWork) 
+        private ObservableCollection<FolderViewModel> _libraryFolders;
+        public PickMoveToFolderViewModel(IUnitOfWork unitOfWork, ObservableCollection<FolderViewModel> LibraryFolders) 
 		{
             _unitOfWork = unitOfWork;
+            _libraryFolders = LibraryFolders;
             _folderMethods = new FolderMethods(_unitOfWork);
             _imageMethods = new ImageMethods(_unitOfWork);
 
@@ -98,6 +102,15 @@ namespace ImagePerfect.ViewModels
                 try
                 {
                     Directory.Move(folderVm.FolderPath, PathHelper.AddNewFolderNameToPathForDirectoryMoveFolder(newFolderPath, folderVm.FolderName));
+                    //update lib folders to show the folder has moved
+                    _libraryFolders.Clear();
+                    string foldersDirectoryPath = PathHelper.RemoveOneFolderFromPath(folderVm.FolderPath);
+                    List<Folder> refreshFolders = await _folderMethods.GetFoldersInDirectory(PathHelper.GetRegExpString(foldersDirectoryPath));
+                    foreach (Folder folder in refreshFolders)
+                    {
+                        FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(folder);
+                        _libraryFolders.Add(folderViewModel);
+                    }
                 }
                 catch(Exception e)
                 {
