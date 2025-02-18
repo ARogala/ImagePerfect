@@ -117,8 +117,10 @@
 											CommandParameter="{Binding}">
 										Open
 									</Button>
-									<Button Grid.Row="0" Grid.Column="2" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="2">
-										Delete
+									<Button Grid.Row="0" Grid.Column="2" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="2"
+											Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).MoveImageToTrashCommand}"
+											CommandParameter="{Binding}">
+										Move To Trash
 									</Button>
 								</Grid>
 								

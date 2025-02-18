@@ -108,10 +108,9 @@ namespace ImagePerfect.Repository
 
             string tableName = GetTableName();
             string keyColumn = GetKeyColumnName();
-            string keyProperty = GetKeyPropertyName();
-            string query = $"DELETE FROM {tableName} WHERE {keyColumn} = @{keyProperty}";
+            string query = $"DELETE FROM {tableName} WHERE {keyColumn} = @Parameter";
 
-            rowsEffected = await _connection.ExecuteAsync(query, new { id });
+            rowsEffected = await _connection.ExecuteAsync(query, new { Parameter = id });
 
             await _connection.CloseAsync();
             return rowsEffected > 0 ? true : false;
