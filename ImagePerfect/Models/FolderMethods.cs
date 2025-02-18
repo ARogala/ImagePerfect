@@ -49,5 +49,10 @@ namespace ImagePerfect.Models
         {
             return await _unitOfWork.Folder.MoveFolder(folderMoveSql, imageMoveSql);
         }
+
+        public async Task<bool> DeleteFolder(int id)
+        {
+            return await _unitOfWork.Folder.Delete(id);
+        }
     }
 }
