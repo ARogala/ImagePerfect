@@ -13,6 +13,7 @@ using System.Reactive;
 using ImagePerfect.ObjectMappers;
 using System.Linq;
 using DynamicData;
+using System.IO;
 
 namespace ImagePerfect.ViewModels
 {
@@ -294,7 +295,18 @@ namespace ImagePerfect.ViewModels
 
         private async void OpenImageInExternalViewer(ImageViewModel imageVm)
         {
-            Debug.WriteLine(imageVm.ImagePath);
+            string externalImageViewerExePath = PathHelper.GetExternalImageViewerExePath();
+            string imagePathForProcessStart = PathHelper.FormatImageFilePathForProcessStart(imageVm.ImagePath);
+            if (File.Exists(imageVm.ImagePath) && File.Exists(externalImageViewerExePath)) 
+            {
+                Process.Start(externalImageViewerExePath, imagePathForProcessStart);
+            }
+            else
+            {
+                var box = MessageBoxManager.GetMessageBoxStandard("Open Image", "You need to install nomacs.", ButtonEnum.Ok);
+                await box.ShowAsync();
+                return;
+            }
         }
 
         private async void GetAllFolders()
