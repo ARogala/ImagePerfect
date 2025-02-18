@@ -66,8 +66,10 @@
 								</Grid>
 								<Grid RowDefinitions="Auto" ColumnDefinitions="*,*" MaxWidth="600">
 									<v:PickMoveToFolderView Grid.Row="0" Grid.Column="0" DataContext="{Binding #Root.((vm:MainWindowViewModel)DataContext).PickMoveToFolder}" />
-									<Button Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="2">
-										Delete Folder
+									<Button Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="2" IsEnabled="{Binding !IsRoot}"
+											Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).MoveFolderToTrashCommand}"
+											CommandParameter="{Binding}">
+										Move To Trash
 									</Button>
 								</Grid>
 								

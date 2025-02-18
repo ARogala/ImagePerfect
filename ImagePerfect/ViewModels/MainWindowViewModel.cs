@@ -70,6 +70,9 @@ namespace ImagePerfect.ViewModels
             MoveImageToTrashCommand = ReactiveCommand.Create((ImageViewModel imageVm) => { 
                 MoveImageToTrash(imageVm);
             });
+            MoveFolderToTrashCommand = ReactiveCommand.Create((FolderViewModel folderVm) => { 
+                MoveFolderToTrash(folderVm);
+            });
             GetRootFolder();
         }
         public bool ShowLoading
@@ -112,6 +115,8 @@ namespace ImagePerfect.ViewModels
         public ReactiveCommand<ImageViewModel, Unit> OpenImageInExternalViewerCommand { get; }
 
         public ReactiveCommand<ImageViewModel, Unit> MoveImageToTrashCommand { get; }
+
+        public ReactiveCommand<FolderViewModel, Unit> MoveFolderToTrashCommand { get; }
         private async void GetRootFolder()
         {
             Folder? rootFolder = await _folderMethods.GetRootFolder();
@@ -358,6 +363,11 @@ namespace ImagePerfect.ViewModels
                     }
                 }
             }
+        }
+
+        private async void MoveFolderToTrash(FolderViewModel folderVm)
+        {
+            Debug.WriteLine(folderVm.FolderPath);
         }
 
         private async void GetAllFolders()
