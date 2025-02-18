@@ -63,6 +63,9 @@ namespace ImagePerfect.ViewModels
             DeleteLibraryCommand = ReactiveCommand.Create(() => {
                 DeleteLibrary();
             });
+            OpenImageInExternalViewerCommand = ReactiveCommand.Create((ImageViewModel imageVm) => { 
+                OpenImageInExternalViewer(imageVm);
+            });
             GetRootFolder();
         }
         public bool ShowLoading
@@ -101,6 +104,8 @@ namespace ImagePerfect.ViewModels
         public ReactiveCommand<ImageViewModel, Unit> AddImageRatingCommand { get; }
 
         public ReactiveCommand<Unit, Unit> DeleteLibraryCommand { get; }
+
+        public ReactiveCommand<ImageViewModel, Unit> OpenImageInExternalViewerCommand { get; }
         private async void GetRootFolder()
         {
             Folder? rootFolder = await _folderMethods.GetRootFolder();
@@ -285,6 +290,11 @@ namespace ImagePerfect.ViewModels
                 return;     
             }
            
+        }
+
+        private async void OpenImageInExternalViewer(ImageViewModel imageVm)
+        {
+            Debug.WriteLine(imageVm.ImagePath);
         }
 
         private async void GetAllFolders()
