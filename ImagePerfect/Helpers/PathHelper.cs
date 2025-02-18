@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace ImagePerfect.Helpers
 {
+    //this whole class will need platform specific code to handle file paths. Linux vs Windows paths will be different
     public static class PathHelper
     {
         //regular expression string used in sql with REGEXP_LIKE to get all folders in directory (NOT Their sub folders)
@@ -130,6 +131,20 @@ namespace ImagePerfect.Helpers
             path = path.Replace(@"file:///", "");
             path = path.Replace(@"/", @"\");
             return path;
+        }
+
+        //this needs obvious improvement -- maybe have user select path and store in db. 
+        public static string GetExternalImageViewerExePath()
+        {
+            return @"C:\Program Files\nomacs\bin\nomacs.exe";
+        }
+
+        public static string FormatImageFilePathForProcessStart(string imagePath)
+        {
+            //https://stackoverflow.com/questions/1857325/c-sharp-easiest-way-to-parse-filename-with-spaces-eg-c-test-file-with-space
+            //escape the " to wrap the path in " like this "C:\pictures\pic with spaces.jpg"
+            //this allows the app to open files that have spaces in their names.
+            return "\"" + imagePath + "\"";
         }
     }
 }
