@@ -67,6 +67,9 @@ namespace ImagePerfect.ViewModels
             OpenImageInExternalViewerCommand = ReactiveCommand.Create((ImageViewModel imageVm) => { 
                 OpenImageInExternalViewer(imageVm);
             });
+            MoveImageToTrashCommand = ReactiveCommand.Create((ImageViewModel imageVm) => { 
+                MoveImageToTrash(imageVm);
+            });
             GetRootFolder();
         }
         public bool ShowLoading
@@ -107,6 +110,8 @@ namespace ImagePerfect.ViewModels
         public ReactiveCommand<Unit, Unit> DeleteLibraryCommand { get; }
 
         public ReactiveCommand<ImageViewModel, Unit> OpenImageInExternalViewerCommand { get; }
+
+        public ReactiveCommand<ImageViewModel, Unit> MoveImageToTrashCommand { get; }
         private async void GetRootFolder()
         {
             Folder? rootFolder = await _folderMethods.GetRootFolder();
@@ -306,6 +311,52 @@ namespace ImagePerfect.ViewModels
                 var box = MessageBoxManager.GetMessageBoxStandard("Open Image", "You need to install nomacs.", ButtonEnum.Ok);
                 await box.ShowAsync();
                 return;
+            }
+        }
+        private async void MoveImageToTrash(ImageViewModel imageVm)
+        {
+           
+            var boxYesNo = MessageBoxManager.GetMessageBoxStandard("Delete Image", "Are you sure you want to delete your image?", ButtonEnum.YesNo);
+            var result = await boxYesNo.ShowAsync();
+            if (result == ButtonResult.Yes) 
+            {
+                List<Folder> folders = await _folderMethods.GetFoldersInDirectory(PathHelper.GetRegExpString(imageVm.ImageFolderPath));
+                List<Image> images = await _imageMethods.GetAllImagesInFolder(imageVm.FolderId);
+                if (images.Count == 1 && folders.Count == 0)
+                {
+                    var box = MessageBoxManager.GetMessageBoxStandard("Delete Image", "This is the last image in the folder go back and delete the folder", ButtonEnum.Ok);
+                    await box.ShowAsync();
+                    return;
+                }
+                Folder? rootFolder = await _folderMethods.GetRootFolder();
+                string trashFolderPath = PathHelper.GetTrashFolderPath(rootFolder.FolderPath);
+
+                //create ImagePerfectTRASH if it doesnt exist
+                if (!Directory.Exists(trashFolderPath))
+                {
+                    Directory.CreateDirectory(trashFolderPath);
+                }
+                if (File.Exists(imageVm.ImagePath))
+                {
+                    //delete image from db
+                    bool success = await _imageMethods.DeleteImage(imageVm.ImageId);
+
+                    if (success)
+                    {
+                        //move file to trash folder
+                        string newImagePath = PathHelper.GetImageFileTrashPath(imageVm, trashFolderPath);
+                        File.Move(imageVm.ImagePath, newImagePath);
+
+                        //refresh UI
+                        images = await _imageMethods.GetAllImagesInFolder(imageVm.FolderId);
+                        Images.Clear();
+                        foreach (Image image in images)
+                        {
+                            ImageViewModel imageViewModel = await ImageMapper.GetImageVm(image);
+                            Images.Add(imageViewModel);
+                        }
+                    }
+                }
             }
         }
 

@@ -35,5 +35,10 @@ namespace ImagePerfect.Models
         {
             return await _unitOfWork.Image.Update(image);
         }
+
+        public async Task<bool> DeleteImage(int id)
+        {
+            return await _unitOfWork.Image.Delete(id);
+        }
     }
 }

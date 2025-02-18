@@ -1,7 +1,9 @@
 ﻿using ImagePerfect.Models;
+using ImagePerfect.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -145,6 +147,17 @@ namespace ImagePerfect.Helpers
             //escape the " to wrap the path in " like this "C:\pictures\pic with spaces.jpg"
             //this allows the app to open files that have spaces in their names.
             return "\"" + imagePath + "\"";
+        }
+
+        public static string GetTrashFolderPath(string rootFolderPath)
+        {
+            return rootFolderPath + @"\" + "ImagePerfectTRASH";
+        }
+        public static string GetImageFileTrashPath(ImageViewModel imageVm, string trashFolderPath)
+        {
+            //add a guid to guarantee no image in trash has the same name
+            Guid g = Guid.NewGuid();
+            return trashFolderPath + @"\" + g + Path.GetFileName(imageVm.ImagePath);
         }
     }
 }
