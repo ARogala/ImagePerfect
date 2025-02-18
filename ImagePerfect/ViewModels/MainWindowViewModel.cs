@@ -367,7 +367,49 @@ namespace ImagePerfect.ViewModels
 
         private async void MoveFolderToTrash(FolderViewModel folderVm)
         {
-            Debug.WriteLine(folderVm.FolderPath);
+            var boxYesNo = MessageBoxManager.GetMessageBoxStandard("Delete Folder", "Are you sure you want to delete your folder?", ButtonEnum.YesNo);
+            var result = await boxYesNo.ShowAsync();
+            if (result == ButtonResult.Yes) 
+            {
+                string pathThatContainsFolder = PathHelper.RemoveOneFolderFromPath(folderVm.FolderPath);
+                List<Image> images = await _imageMethods.GetAllImagesInFolder(pathThatContainsFolder);
+                List<Folder> folders = await _folderMethods.GetFoldersInDirectory(PathHelper.GetRegExpString(pathThatContainsFolder));
+                if (folders.Count == 1 && images.Count == 0)
+                {
+                    var box = MessageBoxManager.GetMessageBoxStandard("Delete Folder", "This is the last folder in the current directory go back and delete the root folder", ButtonEnum.Ok);
+                    await box.ShowAsync();
+                    return;
+                }
+                Folder? rootFolder = await _folderMethods.GetRootFolder();
+                string trashFolderPath = PathHelper.GetTrashFolderPath(rootFolder.FolderPath);
+
+                //create ImagePerfectTRASH if it doesnt exist
+                if (!Directory.Exists(trashFolderPath))
+                {
+                    Directory.CreateDirectory(trashFolderPath);
+                }
+                if (Directory.Exists(folderVm.FolderPath))
+                {
+                    //delete folder from db
+                    bool success = await _folderMethods.DeleteFolder(folderVm.FolderId);
+                    if (success) 
+                    {
+                        //move folder to trash folder
+                        string newFolderPath = PathHelper.GetFolderTrashPath(folderVm, trashFolderPath);
+                        Directory.Move(folderVm.FolderPath, newFolderPath);
+
+                        //refresh UI
+                        folders = await _folderMethods.GetFoldersInDirectory(PathHelper.GetRegExpString(pathThatContainsFolder));
+                        LibraryFolders.Clear();
+                        foreach (Folder folder in folders)
+                        {
+                            FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(folder);
+                            LibraryFolders.Add(folderViewModel);
+                        }
+                    }
+                }
+            }
+            
         }
 
         private async void GetAllFolders()
