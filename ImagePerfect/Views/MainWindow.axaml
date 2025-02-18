@@ -112,7 +112,9 @@
 									CommandParameter="{Binding}">
 										Back
 									</Button>
-									<Button Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="2">
+									<Button Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="2"
+											Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).OpenImageInExternalViewerCommand}"
+											CommandParameter="{Binding}">
 										Open
 									</Button>
 									<Button Grid.Row="0" Grid.Column="2" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="2">
