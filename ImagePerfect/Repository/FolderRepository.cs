@@ -4,6 +4,7 @@ using ImagePerfect.Repository.IRepository;
 using System.Threading.Tasks;
 using Dapper;
 using System.Collections.Generic;
+using ImagePerfect.Helpers;
 
 namespace ImagePerfect.Repository
 {
@@ -42,9 +43,22 @@ namespace ImagePerfect.Repository
             return rowsEffected > 0 ? true : false;
         }
 
+        //Only gets the folders in the path -- the folder itself or any sub directories within each folder are not returned
         public async Task<List<Folder>> GetFoldersInDirectory(string directoryPath)
         {
-            string sql = @"SELECT * FROM folders WHERE REGEXP_LIKE(FolderPath, '" + directoryPath + "');";
+            string regExpString = PathHelper.GetRegExpStringAllFoldersInDirectory(directoryPath);
+            string sql = @"SELECT * FROM folders WHERE REGEXP_LIKE(FolderPath, '" + regExpString + "');";
+            List<Folder> folders = (List<Folder>)await _connection.QueryAsync<Folder>(sql);
+            await _connection.CloseAsync();
+            return folders;
+        }
+
+        //gets the folder itself as well as all folders and subfolders within. 
+        //the entire directory tree of the path
+        public async Task<List<Folder>> GetDirectoryTree(string directoryPath)
+        {
+            string regExpString = PathHelper.GetRegExpStringDirectoryTree(directoryPath);
+            string sql = @"SELECT * FROM folders WHERE REGEXP_LIKE(FolderPath, '" + regExpString + "');";
             List<Folder> folders = (List<Folder>)await _connection.QueryAsync<Folder>(sql);
             await _connection.CloseAsync();
             return folders;

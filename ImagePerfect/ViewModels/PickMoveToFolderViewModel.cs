@@ -83,8 +83,8 @@ namespace ImagePerfect.ViewModels
             }
           
             //pull current folder and sub folders from db
-            List<Folder> folders = await _folderMethods.GetFoldersInDirectory(PathHelper.GetRegExpStringForSubDirectories(folderVm.FolderPath));
-            List<Image> images = await _imageMethods.GetImagesInDirectory(PathHelper.GetRegExpStringForSubDirectories(folderVm.FolderPath));
+            List<Folder> folders = await _folderMethods.GetDirectoryTree(folderVm.FolderPath);
+            List<Image> images = await _imageMethods.GetImagesInDirectory(PathHelper.GetRegExpStringDirectoryTree(folderVm.FolderPath));
            
             //modify folder path and folder, cover image path, and images
             folders = PathHelper.ModifyFolderPathsForFolderMove(folders, folderVm.FolderName, newFolderPath);
@@ -105,7 +105,7 @@ namespace ImagePerfect.ViewModels
                     //update lib folders to show the folder has moved
                     _libraryFolders.Clear();
                     string foldersDirectoryPath = PathHelper.RemoveOneFolderFromPath(folderVm.FolderPath);
-                    List<Folder> refreshFolders = await _folderMethods.GetFoldersInDirectory(PathHelper.GetRegExpStringAllFoldersInDirectory(foldersDirectoryPath));
+                    List<Folder> refreshFolders = await _folderMethods.GetFoldersInDirectory(foldersDirectoryPath);
                     foreach (Folder folder in refreshFolders)
                     {
                         FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(folder);

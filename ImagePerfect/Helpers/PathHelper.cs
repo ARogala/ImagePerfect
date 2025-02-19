@@ -14,12 +14,15 @@ namespace ImagePerfect.Helpers
     public static class PathHelper
     {
         //regular expression string used in sql with REGEXP_LIKE to get all folders in directory (NOT Their sub folders)
+        //Only gets the folders in the path -- the folder itself or any sub directories within each folder are not returned
         public static string GetRegExpStringAllFoldersInDirectory(string path)
         {
             return path.Replace(@"\", @"\\\\") + @"\\\\[^\\\\]+\\\\?$";
         }
-        //regexp string to get folder and their subfolders
-        public static string GetRegExpStringForSubDirectories(string path)
+        //regexp string to get folder and all subfolders
+        //gets the folder itself as well as all folders and subfolders within. 
+        //the entire directory tree of the path
+        public static string GetRegExpStringDirectoryTree(string path)
         {
             return path.Replace(@"\",@"\\\\");
         }
