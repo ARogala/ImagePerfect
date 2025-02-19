@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using ImagePerfect.Helpers;
 using ImagePerfect.Models;
 using ImagePerfect.Repository.IRepository;
 using MySqlConnector;
@@ -35,9 +36,10 @@ namespace ImagePerfect.Repository
             return allImagesInFolder;
         }
 
-        public async Task<List<Image>> GetImagesInDirectory(string directoryPath)
+        public async Task<List<Image>> GetAllImagesInDirectoryTree(string directoryPath)
         {
-            string sql = @"SELECT * FROM images WHERE REGEXP_LIKE(ImageFolderPath, '" + directoryPath + "');";
+            string regExpString = PathHelper.GetRegExpStringDirectoryTree(directoryPath);
+            string sql = @"SELECT * FROM images WHERE REGEXP_LIKE(ImageFolderPath, '" + regExpString + "');";
             List<Image> images = (List<Image>)await _connection.QueryAsync<Image>(sql);
             await _connection.CloseAsync();
             return images;

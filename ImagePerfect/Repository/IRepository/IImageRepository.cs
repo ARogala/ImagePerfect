@@ -9,7 +9,7 @@ namespace ImagePerfect.Repository.IRepository
         //any Image model sepecific database methods here
         Task<List<Image>> GetAllImagesInFolder(int folderId);
         Task<List<Image>> GetAllImagesInFolder(string folderPath);
-        Task<List<Image>> GetImagesInDirectory(string directoryPath);
+        Task<List<Image>> GetAllImagesInDirectoryTree(string directoryPath);
         Task<bool> AddImageCsv(string filePath, int folderId);
     }
 }
