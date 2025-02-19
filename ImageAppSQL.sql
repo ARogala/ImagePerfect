@@ -42,6 +42,7 @@ ON DELETE CASCADE to delete all images if a folder is deleted
 CREATE TABLE `images` (
 	`ImageId` bigint unsigned NOT NULL AUTO_INCREMENT,
 	`ImagePath` Varchar(2000) NOT NULL,
+	`FileName` Varchar(500) NOT NULL,
 	`ImageTags` Varchar(2000),
 	`ImageRating` tinyint unsigned,
 	`ImageFolderPath` Varchar(2000) NOT NULL,
