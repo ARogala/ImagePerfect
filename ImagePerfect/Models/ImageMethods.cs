@@ -26,9 +26,9 @@ namespace ImagePerfect.Models
             return await _unitOfWork.Image.GetAllImagesInFolder(folderPath);
         }
 
-        public async Task<List<Image>> GetImagesInDirectory(string directoryPath)
+        public async Task<List<Image>> GetAllImagesInDirectoryTree(string directoryPath)
         {
-            return await _unitOfWork.Image.GetImagesInDirectory(directoryPath);
+            return await _unitOfWork.Image.GetAllImagesInDirectoryTree(directoryPath);
         }
 
         public async Task<bool> UpdateImage(Image image)

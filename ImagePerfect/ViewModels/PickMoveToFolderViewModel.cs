@@ -84,12 +84,11 @@ namespace ImagePerfect.ViewModels
           
             //pull current folder and sub folders from db
             List<Folder> folders = await _folderMethods.GetDirectoryTree(folderVm.FolderPath);
-            List<Image> images = await _imageMethods.GetImagesInDirectory(PathHelper.GetRegExpStringDirectoryTree(folderVm.FolderPath));
+            List<Image> images = await _imageMethods.GetAllImagesInDirectoryTree(folderVm.FolderPath);
            
             //modify folder path and folder, cover image path, and images
             folders = PathHelper.ModifyFolderPathsForFolderMove(folders, folderVm.FolderName, newFolderPath);
             images = PathHelper.ModifyImagePathsForFolderMove(images, folderVm.FolderName, newFolderPath);
-
 
             //build sql string and update db
             string folderMoveSql = SqlStringBuilder.BuildFolderSqlForFolderMove(folders);
