@@ -22,7 +22,7 @@ namespace ImagePerfect.Repository
         //any Image model specific database methods here
         public async Task<List<Image>> GetAllImagesInFolder(int folderId)
         {
-            string sql = @"SELECT * FROM images WHERE FolderId = @folderId";
+            string sql = @"SELECT * FROM images WHERE FolderId = @folderId ORDER BY FileName";
             List<Image> allImagesInFolder = (List<Image>)await _connection.QueryAsync<Image>(sql, new { folderId });
             await _connection.CloseAsync();
             return allImagesInFolder;
@@ -30,7 +30,7 @@ namespace ImagePerfect.Repository
 
         public async Task<List<Image>> GetAllImagesInFolder(string folderPath)
         {
-            string sql = @"SELECT * FROM images WHERE ImageFolderPath = @folderPath";
+            string sql = @"SELECT * FROM images WHERE ImageFolderPath = @folderPath ORDER BY FileName";
             List<Image> allImagesInFolder = (List<Image>)await _connection.QueryAsync<Image>(sql, new { folderPath });
             await _connection.CloseAsync();
             return allImagesInFolder;
@@ -39,7 +39,7 @@ namespace ImagePerfect.Repository
         public async Task<List<Image>> GetAllImagesInDirectoryTree(string directoryPath)
         {
             string regExpString = PathHelper.GetRegExpStringDirectoryTree(directoryPath);
-            string sql = @"SELECT * FROM images WHERE REGEXP_LIKE(ImageFolderPath, '" + regExpString + "');";
+            string sql = @"SELECT * FROM images WHERE REGEXP_LIKE(ImageFolderPath, '" + regExpString + "') ORDER BY FileName;";
             List<Image> images = (List<Image>)await _connection.QueryAsync<Image>(sql);
             await _connection.CloseAsync();
             return images;
