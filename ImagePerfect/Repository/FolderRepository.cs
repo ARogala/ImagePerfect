@@ -47,7 +47,7 @@ namespace ImagePerfect.Repository
         public async Task<List<Folder>> GetFoldersInDirectory(string directoryPath)
         {
             string regExpString = PathHelper.GetRegExpStringAllFoldersInDirectory(directoryPath);
-            string sql = @"SELECT * FROM folders WHERE REGEXP_LIKE(FolderPath, '" + regExpString + "');";
+            string sql = @"SELECT * FROM folders WHERE REGEXP_LIKE(FolderPath, '" + regExpString + "') ORDER BY FolderName;";
             List<Folder> folders = (List<Folder>)await _connection.QueryAsync<Folder>(sql);
             await _connection.CloseAsync();
             return folders;
@@ -58,7 +58,7 @@ namespace ImagePerfect.Repository
         public async Task<List<Folder>> GetDirectoryTree(string directoryPath)
         {
             string regExpString = PathHelper.GetRegExpStringDirectoryTree(directoryPath);
-            string sql = @"SELECT * FROM folders WHERE REGEXP_LIKE(FolderPath, '" + regExpString + "');";
+            string sql = @"SELECT * FROM folders WHERE REGEXP_LIKE(FolderPath, '" + regExpString + "') ORDER BY FolderName;";
             List<Folder> folders = (List<Folder>)await _connection.QueryAsync<Folder>(sql);
             await _connection.CloseAsync();
             return folders;
