@@ -105,7 +105,7 @@ namespace ImagePerfect.ViewModels
                     //update lib folders to show the folder has moved
                     _libraryFolders.Clear();
                     string foldersDirectoryPath = PathHelper.RemoveOneFolderFromPath(folderVm.FolderPath);
-                    List<Folder> refreshFolders = await _folderMethods.GetFoldersInDirectory(PathHelper.GetRegExpString(foldersDirectoryPath));
+                    List<Folder> refreshFolders = await _folderMethods.GetFoldersInDirectory(PathHelper.GetRegExpStringAllFoldersInDirectory(foldersDirectoryPath));
                     foreach (Folder folder in refreshFolders)
                     {
                         FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(folder);

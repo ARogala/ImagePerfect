@@ -14,7 +14,7 @@ namespace ImagePerfect.Helpers
     public static class PathHelper
     {
         //regular expression string used in sql with REGEXP_LIKE to get all folders in directory (NOT Their sub folders)
-        public static string GetRegExpString(string path)
+        public static string GetRegExpStringAllFoldersInDirectory(string path)
         {
             return path.Replace(@"\", @"\\\\") + @"\\\\[^\\\\]+\\\\?$";
         }
