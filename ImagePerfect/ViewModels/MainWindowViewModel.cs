@@ -367,6 +367,14 @@ namespace ImagePerfect.ViewModels
 
         private async void MoveFolderToTrash(FolderViewModel folderVm)
         {
+            //only allow delete if folder does not contain children/sub directories
+            List<Folder> folderAndSubFolders = await _folderMethods.GetFoldersInDirectory(PathHelper.GetRegExpStringForSubDirectories(folderVm.FolderPath));
+            if (folderAndSubFolders.Count > 1) 
+            {
+                var box = MessageBoxManager.GetMessageBoxStandard("Delete Folder", "This folder contains sub folders clean those up first.", ButtonEnum.Ok);
+                await box.ShowAsync();
+                return;
+            }
             var boxYesNo = MessageBoxManager.GetMessageBoxStandard("Delete Folder", "Are you sure you want to delete your folder?", ButtonEnum.YesNo);
             var result = await boxYesNo.ShowAsync();
             if (result == ButtonResult.Yes) 
@@ -390,7 +398,7 @@ namespace ImagePerfect.ViewModels
                 }
                 if (Directory.Exists(folderVm.FolderPath))
                 {
-                    //delete folder from db
+                    //delete folder from db -- does not delete sub folders.
                     bool success = await _folderMethods.DeleteFolder(folderVm.FolderId);
                     if (success) 
                     {

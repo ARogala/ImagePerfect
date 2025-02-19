@@ -18,7 +18,7 @@ namespace ImagePerfect.Helpers
         {
             return path.Replace(@"\", @"\\\\") + @"\\\\[^\\\\]+\\\\?$";
         }
-        //regexp string to get folders and their subfolders
+        //regexp string to get folder and their subfolders
         public static string GetRegExpStringForSubDirectories(string path)
         {
             return path.Replace(@"\",@"\\\\");
