@@ -1,5 +1,6 @@
 ﻿using ImagePerfect.Models;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 
@@ -9,32 +10,63 @@ namespace ImagePerfect.Helpers
     {
         public static string BuildFolderSqlForFolderMove(List<Folder> folders)
         {
+            //need two sql string one that updates both folder path and coverimage path
+            //and one just for folder path where there are no cover images
+            int coverImageCount = 0;
+            foreach(Folder folder in folders)
+            {
+                if(folder.CoverImagePath != "")
+                {
+                    coverImageCount = coverImageCount + 1;
+                }
+            }
+
             StringBuilder sb = new StringBuilder("UPDATE folders SET FolderPath = CASE ");
             foreach (Folder folder in folders)
             {
                 sb.Append($"WHEN FolderId = {folder.FolderId} THEN '{PathHelper.FormatPathForDbStorage(folder.FolderPath)}' ");
             }
-            sb.Append("ELSE FolderPath End, CoverImagePath = CASE ");
-            foreach (Folder folder in folders)
+            if (coverImageCount > 0)
             {
-                if (folder.CoverImagePath != "")
+                sb.Append("ELSE FolderPath End, CoverImagePath = CASE ");
+                foreach (Folder folder in folders)
                 {
-                    sb.Append($"WHEN FolderId = {folder.FolderId} THEN '{PathHelper.FormatPathForDbStorage(folder.CoverImagePath)}' ");
+                    if (folder.CoverImagePath != "")
+                    {
+                        sb.Append($"WHEN FolderId = {folder.FolderId} THEN '{PathHelper.FormatPathForDbStorage(folder.CoverImagePath)}' ");
+                    }
                 }
+                sb.Append("ELSE CoverImagePath END WHERE FolderId IN (");
+                for (int i = 0; i < folders.Count; i++)
+                {
+                    if (i < folders.Count - 1)
+                    {
+                        sb.Append($"{folders[i].FolderId},");
+                    }
+                    else
+                    {
+                        sb.Append($"{folders[i].FolderId}");
+                    }
+                }
+                sb.Append(");");
             }
-            sb.Append("ELSE CoverImagePath END WHERE FolderId IN (");
-            for (int i = 0; i < folders.Count; i++)
+            else
             {
-                if (i < folders.Count - 1)
+                sb.Append("ELSE FolderPath END WHERE FolderId IN (");
+                for (int i = 0; i < folders.Count; i++)
                 {
-                    sb.Append($"{folders[i].FolderId},");
+                    if (i < folders.Count - 1)
+                    {
+                        sb.Append($"{folders[i].FolderId},");
+                    }
+                    else
+                    {
+                        sb.Append($"{folders[i].FolderId}");
+                    }
                 }
-                else
-                {
-                    sb.Append($"{folders[i].FolderId}");
-                }
+                sb.Append(");");
             }
-            sb.Append(");");
+            
             return sb.ToString();
         }
 
