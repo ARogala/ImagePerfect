@@ -144,7 +144,7 @@ namespace ImagePerfect.ViewModels
                 ShowLoading = false;
                 //remove one folder from path
                 newPath = PathHelper.RemoveOneFolderFromPath(imageFolderPath);
-                folders = await _folderMethods.GetFoldersInDirectory(PathHelper.GetRegExpString(newPath));
+                folders = await _folderMethods.GetFoldersInDirectory(PathHelper.GetRegExpStringAllFoldersInDirectory(newPath));
                 //folder may or may not have images but will just be an empty list if none.
                 images = await _imageMethods.GetAllImagesInFolder(newPath);
                 LibraryFolders.Clear();
@@ -171,7 +171,7 @@ namespace ImagePerfect.ViewModels
             List<Folder> folders = new List<Folder>();
             List<Image> images = new List<Image>();
             string newPath = PathHelper.RemoveOneFolderFromPath(imageVm.ImageFolderPath);
-            folders = await _folderMethods.GetFoldersInDirectory(PathHelper.GetRegExpString(newPath));
+            folders = await _folderMethods.GetFoldersInDirectory(PathHelper.GetRegExpStringAllFoldersInDirectory(newPath));
             //folder may or may not have images but will just be an empty list if none.
             images = await _imageMethods.GetAllImagesInFolder(newPath);
             LibraryFolders.Clear();
@@ -199,7 +199,7 @@ namespace ImagePerfect.ViewModels
             List<Image> images = new List<Image>();
             string newPath = PathHelper.RemoveTwoFoldersFromPath(currentFolder.FolderPath);
 
-            folders = await _folderMethods.GetFoldersInDirectory(PathHelper.GetRegExpString(newPath));
+            folders = await _folderMethods.GetFoldersInDirectory(PathHelper.GetRegExpStringAllFoldersInDirectory(newPath));
             //folder may or may not have images but will just be an empty list if none.
             images = await _imageMethods.GetAllImagesInFolder(newPath);
             LibraryFolders.Clear();
@@ -224,12 +224,12 @@ namespace ImagePerfect.ViewModels
             //two boolean varibale 4 combos TF TT FT and FF
             if (hasChildren == true && hasFiles == false) 
             {
-                folders = await _folderMethods.GetFoldersInDirectory(PathHelper.GetRegExpString(currentFolder.FolderPath));
+                folders = await _folderMethods.GetFoldersInDirectory(PathHelper.GetRegExpStringAllFoldersInDirectory(currentFolder.FolderPath));
             }
             else if (hasChildren == true && hasFiles == true)
             {
                 //get folders and images
-                folders = await _folderMethods.GetFoldersInDirectory(PathHelper.GetRegExpString(currentFolder.FolderPath));
+                folders = await _folderMethods.GetFoldersInDirectory(PathHelper.GetRegExpStringAllFoldersInDirectory(currentFolder.FolderPath));
                 images = await _imageMethods.GetAllImagesInFolder(currentFolder.FolderId);
                 
             }
@@ -325,7 +325,7 @@ namespace ImagePerfect.ViewModels
             var result = await boxYesNo.ShowAsync();
             if (result == ButtonResult.Yes) 
             {
-                List<Folder> folders = await _folderMethods.GetFoldersInDirectory(PathHelper.GetRegExpString(imageVm.ImageFolderPath));
+                List<Folder> folders = await _folderMethods.GetFoldersInDirectory(PathHelper.GetRegExpStringAllFoldersInDirectory(imageVm.ImageFolderPath));
                 List<Image> images = await _imageMethods.GetAllImagesInFolder(imageVm.FolderId);
                 if (images.Count == 1 && folders.Count == 0)
                 {
@@ -381,7 +381,7 @@ namespace ImagePerfect.ViewModels
             {
                 string pathThatContainsFolder = PathHelper.RemoveOneFolderFromPath(folderVm.FolderPath);
                 List<Image> images = await _imageMethods.GetAllImagesInFolder(pathThatContainsFolder);
-                List<Folder> folders = await _folderMethods.GetFoldersInDirectory(PathHelper.GetRegExpString(pathThatContainsFolder));
+                List<Folder> folders = await _folderMethods.GetFoldersInDirectory(PathHelper.GetRegExpStringAllFoldersInDirectory(pathThatContainsFolder));
                 if (folders.Count == 1 && images.Count == 0)
                 {
                     var box = MessageBoxManager.GetMessageBoxStandard("Delete Folder", "This is the last folder in the current directory go back and delete the root folder", ButtonEnum.Ok);
@@ -407,7 +407,7 @@ namespace ImagePerfect.ViewModels
                         Directory.Move(folderVm.FolderPath, newFolderPath);
 
                         //refresh UI
-                        folders = await _folderMethods.GetFoldersInDirectory(PathHelper.GetRegExpString(pathThatContainsFolder));
+                        folders = await _folderMethods.GetFoldersInDirectory(PathHelper.GetRegExpStringAllFoldersInDirectory(pathThatContainsFolder));
                         LibraryFolders.Clear();
                         foreach (Folder folder in folders)
                         {
