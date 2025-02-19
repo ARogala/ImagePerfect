@@ -13,6 +13,9 @@ namespace ImagePerfect.Models
         [Column("ImagePath")]
         public string ImagePath { get; set; }
 
+        [Column("FileName")]
+        public string FileName { get; set; }
+
         [Column("ImageTags")]
         public string? ImageTags { get; set; }
 
