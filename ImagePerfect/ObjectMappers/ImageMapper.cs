@@ -14,6 +14,7 @@ namespace ImagePerfect.ObjectMappers
                 ImageId = image.ImageId,
                 ImageBitmap = await ImageHelper.FormatImage(image.ImagePath),
                 ImagePath = image.ImagePath,
+                FileName = image.FileName,
                 ImageTags = image.ImageTags,
                 ImageRating = image.ImageRating,
                 ImageFolderPath = image.ImageFolderPath,
@@ -29,6 +30,7 @@ namespace ImagePerfect.ObjectMappers
             { 
                 ImageId= imageVm.ImageId,
                 ImagePath = imageVm.ImagePath,
+                FileName = imageVm.FileName,
                 ImageTags = imageVm.ImageTags,
                 ImageRating = imageVm.ImageRating,
                 ImageFolderPath = imageVm.ImageFolderPath,
