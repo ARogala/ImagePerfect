@@ -73,6 +73,9 @@ namespace ImagePerfect.ViewModels
             MoveFolderToTrashCommand = ReactiveCommand.Create((FolderViewModel folderVm) => { 
                 MoveFolderToTrash(folderVm);
             });
+            ScanFolderImagesForMetaDataCommand = ReactiveCommand.Create((FolderViewModel folderVm) => { 
+            
+            });
             GetRootFolder();
         }
         public bool ShowLoading
@@ -117,6 +120,8 @@ namespace ImagePerfect.ViewModels
         public ReactiveCommand<ImageViewModel, Unit> MoveImageToTrashCommand { get; }
 
         public ReactiveCommand<FolderViewModel, Unit> MoveFolderToTrashCommand { get; }
+
+        public ReactiveCommand<FolderViewModel, Unit> ScanFolderImagesForMetaDataCommand { get; }
         private async void GetRootFolder()
         {
             Folder? rootFolder = await _folderMethods.GetRootFolder();
@@ -418,6 +423,15 @@ namespace ImagePerfect.ViewModels
                 }
             }
             
+        }
+
+        private async void ScanFolderImagesForMetaData(FolderViewModel folderVm)
+        {
+            //get all images at folder id
+
+            //scan images for metadata
+
+            //add and or update database with metadata
         }
 
         private async void GetAllFolders()
