@@ -73,7 +73,7 @@
 									</Button>
 								</Grid>
 								<Grid RowDefinitions="Auto" ColumnDefinitions="*,*" MaxWidth="600">
-									<Button Grid.Row="0" Grid.Column="0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="2" IsVisible="{Binding HasFiles}"
+									<Button Grid.Row="0" Grid.Column="0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="2" IsVisible="{Binding !ShowImportImagesButton}"
 											Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).ScanFolderImagesForMetaDataCommand}"
 											CommandParameter="{Binding}">
 										Scan Images For Metadata
