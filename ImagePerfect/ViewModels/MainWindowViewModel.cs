@@ -14,6 +14,7 @@ using ImagePerfect.ObjectMappers;
 using System.Linq;
 using DynamicData;
 using System.IO;
+using System.ComponentModel.DataAnnotations;
 
 namespace ImagePerfect.ViewModels
 {
@@ -24,6 +25,10 @@ namespace ImagePerfect.ViewModels
         private readonly ImageCsvMethods _imageCsvMethods;
         private readonly ImageMethods _imageMethods;
         private bool _showLoading;
+        private string _currentDirectory;
+        private string _rootFolderLocation;
+        private string _newFolderName;
+        private bool _isNewFolderEnabled;
         public MainWindowViewModel() { }
         public MainWindowViewModel(IUnitOfWork unitOfWork)
         {
@@ -76,12 +81,48 @@ namespace ImagePerfect.ViewModels
             ScanFolderImagesForMetaDataCommand = ReactiveCommand.Create((FolderViewModel folderVm) => { 
                 ScanFolderImagesForMetaData(folderVm);
             });
+            CreateNewFolderCommand = ReactiveCommand.Create(() => { CreateNewFolder(); });
             GetRootFolder();
         }
         public bool ShowLoading
         {
             get => _showLoading;
             set => this.RaiseAndSetIfChanged(ref _showLoading, value);
+        }
+
+        public bool IsNewFolderEnabled
+        {
+            get => _isNewFolderEnabled;
+            set => this.RaiseAndSetIfChanged(ref _isNewFolderEnabled, value);
+        }
+
+        public string NewFolderName
+        {
+            get => _newFolderName;
+            set 
+            {
+                this.RaiseAndSetIfChanged(ref _newFolderName, value);
+                if (value == "" || CurrentDirectory == RootFolderLocation) 
+                { 
+                    IsNewFolderEnabled = false;
+                }
+                else
+                {
+                    IsNewFolderEnabled = true;
+                }
+            }
+        }
+
+        public string CurrentDirectory
+        {
+            get => _currentDirectory;
+            set => _currentDirectory = value;
+        }
+
+        public string RootFolderLocation
+        {
+            get => _rootFolderLocation;
+            set => _rootFolderLocation = value;
         }
         public PickRootFolderViewModel PickRootFolder { get => new PickRootFolderViewModel(_unitOfWork, LibraryFolders); }
 
@@ -122,6 +163,9 @@ namespace ImagePerfect.ViewModels
         public ReactiveCommand<FolderViewModel, Unit> MoveFolderToTrashCommand { get; }
 
         public ReactiveCommand<FolderViewModel, Unit> ScanFolderImagesForMetaDataCommand { get; }
+
+        public ReactiveCommand<Unit, Unit> CreateNewFolderCommand { get; }
+
         private async void GetRootFolder()
         {
             Folder? rootFolder = await _folderMethods.GetRootFolder();
@@ -129,8 +173,11 @@ namespace ImagePerfect.ViewModels
             {
                 FolderViewModel rootFolderVm = await FolderMapper.GetFolderVm(rootFolder);
                 LibraryFolders.Add(rootFolderVm);
+                RootFolderLocation = PathHelper.RemoveOneFolderFromPath(rootFolder.FolderPath);
+                CurrentDirectory = RootFolderLocation;
             }
         }
+
         private async void ImportImages(FolderViewModel imageFolder)
         {
             List<Folder> folders = new List<Folder>();
@@ -167,6 +214,7 @@ namespace ImagePerfect.ViewModels
 
             }
         }
+
         private async void BackFolderFromImage(ImageViewModel imageVm)
         {
             /*
@@ -176,6 +224,8 @@ namespace ImagePerfect.ViewModels
             List<Folder> folders = new List<Folder>();
             List<Image> images = new List<Image>();
             string newPath = PathHelper.RemoveOneFolderFromPath(imageVm.ImageFolderPath);
+            //set the current directory -- used to add new folder to location
+            CurrentDirectory = newPath;
             folders = await _folderMethods.GetFoldersInDirectory(newPath);
             //folder may or may not have images but will just be an empty list if none.
             images = await _imageMethods.GetAllImagesInFolder(newPath);
@@ -192,6 +242,7 @@ namespace ImagePerfect.ViewModels
                 Images.Add(imageViewModel);
             }
         }
+
         private async void BackFolder(FolderViewModel currentFolder)
         {
             /*
@@ -203,7 +254,8 @@ namespace ImagePerfect.ViewModels
             List<Folder> folders = new List<Folder>();
             List<Image> images = new List<Image>();
             string newPath = PathHelper.RemoveTwoFoldersFromPath(currentFolder.FolderPath);
-
+            //set the current directory -- used to add new folder to location
+            CurrentDirectory = newPath;
             folders = await _folderMethods.GetFoldersInDirectory(newPath);
             //folder may or may not have images but will just be an empty list if none.
             images = await _imageMethods.GetAllImagesInFolder(newPath);
@@ -220,12 +272,15 @@ namespace ImagePerfect.ViewModels
                 Images.Add(imageViewModel);
             }
         }
+
         private async void NextFolder(FolderViewModel currentFolder)
         {
             List<Folder> folders = new List<Folder>();
             List<Image> images = new List<Image>();
             bool hasChildren = currentFolder.HasChildren;
             bool hasFiles = currentFolder.HasFiles;
+            //set the current directory -- used to add new folder to location
+            CurrentDirectory = currentFolder.FolderPath;
             //two boolean varibale 4 combos TF TT FT and FF
             if (hasChildren == true && hasFiles == false) 
             {
@@ -262,6 +317,7 @@ namespace ImagePerfect.ViewModels
                 Images.Add(imageViewModel);
             }
         }
+
         private async void DeleteLibrary()
         {
             var box = MessageBoxManager.GetMessageBoxStandard("Delete Library", "Are you sure you want to delete your library? The images on the file system will remain.", ButtonEnum.YesNo);
@@ -323,6 +379,7 @@ namespace ImagePerfect.ViewModels
                 return;
             }
         }
+
         private async void MoveImageToTrash(ImageViewModel imageVm)
         {
            
@@ -433,6 +490,11 @@ namespace ImagePerfect.ViewModels
             //scan images for metadata
             ImageMetaDataHelper.ScanImagesForMetaData(images);
             //add and or update database with metadata
+        }
+
+        private void CreateNewFolder()
+        {
+            Debug.WriteLine("create new folder here: " + CurrentDirectory + " folder name " + NewFolderName);
         }
 
         private async void GetAllFolders()
