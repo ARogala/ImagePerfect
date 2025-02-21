@@ -169,5 +169,10 @@ namespace ImagePerfect.Helpers
             Guid g = Guid.NewGuid();
             return trashFolderPath + @"\" + g + folderVm.FolderName;
         }
+
+        public static string GetNewFolderPath(string currentDirectory, string newFolderName)
+        {
+            return currentDirectory + @"\" + newFolderName;
+        }
     }
 }
