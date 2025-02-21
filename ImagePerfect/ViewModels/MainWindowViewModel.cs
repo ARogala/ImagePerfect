@@ -74,7 +74,7 @@ namespace ImagePerfect.ViewModels
                 MoveFolderToTrash(folderVm);
             });
             ScanFolderImagesForMetaDataCommand = ReactiveCommand.Create((FolderViewModel folderVm) => { 
-            
+                ScanFolderImagesForMetaData(folderVm);
             });
             GetRootFolder();
         }
@@ -428,9 +428,10 @@ namespace ImagePerfect.ViewModels
         private async void ScanFolderImagesForMetaData(FolderViewModel folderVm)
         {
             //get all images at folder id
+            List<Image> images = await _imageMethods.GetAllImagesInFolder(folderVm.FolderId);
 
             //scan images for metadata
-
+            ImageMetaDataHelper.ScanImagesForMetaData(images);
             //add and or update database with metadata
         }
 
