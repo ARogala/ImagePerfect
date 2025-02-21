@@ -492,10 +492,55 @@ namespace ImagePerfect.ViewModels
             //add and or update database with metadata
         }
 
-        private void CreateNewFolder()
+        private async void CreateNewFolder()
         {
-            Debug.WriteLine("create new folder here: " + CurrentDirectory + " folder name " + NewFolderName);
+            //first check if directory exists
+            string newFolderPath = PathHelper.GetNewFolderPath(CurrentDirectory, NewFolderName);
+            if (Directory.Exists(newFolderPath))
+            {
+                var box = MessageBoxManager.GetMessageBoxStandard("New Folder", "A folder with this name already exists.", ButtonEnum.Ok);
+                await box.ShowAsync();
+                return;
+            }
+            //add dir to datbase
+            Folder newFolder = new Folder
+            {
+                FolderName = NewFolderName,
+                FolderPath = newFolderPath,
+                HasChildren = false,
+                CoverImagePath = "",
+                FolderRating = 0,
+                HasFiles = false,
+                IsRoot = false,
+                FolderContentMetaDataScanned = false,
+                AreImagesImported = false,
+            };
+            bool success = await _folderMethods.CreateNewFolder(newFolder);
+
+            //create on disk
+            if (success)
+            {
+                try
+                {
+                    Directory.CreateDirectory(newFolderPath);
+                    //refresh UI
+                    List<Folder> folders = await _folderMethods.GetFoldersInDirectory(CurrentDirectory);
+                    LibraryFolders.Clear();
+                    foreach (Folder folder in folders)
+                    {
+                        FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(folder);
+                        LibraryFolders.Add(folderViewModel);
+                    }
+                }
+                catch (Exception e) 
+                {
+                    var box = MessageBoxManager.GetMessageBoxStandard("New Folder", $"Error {e}.", ButtonEnum.Ok);
+                    await box.ShowAsync();
+                    return;
+                }
+            }   
         }
+
 
         private async void GetAllFolders()
         {

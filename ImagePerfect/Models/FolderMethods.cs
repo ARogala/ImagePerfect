@@ -59,5 +59,10 @@ namespace ImagePerfect.Models
         {
             return await _unitOfWork.Folder.Delete(id);
         }
+
+        public async Task<bool> CreateNewFolder(Folder newFolder)
+        {
+            return await _unitOfWork.Folder.Add(newFolder);
+        }
     }
 }
