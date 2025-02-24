@@ -43,10 +43,15 @@ namespace ImagePerfect.Helpers
 
         private static void ReadMetadata(ImageSharp.Image image, Image localImg)
         {
+          
             if (image.Metadata.IptcProfile?.Values?.Any() == true)
             {
                 foreach (var prop in image.Metadata.IptcProfile.Values)
+                {
                     Debug.WriteLine($"{prop.Tag}: {prop.Value} ");
+           
+                }
+             
                 Debug.WriteLine(localImg.FileName);
                 Debug.WriteLine("------------------");
             }
@@ -55,24 +60,24 @@ namespace ImagePerfect.Helpers
                 Debug.WriteLine($" does not contain metadata");
                 Debug.WriteLine("------------------");
             }
-                
 
-            //if (image.Metadata.ExifProfile?.Values?.Any() == true)
-            //{
-            //    foreach (var prop in image.Metadata.ExifProfile.Values)
-            //        Debug.WriteLine($"{prop.Tag}: {prop.GetValue()}");
+            //shotwell rating is in exifprofile
+            if (image.Metadata.ExifProfile?.Values?.Any() == true)
+            {
+                foreach (var prop in image.Metadata.ExifProfile.Values)
+                    Debug.WriteLine($"{prop.Tag}: {prop.GetValue()}");
+                Debug.WriteLine(localImg.FileName);
+                Debug.WriteLine("------------------------------");
+            }
 
-            //    Debug.WriteLine("------------------------------");
-            //}
-
-            //if(image.Metadata.IccProfile?.Entries?.Any() == true) 
-            //{
-            //    foreach (var prop in image.Metadata.IccProfile.Entries)
-            //    {
-            //        Debug.WriteLine($"{prop.TagSignature} : {prop.Signature}");
-            //    }
-            //    Debug.WriteLine("------------------------------");
-            //}   
+            if (image.Metadata.IccProfile?.Entries?.Any() == true)
+            {
+                foreach (var prop in image.Metadata.IccProfile.Entries)
+                {
+                    Debug.WriteLine($"{prop.TagSignature} : {prop.Signature}");
+                }
+                Debug.WriteLine("------------------------------");
+            }
         }
     }
 }
