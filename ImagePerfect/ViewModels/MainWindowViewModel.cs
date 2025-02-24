@@ -488,7 +488,14 @@ namespace ImagePerfect.ViewModels
             List<Image> images = await _imageMethods.GetAllImagesInFolder(folderVm.FolderId);
 
             //scan images for metadata
-            ImageMetaDataHelper.ScanImagesForMetaData(images);
+            List<Image> imagesPlusUpdatedMetaData = await ImageMetaDataHelper.ScanImagesForMetaData(images);
+            foreach (Image image in imagesPlusUpdatedMetaData) 
+            {
+                Debug.WriteLine($"Tags: {image.ImageTags}");
+                Debug.WriteLine($"Rating: {image.ImageRating}");
+                Debug.WriteLine(image.FileName);
+                Debug.WriteLine("----------------------------------");
+            }
             //add and or update database with metadata
         }
 
