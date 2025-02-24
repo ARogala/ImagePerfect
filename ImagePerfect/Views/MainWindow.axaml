@@ -31,6 +31,7 @@
 			Add some filters here
 			-->
 		</StackPanel>
+		<!--
 		<StackPanel Grid.Row="2" MaxWidth="400">
 			<TextBlock Margin="0 5" >Create A New Folder:</TextBlock>
 			<TextBox  Watermark="Enter folder name" Text="{Binding NewFolderName}" />
@@ -41,6 +42,7 @@
 				Create Folder
 			</Button>
 		</StackPanel>
+		-->
 		<ProgressBar Grid.Row="3" Margin="10" IsIndeterminate="True" IsVisible="{Binding ShowLoading}"/>
 		<ScrollViewer Grid.Row="4">
 			<StackPanel>
@@ -83,7 +85,7 @@
 									</Button>
 								</Grid>
 								<Grid RowDefinitions="Auto" ColumnDefinitions="*,*" MaxWidth="600">
-									<Button Grid.Row="0" Grid.Column="0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="2" IsVisible="{Binding !ShowImportImagesButton}"
+									<Button Grid.Row="0" Grid.Column="0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="2"
 											Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).ScanFolderImagesForMetaDataCommand}"
 											CommandParameter="{Binding}">
 										Scan Images For Metadata
