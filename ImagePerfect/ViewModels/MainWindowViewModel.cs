@@ -15,6 +15,7 @@ using System.Linq;
 using DynamicData;
 using System.IO;
 using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 
 namespace ImagePerfect.ViewModels
 {
@@ -29,6 +30,8 @@ namespace ImagePerfect.ViewModels
         private string _rootFolderLocation;
         private string _newFolderName;
         private bool _isNewFolderEnabled;
+        private List<string> _tagsList = new List<string>();
+
         public MainWindowViewModel() { }
         public MainWindowViewModel(IUnitOfWork unitOfWork)
         {
@@ -61,7 +64,8 @@ namespace ImagePerfect.ViewModels
                 UpdateFolder(folderVm, "Rating");
             });
             AddImageTagsCommand = ReactiveCommand.Create((ImageViewModel imageVm) => {
-                UpdateImage(imageVm, "Tags");
+                //UpdateImage(imageVm, "Tags");
+                AddImageTag(imageVm);
             });
             AddImageRatingCommand = ReactiveCommand.Create((ImageViewModel imageVm) => {
                 UpdateImage(imageVm, "Rating");
@@ -82,7 +86,13 @@ namespace ImagePerfect.ViewModels
                 ScanFolderImagesForMetaData(folderVm);
             });
             //CreateNewFolderCommand = ReactiveCommand.Create(() => { CreateNewFolder(); });
-            GetRootFolder();
+            Initialize();
+        }
+
+        public List<string> TagsList
+        {
+            get => _tagsList;
+            set => this.RaiseAndSetIfChanged(ref _tagsList, value); 
         }
         public bool ShowLoading
         {
@@ -166,7 +176,12 @@ namespace ImagePerfect.ViewModels
 
         //public ReactiveCommand<Unit, Unit> CreateNewFolderCommand { get; }
 
-        private async void GetRootFolder()
+        private async void Initialize()
+        {
+            await GetRootFolder();
+            await GetTagsList();
+        }
+        private async Task GetRootFolder()
         {
             Folder? rootFolder = await _folderMethods.GetRootFolder();
             if (rootFolder != null) 
@@ -176,6 +191,12 @@ namespace ImagePerfect.ViewModels
                 RootFolderLocation = PathHelper.RemoveOneFolderFromPath(rootFolder.FolderPath);
                 CurrentDirectory = RootFolderLocation;
             }
+        }
+
+        //should technically have its own repo but only plan on having only this one method just keeping it in images repo.
+        private async Task GetTagsList()
+        {
+            TagsList = await _imageMethods.GetTagsList();
         }
 
         private async void ImportImages(FolderViewModel imageFolder)
@@ -364,6 +385,25 @@ namespace ImagePerfect.ViewModels
            
         }
 
+        private async void AddImageTag(ImageViewModel imageVm)
+        {
+            //add NewTag to ImageTags
+            if(imageVm.ImageTags == "")
+            {
+                imageVm.ImageTags = imageVm.NewTag;
+            }
+            else
+            {
+                imageVm.ImageTags = imageVm.ImageTags + "," + imageVm.NewTag;
+            }
+            Image image = ImageMapper.GetImageFromVm(imageVm);
+            //update image table and tags table in db
+            bool success = await _imageMethods.UpdateImageTags(image, imageVm.NewTag);
+            //Update TagsList to show in UI AutoCompleteBox 
+            await GetTagsList();
+            //write new tag to image metadata
+        }
+       
         private async void OpenImageInExternalViewer(ImageViewModel imageVm)
         {
             string externalImageViewerExePath = PathHelper.GetExternalImageViewerExePath();

@@ -10,12 +10,13 @@ namespace ImagePerfect.ViewModels
 		private string _imagePath;
 		private string _fileName;
 		private string? _imageTags;
+		private string _newTag;
 		private int _imageRating;
 		private string _imageFolderPath;
 		private bool _imageMetaDataScanned;
 		private int _folderId;
 
-		public int ImageId
+        public int ImageId
 		{
 			get => _imageId;
 			set => this.RaiseAndSetIfChanged(ref _imageId, value);
@@ -41,6 +42,11 @@ namespace ImagePerfect.ViewModels
 			get => _imageTags;
 			set => this.RaiseAndSetIfChanged(ref _imageTags, value);
 		}
+		public string NewTag
+		{
+			get => _newTag;
+			set => this.RaiseAndSetIfChanged(ref _newTag, value);
+		}
 		public int ImageRating
 		{
 			get => _imageRating;
@@ -62,5 +68,5 @@ namespace ImagePerfect.ViewModels
 			set => this.RaiseAndSetIfChanged(ref _folderId, value);
 		}
 
-	}
+    }
 }

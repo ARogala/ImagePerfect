@@ -36,6 +36,16 @@ namespace ImagePerfect.Models
             return await _unitOfWork.Image.Update(image);
         }
 
+        public async Task<bool> UpdateImageTags(Image image, string newTag)
+        {
+            return await _unitOfWork.Image.UpdateImageTags(image, newTag);
+        }
+
+        public async Task<List<string>> GetTagsList()
+        {
+            return await _unitOfWork.Image.GetTagsList();
+        }
+
         public async Task<bool> DeleteImage(int id)
         {
             return await _unitOfWork.Image.Delete(id);

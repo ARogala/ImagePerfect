@@ -54,6 +54,13 @@ CREATE TABLE `images` (
 	CONSTRAINT `images_ibfk_1` FOREIGN KEY (`FolderId`) REFERENCES `folders` (`FolderId`) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+CREATE TABLE `tags`(
+	`TagId` bigint unsigned NOT NULL AUTO_INCREMENT,
+	`TagName` Varchar(100) NOT NULL,
+	PRIMARY KEY (`TagId`),
+	CONSTRAINT `tags_uq` UNIQUE (`TagName`)
+);
+
 
 /*
 https://stackoverflow.com/questions/66848547/mysql-error-code-3948-loading-local-data-is-disabled-this-must-be-enabled-on-b
