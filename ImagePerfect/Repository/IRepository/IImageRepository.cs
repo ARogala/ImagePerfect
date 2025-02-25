@@ -11,5 +11,7 @@ namespace ImagePerfect.Repository.IRepository
         Task<List<Image>> GetAllImagesInFolder(string folderPath);
         Task<List<Image>> GetAllImagesInDirectoryTree(string directoryPath);
         Task<bool> AddImageCsv(string filePath, int folderId);
+        Task<bool> UpdateImageTags(Image image, string newTag);
+        Task<List<string>> GetTagsList();
     }
 }
