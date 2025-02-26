@@ -410,6 +410,11 @@ namespace ImagePerfect.ViewModels
         //this will add NewTags to the tags list and update image metadata and image sql
         private async void AddImageTag(ImageViewModel imageVm)
         {
+            //click submit with empty input just return
+            if(imageVm.NewTag == "" || imageVm.NewTag == null)
+            {
+                return;
+            }
             //add NewTag to ImageTags
             if(imageVm.ImageTags == "")
             {
