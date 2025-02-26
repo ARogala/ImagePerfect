@@ -79,8 +79,7 @@ namespace ImagePerfect.Helpers
         {
             if (image.Metadata.IptcProfile == null)
                 image.Metadata.IptcProfile = new IptcProfile();
-
-            if (imagePerfectImage.ImageTags != "")
+            if (imagePerfectImage.ImageTags != "" && imagePerfectImage.ImageTags != null)
             {
                 //remove all
                 image.Metadata.IptcProfile.RemoveValue(IptcTag.Keywords);
@@ -94,7 +93,7 @@ namespace ImagePerfect.Helpers
                 await image.SaveAsync($"{imagePerfectImage.ImagePath}");
             }
             //just remove all if that is what we want -- this will be the case if the user removes the entire string in the UI
-            else if (imagePerfectImage.ImageTags == "")
+            else if (imagePerfectImage.ImageTags == "" || imagePerfectImage.ImageTags == null)
             {
                 //remove all
                 image.Metadata.IptcProfile.RemoveValue(IptcTag.Keywords);
