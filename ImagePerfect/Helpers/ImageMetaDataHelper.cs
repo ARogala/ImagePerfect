@@ -8,6 +8,7 @@ using SixLabors.ImageSharp.Metadata.Profiles.Iptc;
 using SixLabors.ImageSharp.Metadata.Profiles.Exif;
 using System;
 using System.Threading.Tasks;
+using SixLabors.ImageSharp;
 //https://aaronbos.dev/posts/iptc-metadata-csharp-imagesharp
 namespace ImagePerfect.Helpers
 {
@@ -21,6 +22,12 @@ namespace ImagePerfect.Helpers
                 UpdateMetadata(imageInfo, image);   
             }
             return images;
+        }
+
+        public static async void WriteTagToImage(ImagePerfectImage image)
+        {
+            ImageSharp.Image imageSharpImage = await ImageSharp.Image.LoadAsync(image.ImagePath);
+            WriteKeywordToImage(imageSharpImage, image);
         }
 
         private static void UpdateMetadata(ImageSharp.ImageInfo imageInfo, ImagePerfectImage image)
@@ -57,21 +64,26 @@ namespace ImagePerfect.Helpers
             }
         }
 
-        private static void WriteMetadata(ImageSharp.Image image, Image localImg)
+        //clear all the current keywords add the imagePerfect ones save
+        //this will keep it in sync
+        private static async void WriteKeywordToImage(ImageSharp.Image image, ImagePerfectImage imagePerfectImage)
         {
             if (image.Metadata.IptcProfile == null)
                 image.Metadata.IptcProfile = new IptcProfile();
 
-            image.Metadata.IptcProfile.SetValue(IptcTag.Name, "Pokemon");
-            image.Metadata.IptcProfile.SetValue(IptcTag.Byline, "Thimo Pedersen");
-            image.Metadata.IptcProfile.SetValue(IptcTag.Caption, "Classic Pokeball Toy on a bunch of Pokemon Cards. Zapdos, Ninetales and a Trainercard visible.");
-            image.Metadata.IptcProfile.SetValue(IptcTag.Source, @"https://rb.gy/hgkqhy");
-            image.Metadata.IptcProfile.SetValue(IptcTag.Keywords, "Pokemon");
-            image.Metadata.IptcProfile.SetValue(IptcTag.Keywords, "Pokeball");
-            image.Metadata.IptcProfile.SetValue(IptcTag.Keywords, "Cards");
-            image.Metadata.IptcProfile.SetValue(IptcTag.Keywords, "Zapdos");
-            image.Metadata.IptcProfile.SetValue(IptcTag.Keywords, "Ninetails");
-            image.Metadata.IptcProfile.SetValue(IptcTag.CustomField1, "Ninetails");
+            if (imagePerfectImage.ImageTags != "")
+            {
+                //remove all
+                image.Metadata.IptcProfile.RemoveValue(IptcTag.Keywords);
+
+                string[] tags = imagePerfectImage.ImageTags.Split(",");
+                foreach (string tag in tags)
+                {
+                    //re-add
+                    image.Metadata.IptcProfile.SetValue(IptcTag.Keywords, tag);
+                }
+                await image.SaveAsync($"{imagePerfectImage.ImagePath}");
+            }
         }
     }
 }
