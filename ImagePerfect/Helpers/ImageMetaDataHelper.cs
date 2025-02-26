@@ -41,6 +41,9 @@ namespace ImagePerfect.Helpers
           
             if (imageInfo.Metadata.IptcProfile?.Values?.Any() == true)
             {
+                //if keywords are in db and writen to file already this will double it up on the ImagePerfectImage object..
+                //So clear ImagePerfectImage object tags first
+                image.ImageTags = "";
                 foreach (var prop in imageInfo.Metadata.IptcProfile.Values)
                 {
                     if(prop.Tag == IptcTag.Keywords)
