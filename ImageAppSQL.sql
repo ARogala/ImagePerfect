@@ -121,3 +121,18 @@ CoverImagePath = CASE
   ELSE CoverImagePath
   END
 WHERE FolderId IN (11,13,14,15);
+
+/*
+https://stackoverflow.com/questions/64194596/mysql-select-distinct-values-from-a-column-where-values-are-separated-by-comma
+*/
+with recursive 
+    data as (select concat(ImageTags, ',') rest from images),
+    words as (
+        select substring(rest, 1, locate(',', rest) - 1) word, substring(rest, locate(',', rest) + 1) rest
+        from data
+        union all
+        select substring(rest, 1, locate(',', rest) - 1) word, substring(rest, locate(',', rest) + 1) rest
+        from words
+        where locate(',', rest) > 0
+)
+select distinct word from words order by word
