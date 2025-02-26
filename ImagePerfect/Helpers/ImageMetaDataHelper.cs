@@ -30,6 +30,12 @@ namespace ImagePerfect.Helpers
             WriteKeywordToImage(imageSharpImage, image);
         }
 
+        public static async void AddRatingToImage(ImagePerfectImage image)
+        {
+            ImageSharp.Image imageSharpImage = await ImageSharp.Image.LoadAsync(image.ImagePath);
+            WriteRatingToImage(imageSharpImage, image);
+        }
+
         private static void UpdateMetadata(ImageSharp.ImageInfo imageInfo, ImagePerfectImage image)
         {
           
@@ -84,6 +90,15 @@ namespace ImagePerfect.Helpers
                 }
                 await image.SaveAsync($"{imagePerfectImage.ImagePath}");
             }
+        }
+
+        private static async void WriteRatingToImage(ImageSharp.Image image, ImagePerfectImage imagePerfectImage)
+        {
+            if(image.Metadata.ExifProfile == null)
+                image.Metadata.ExifProfile = new ExifProfile();
+            ushort newRating = Convert.ToUInt16(imagePerfectImage.ImageRating);
+            image.Metadata.ExifProfile.SetValue(ExifTag.Rating, newRating);
+            await image.SaveAsync($"{imagePerfectImage.ImagePath}");
         }
     }
 }

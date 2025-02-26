@@ -400,6 +400,10 @@ namespace ImagePerfect.ViewModels
                 //write new tag to image metadata
                 ImageMetaDataHelper.WriteTagToImage(image);
             }
+            else if (fieldUpdated == "Rating")
+            {
+                ImageMetaDataHelper.AddRatingToImage(image);
+            }
            
         }
         //this will add NewTags to the tags list and update image metadata and image sql
