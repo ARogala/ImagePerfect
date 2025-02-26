@@ -124,6 +124,7 @@ WHERE FolderId IN (11,13,14,15);
 
 /*
 https://stackoverflow.com/questions/64194596/mysql-select-distinct-values-from-a-column-where-values-are-separated-by-comma
+https://stackoverflow.com/questions/49196949/get-all-distinct-values-from-a-particular-column-with-comma-separated-values
 */
 with recursive 
     data as (select concat(ImageTags, ',') rest from images),
