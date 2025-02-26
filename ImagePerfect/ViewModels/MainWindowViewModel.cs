@@ -551,19 +551,42 @@ namespace ImagePerfect.ViewModels
 
         private async void ScanFolderImagesForMetaData(FolderViewModel folderVm)
         {
+            ShowLoading = true;
             //get all images at folder id
             List<Image> images = await _imageMethods.GetAllImagesInFolder(folderVm.FolderId);
 
             //scan images for metadata
             List<Image> imagesPlusUpdatedMetaData = await ImageMetaDataHelper.ScanImagesForMetaData(images);
-            foreach (Image image in imagesPlusUpdatedMetaData) 
+            //foreach (Image image in imagesPlusUpdatedMetaData) 
+            //{
+            //    Debug.WriteLine($"Tags: {image.ImageTags}");
+            //    Debug.WriteLine($"Rating: {image.ImageRating}");
+            //    Debug.WriteLine(image.FileName);
+            //    Debug.WriteLine("----------------------------------");
+            //}
+            //update database with metadata
+            string imageUpdateSql = SqlStringBuilder.BuildImageSqlForScanMetadata(imagesPlusUpdatedMetaData);
+            bool success = await _imageMethods.UpdateImageMetaData(imageUpdateSql, folderVm.FolderId);
+            //show data scanned success
+            if (success)
             {
-                Debug.WriteLine($"Tags: {image.ImageTags}");
-                Debug.WriteLine($"Rating: {image.ImageRating}");
-                Debug.WriteLine(image.FileName);
-                Debug.WriteLine("----------------------------------");
+                //refresh UI
+                List<Folder> folders = await _folderMethods.GetFoldersInDirectory(CurrentDirectory);
+                LibraryFolders.Clear();
+                foreach (Folder folder in folders)
+                {
+                    FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(folder);
+                    LibraryFolders.Add(folderViewModel);
+                }
+                List<Image> imagesInDir = await _imageMethods.GetAllImagesInFolder(CurrentDirectory);
+                Images.Clear();
+                foreach (Image image in imagesInDir)
+                {
+                    ImageViewModel imageViewModel = await ImageMapper.GetImageVm(image);
+                    Images.Add(imageViewModel);
+                }
             }
-            //add and or update database with metadata
+            ShowLoading = false;
         }
 
         /*

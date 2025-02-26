@@ -93,6 +93,13 @@ namespace ImagePerfect.Helpers
                 }
                 await image.SaveAsync($"{imagePerfectImage.ImagePath}");
             }
+            //just remove all if that is what we want -- this will be the case if the user removes the entire string in the UI
+            else if (imagePerfectImage.ImageTags == "")
+            {
+                //remove all
+                image.Metadata.IptcProfile.RemoveValue(IptcTag.Keywords);
+                await image.SaveAsync($"{imagePerfectImage.ImagePath}");
+            }
         }
 
         private static async void WriteRatingToImage(ImageSharp.Image image, ImagePerfectImage imagePerfectImage)
