@@ -63,9 +63,11 @@ namespace ImagePerfect.ViewModels
             AddFolderRatingCommand = ReactiveCommand.Create((FolderViewModel folderVm) => {
                 UpdateFolder(folderVm, "Rating");
             });
-            AddImageTagsCommand = ReactiveCommand.Create((ImageViewModel imageVm) => {
-                //UpdateImage(imageVm, "Tags");
+            AddImageTagsCommand = ReactiveCommand.Create((ImageViewModel imageVm) => {           
                 AddImageTag(imageVm);
+            });
+            EditImageTagsCommand = ReactiveCommand.Create((ImageViewModel imageVm) => {
+                UpdateImage(imageVm, "Tags");
             });
             AddImageRatingCommand = ReactiveCommand.Create((ImageViewModel imageVm) => {
                 UpdateImage(imageVm, "Rating");
@@ -161,6 +163,8 @@ namespace ImagePerfect.ViewModels
         public ReactiveCommand<FolderViewModel, Unit> AddFolderRatingCommand { get; }
 
         public ReactiveCommand<ImageViewModel, Unit> AddImageTagsCommand { get; }
+
+        public ReactiveCommand<ImageViewModel, Unit> EditImageTagsCommand { get; }
 
         public ReactiveCommand<ImageViewModel, Unit> AddImageRatingCommand { get; }
 
@@ -371,7 +375,15 @@ namespace ImagePerfect.ViewModels
                 return;
             }
         }
-        
+
+        /*
+         * The reason for having both UpdateImage and AddImagTag is because of the following
+         *  1. In the UI I wanted to have the AutoCompleteBox with a quick way to select previously enterd tags
+         *  2. Looking for a quick way to do thay while trying to avoid makeing a JOIN table to link images with tags (this will make sql queries easier and should improve performace on very large datasets)
+         *  3. wanted to maintain a quick way to remove a tag if one was entered in error. 
+         *  4. Drawback will be the two methods here and i will want a way to remove individual tags from the tags table
+         */
+        //update image sql and metadata only. 
         private async void UpdateImage(ImageViewModel imageVm, string fieldUpdated)
         {
             Image image = ImageMapper.GetImageFromVm(imageVm);
@@ -382,9 +394,15 @@ namespace ImagePerfect.ViewModels
                 await box.ShowAsync();
                 return;     
             }
+            //write tag or rating to image metadata
+            if(fieldUpdated == "Tags")
+            {
+                //write new tag to image metadata
+                ImageMetaDataHelper.WriteTagToImage(image);
+            }
            
         }
-
+        //this will add NewTags to the tags list and update image metadata and image sql
         private async void AddImageTag(ImageViewModel imageVm)
         {
             //add NewTag to ImageTags
@@ -399,9 +417,14 @@ namespace ImagePerfect.ViewModels
             Image image = ImageMapper.GetImageFromVm(imageVm);
             //update image table and tags table in db
             bool success = await _imageMethods.UpdateImageTags(image, imageVm.NewTag);
-            //Update TagsList to show in UI AutoCompleteBox 
-            await GetTagsList();
-            //write new tag to image metadata
+            if (success) 
+            {
+                //Update TagsList to show in UI AutoCompleteBox clear NewTag in box as well
+                await GetTagsList();
+                imageVm.NewTag = "";
+                //write new tag to image metadata
+                ImageMetaDataHelper.WriteTagToImage(image);
+            }
         }
        
         private async void OpenImageInExternalViewer(ImageViewModel imageVm)
