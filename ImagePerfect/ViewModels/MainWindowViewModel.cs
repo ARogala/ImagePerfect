@@ -377,11 +377,12 @@ namespace ImagePerfect.ViewModels
         }
 
         /*
-         * The reason for having both UpdateImage and AddImagTag is because of the following
+         *  The reason for having both UpdateImage and AddImagTag is because of the following
          *  1. In the UI I wanted to have the AutoCompleteBox with a quick way to select previously enterd tags
          *  2. Looking for a quick way to do thay while trying to avoid makeing a JOIN table to link images with tags (this will make sql queries easier and should improve performace on very large datasets)
          *  3. wanted to maintain a quick way to remove a tag if one was entered in error. 
          *  4. Drawback will be the two methods here and i will want a way to remove individual tags from the tags table
+         *  5. Also after scanning metadata tags list is out of sync
          */
         //update image sql and metadata only. 
         private async void UpdateImage(ImageViewModel imageVm, string fieldUpdated)
@@ -549,6 +550,7 @@ namespace ImagePerfect.ViewModels
             
         }
 
+        //after scanning metadata tags list is out of sync
         private async void ScanFolderImagesForMetaData(FolderViewModel folderVm)
         {
             ShowLoading = true;
