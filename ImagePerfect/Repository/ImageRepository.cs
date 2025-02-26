@@ -101,5 +101,20 @@ namespace ImagePerfect.Repository
             await _connection.CloseAsync();
             return tags;
         }
+
+        public async Task<bool> UpdateImageMetaData(string imageUpdateSql, int folderId)
+        {
+            string sql = @"UPDATE folders set FolderContentMetaDataScanned = 1 WHERE FolderId = @folderId";
+            int rowsEffectedA = 0;
+            int rowsEffectedB = 0;
+            await _connection.OpenAsync();
+            MySqlTransaction txn = await _connection.BeginTransactionAsync();
+            rowsEffectedA = await _connection.ExecuteAsync(imageUpdateSql, transaction: txn);
+            rowsEffectedB = await _connection.ExecuteAsync(sql, new { folderId }, transaction: txn);
+
+            await txn.CommitAsync();
+            await _connection.CloseAsync();
+            return rowsEffectedA > 0 && rowsEffectedB > 0 ? true : false;
+        }
     }
 }

@@ -50,5 +50,10 @@ namespace ImagePerfect.Models
         {
             return await _unitOfWork.Image.Delete(id);
         }
+
+        public async Task<bool> UpdateImageMetaData(string imageUpdateSql, int folderId)
+        {
+            return await _unitOfWork.Image.UpdateImageMetaData(imageUpdateSql, folderId);
+        }
     }
 }

@@ -97,5 +97,37 @@ namespace ImagePerfect.Helpers
             sb.Append(");");
             return sb.ToString();
         }
+
+        public static string BuildImageSqlForScanMetadata(List<Image> images)
+        {
+            StringBuilder sb = new StringBuilder("UPDATE images SET ImageTags = CASE ");
+            foreach (Image image in images) 
+            {
+                if (image.ImageTags != "")
+                {
+                    sb.Append($"WHEN ImageId = {image.ImageId} THEN '{image.ImageTags}' ");
+                }
+                sb.Append($"WHEN ImageId = {image.ImageId} THEN '' ");
+            }
+            sb.Append("ELSE ImageTags END, ImageRating = CASE ");
+            foreach(Image image in images)
+            {
+                sb.Append($"WHEN ImageId = {image.ImageId} THEN {image.ImageRating} ");
+            }
+            sb.Append("ELSE ImageRating END WHERE ImageId IN (");
+            for (int i = 0; i < images.Count; i++) 
+            {
+                if (i < images.Count - 1)
+                {
+                    sb.Append($"{images[i].ImageId},");
+                }
+                else
+                {
+                    sb.Append($"{images[i].ImageId}");
+                }
+            }
+            sb.Append(");");
+            return sb.ToString();
+        }
     }
 }
