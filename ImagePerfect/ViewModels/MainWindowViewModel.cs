@@ -554,16 +554,8 @@ namespace ImagePerfect.ViewModels
             ShowLoading = true;
             //get all images at folder id
             List<Image> images = await _imageMethods.GetAllImagesInFolder(folderVm.FolderId);
-
             //scan images for metadata
             List<Image> imagesPlusUpdatedMetaData = await ImageMetaDataHelper.ScanImagesForMetaData(images);
-            //foreach (Image image in imagesPlusUpdatedMetaData) 
-            //{
-            //    Debug.WriteLine($"Tags: {image.ImageTags}");
-            //    Debug.WriteLine($"Rating: {image.ImageRating}");
-            //    Debug.WriteLine(image.FileName);
-            //    Debug.WriteLine("----------------------------------");
-            //}
             //update database with metadata
             string imageUpdateSql = SqlStringBuilder.BuildImageSqlForScanMetadata(imagesPlusUpdatedMetaData);
             bool success = await _imageMethods.UpdateImageMetaData(imageUpdateSql, folderVm.FolderId);
