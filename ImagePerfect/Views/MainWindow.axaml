@@ -101,14 +101,16 @@
 											CommandParameter="{Binding}">
 										Submit
 									</Button>
-									<TextBox Grid.Row="1" Grid.Column="0" Watermark="Add Tags Comma Separated" Margin="5" MaxLength="2000" Text="{Binding FolderTags}" />
+									<TextBox Grid.Row="1" Grid.Column="0" Margin="5" MaxLength="2000" Text="{Binding FolderTags}" />
 									<Button Grid.Row="1" Grid.Column="1" Width="100" HorizontalContentAlignment="Center"
-											Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).AddFolderTagsCommand}"
+											Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).EditFolderTagsCommand}"
 											CommandParameter="{Binding}">
 										Remove Tag
 									</Button>
-									<AutoCompleteBox Grid.Row="2" Grid.Column="0" MaxLength="100" Margin="5" Watermark="Add A Tag" FilterMode="StartsWith" ItemsSource="{Binding #Root.((vm:MainWindowViewModel)DataContext).TagsList}" />
-									<Button Grid.Row="2" Grid.Column="1" Width="100" HorizontalContentAlignment="Center">
+									<AutoCompleteBox Grid.Row="2" Grid.Column="0" MaxLength="100" Margin="5" Watermark="Add A Tag" Text="{Binding NewTag}" FilterMode="StartsWith" ItemsSource="{Binding #Root.((vm:MainWindowViewModel)DataContext).TagsList}" />
+									<Button Grid.Row="2" Grid.Column="1" Width="100" HorizontalContentAlignment="Center"
+											Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).AddFolderTagsCommand}"
+											CommandParameter="{Binding}">
 										Submit
 									</Button>
 									<NumericUpDown Grid.Row="3" Grid.Column="0" Maximum="10" Minimum="0" Margin="5" Value="{Binding FolderRating}"  />

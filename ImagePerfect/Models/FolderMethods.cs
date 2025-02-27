@@ -64,5 +64,10 @@ namespace ImagePerfect.Models
         {
             return await _unitOfWork.Folder.Add(newFolder);
         }
+
+        public async Task<bool> UpdateFolderTags(Folder folder, string newTag)
+        {
+            return await _unitOfWork.Folder.UpdateFolderTags(folder, newTag);
+        }
     }
 }

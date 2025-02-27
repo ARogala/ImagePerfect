@@ -13,7 +13,8 @@ namespace ImagePerfect.ViewModels
 		private string? _coverImagePath;
 		private string? _folderDescription;
 		private string? _folderTags;
-		private int _folderRating;
+        private string _newTag;
+        private int _folderRating;
 		private bool _hasFiles;
 		private bool _isRoot;
 		private bool _folderContentMetaDataScanned;
@@ -61,7 +62,12 @@ namespace ImagePerfect.ViewModels
 			get => _folderTags;
 			set => this.RaiseAndSetIfChanged(ref _folderTags, value);
 		}
-		public int FolderRating
+        public string NewTag
+        {
+            get => _newTag;
+            set => this.RaiseAndSetIfChanged(ref _newTag, value);
+        }
+        public int FolderRating
 		{
 			get => _folderRating;
 			set => this.RaiseAndSetIfChanged(ref _folderRating, value);
