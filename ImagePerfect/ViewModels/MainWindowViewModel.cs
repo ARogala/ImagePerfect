@@ -58,6 +58,9 @@ namespace ImagePerfect.ViewModels
                 UpdateFolder(folderVm, "Description");
             });
             AddFolderTagsCommand = ReactiveCommand.Create((FolderViewModel folderVm) => {
+                AddFolderTag(folderVm);
+            });
+            EditFolderTagsCommand = ReactiveCommand.Create((FolderViewModel folderVm) => {
                 UpdateFolder(folderVm, "Tags");
             });
             AddFolderRatingCommand = ReactiveCommand.Create((FolderViewModel folderVm) => {
@@ -159,6 +162,8 @@ namespace ImagePerfect.ViewModels
         public ReactiveCommand<FolderViewModel, Unit> AddFolderDescriptionCommand { get; }
 
         public ReactiveCommand<FolderViewModel, Unit> AddFolderTagsCommand { get; }
+
+        public ReactiveCommand<FolderViewModel, Unit> EditFolderTagsCommand { get; }
 
         public ReactiveCommand<FolderViewModel, Unit> AddFolderRatingCommand { get; }
 
@@ -376,6 +381,33 @@ namespace ImagePerfect.ViewModels
             }
         }
 
+        private async void AddFolderTag(FolderViewModel folderVm)
+        {
+            //click submit with empty input just return
+            if (folderVm.NewTag == "" || folderVm.NewTag == null)
+            {
+                return;
+            }
+            //add NewTag to ImageTags
+            if (folderVm.FolderTags == "")
+            {
+                folderVm.FolderTags = folderVm.NewTag;
+            }
+            else
+            {
+                folderVm.FolderTags = folderVm.FolderTags + "," + folderVm.NewTag;
+            }
+            Folder folder = FolderMapper.GetFolderFromVm(folderVm);
+            //update folder table and tags table in db
+            bool success = await _folderMethods.UpdateFolderTags(folder, folderVm.NewTag);
+            if (success)
+            {
+                //Update TagsList to show in UI AutoCompleteBox clear NewTag in box as well
+                await GetTagsList();
+                folderVm.NewTag = "";
+            }
+        }
+
         /*
          *  The reason for having both UpdateImage and AddImagTag is because of the following
          *  1. In the UI I wanted to have the AutoCompleteBox with a quick way to select previously enterd tags
@@ -407,7 +439,7 @@ namespace ImagePerfect.ViewModels
             }
            
         }
-        //this will add NewTags to the tags list and update image metadata and image sql
+        //Add NewTags to the tags list, update ImageTags, and update image metadata
         private async void AddImageTag(ImageViewModel imageVm)
         {
             //click submit with empty input just return
