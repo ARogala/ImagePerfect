@@ -32,6 +32,9 @@ namespace ImagePerfect.ViewModels
         private bool _isNewFolderEnabled;
         private List<string> _tagsList = new List<string>();
 
+        private List<Folder> displayFolders = new List<Folder>();
+        private List<Image> displayImages = new List<Image>();
+
         public MainWindowViewModel() { }
         public MainWindowViewModel(IUnitOfWork unitOfWork)
         {
@@ -185,6 +188,24 @@ namespace ImagePerfect.ViewModels
 
         //public ReactiveCommand<Unit, Unit> CreateNewFolderCommand { get; }
 
+        private async void RefreshFolders()
+        {
+            LibraryFolders.Clear();
+            foreach (Folder folder in displayFolders)
+            {
+                FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(folder);
+                LibraryFolders.Add(folderViewModel);
+            }
+        }
+        private async void RefreshImages()
+        {
+            Images.Clear();
+            foreach (Image image in displayImages)
+            {
+                ImageViewModel imageViewModel = await ImageMapper.GetImageVm(image);
+                Images.Add(imageViewModel);
+            }
+        }
         private async void Initialize()
         {
             await GetRootFolder();
@@ -210,8 +231,6 @@ namespace ImagePerfect.ViewModels
 
         private async void ImportImages(FolderViewModel imageFolder)
         {
-            List<Folder> folders = new List<Folder>();
-            List<Image> images = new List<Image>();
             string newPath = string.Empty;
             string imageFolderPath = imageFolder.FolderPath;
             int imageFolderId = imageFolder.FolderId;
@@ -226,22 +245,12 @@ namespace ImagePerfect.ViewModels
                 ShowLoading = false;
                 //remove one folder from path
                 newPath = PathHelper.RemoveOneFolderFromPath(imageFolderPath);
-                folders = await _folderMethods.GetFoldersInDirectory(newPath);
+                displayFolders = await _folderMethods.GetFoldersInDirectory(newPath);
                 //folder may or may not have images but will just be an empty list if none.
-                images = await _imageMethods.GetAllImagesInFolder(newPath);
-                LibraryFolders.Clear();
-                Images.Clear();
-                foreach (Folder folder in folders)
-                {
-                    FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(folder);
-                    LibraryFolders.Add(folderViewModel);
-                }
-                foreach (Image image in images)
-                {
-                    ImageViewModel imageViewModel = await ImageMapper.GetImageVm(image);
-                    Images.Add(imageViewModel);
-                }
-
+                displayImages = await _imageMethods.GetAllImagesInFolder(newPath);
+                //refresh UI
+                RefreshFolders();
+                RefreshImages();
             }
         }
 
@@ -251,26 +260,15 @@ namespace ImagePerfect.ViewModels
                 Similar to Back folders except these buttons are on the image and we only need to remove one folder
                 Not every folder has a folder so this is the quickest way for now to back out of a folder that only has images
              */
-            List<Folder> folders = new List<Folder>();
-            List<Image> images = new List<Image>();
             string newPath = PathHelper.RemoveOneFolderFromPath(imageVm.ImageFolderPath);
             //set the current directory -- used to add new folder to location
             CurrentDirectory = newPath;
-            folders = await _folderMethods.GetFoldersInDirectory(newPath);
+            displayFolders = await _folderMethods.GetFoldersInDirectory(newPath);
             //folder may or may not have images but will just be an empty list if none.
-            images = await _imageMethods.GetAllImagesInFolder(newPath);
-            LibraryFolders.Clear();
-            Images.Clear();
-            foreach (Folder folder in folders)
-            {
-                FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(folder);
-                LibraryFolders.Add(folderViewModel);
-            }
-            foreach (Image image in images)
-            {
-                ImageViewModel imageViewModel = await ImageMapper.GetImageVm(image);
-                Images.Add(imageViewModel);
-            }
+            displayImages = await _imageMethods.GetAllImagesInFolder(newPath);
+            //refresh UI
+            RefreshFolders();
+            RefreshImages();
         }
 
         private async void BackFolder(FolderViewModel currentFolder)
@@ -281,71 +279,39 @@ namespace ImagePerfect.ViewModels
                 you will be clicking on the back button of folder /pictures/hiking/bearmountian/saturday_2025_05_25 -- that wil be the FolderPath
                 but you want to go back to hiking so you must remove two folders to get /pictures/hiking/
              */
-            List<Folder> folders = new List<Folder>();
-            List<Image> images = new List<Image>();
             string newPath = PathHelper.RemoveTwoFoldersFromPath(currentFolder.FolderPath);
             //set the current directory -- used to add new folder to location
             CurrentDirectory = newPath;
-            folders = await _folderMethods.GetFoldersInDirectory(newPath);
+            displayFolders = await _folderMethods.GetFoldersInDirectory(newPath);
             //folder may or may not have images but will just be an empty list if none.
-            images = await _imageMethods.GetAllImagesInFolder(newPath);
-            LibraryFolders.Clear();
-            Images.Clear();
-            foreach (Folder folder in folders)
-            {
-                FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(folder);
-                LibraryFolders.Add(folderViewModel);
-            }
-            foreach(Image image in images)
-            {
-                ImageViewModel imageViewModel = await ImageMapper.GetImageVm(image);
-                Images.Add(imageViewModel);
-            }
+            displayImages = await _imageMethods.GetAllImagesInFolder(newPath);
+            //refresh UI
+            RefreshFolders();
+            RefreshImages();
         }
 
         private async void NextFolder(FolderViewModel currentFolder)
         {
-            List<Folder> folders = new List<Folder>();
-            List<Image> images = new List<Image>();
             bool hasChildren = currentFolder.HasChildren;
             bool hasFiles = currentFolder.HasFiles;
             //set the current directory -- used to add new folder to location
             CurrentDirectory = currentFolder.FolderPath;
             //two boolean varibale 4 combos TF TT FT and FF
-            if (hasChildren == true && hasFiles == false) 
-            {
-                folders = await _folderMethods.GetFoldersInDirectory(currentFolder.FolderPath);
-            }
-            else if (hasChildren == true && hasFiles == true)
-            {
-                //get folders and images
-                folders = await _folderMethods.GetFoldersInDirectory(currentFolder.FolderPath);
-                images = await _imageMethods.GetAllImagesInFolder(currentFolder.FolderId);
-                
-            }
-            else if(hasChildren == false && hasFiles == true)
-            {
-                //get images
-                images = await _imageMethods.GetAllImagesInFolder(currentFolder.FolderId);
-            }
-            else
+            if(hasChildren == false && hasFiles == false)
             {
                 var box = MessageBoxManager.GetMessageBoxStandard("Empty Folder", "There are no Images in this folder.", ButtonEnum.Ok);
                 await box.ShowAsync();
                 return;
             }
-            LibraryFolders.Clear();
-            Images.Clear();
-            foreach (Folder folder in folders) 
+            else
             {
-                FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(folder);
-                LibraryFolders.Add(folderViewModel);
+                //get folders and images
+                displayFolders = await _folderMethods.GetFoldersInDirectory(currentFolder.FolderPath);
+                displayImages = await _imageMethods.GetAllImagesInFolder(currentFolder.FolderId);
             }
-            foreach(Image image in images)
-            {
-                ImageViewModel imageViewModel = await ImageMapper.GetImageVm(image);
-                Images.Add(imageViewModel);
-            }
+            //refresh UI
+            RefreshFolders();
+            RefreshImages();
         }
 
         private async void DeleteLibrary()
@@ -358,7 +324,8 @@ namespace ImagePerfect.ViewModels
                 //remove all folders -- this will drop images as well. 
                 bool success = await _folderMethods.DeleteAllFolders();
                 if (success) 
-                { 
+                {
+                    //refresh UI
                     LibraryFolders.Clear();
                     Images.Clear();
                 }
@@ -388,7 +355,7 @@ namespace ImagePerfect.ViewModels
             {
                 return;
             }
-            //add NewTag to ImageTags
+            //add NewTag to FolderTags
             if (folderVm.FolderTags == "")
             {
                 folderVm.FolderTags = folderVm.NewTag;
@@ -492,9 +459,9 @@ namespace ImagePerfect.ViewModels
             var result = await boxYesNo.ShowAsync();
             if (result == ButtonResult.Yes) 
             {
-                List<Folder> folders = await _folderMethods.GetFoldersInDirectory(imageVm.ImageFolderPath);
-                List<Image> images = await _imageMethods.GetAllImagesInFolder(imageVm.FolderId);
-                if (images.Count == 1 && folders.Count == 0)
+                displayFolders = await _folderMethods.GetFoldersInDirectory(imageVm.ImageFolderPath);
+                displayImages = await _imageMethods.GetAllImagesInFolder(imageVm.FolderId);
+                if (displayImages.Count == 1 && displayFolders.Count == 0)
                 {
                     var box = MessageBoxManager.GetMessageBoxStandard("Delete Image", "This is the last image in the folder go back and delete the folder", ButtonEnum.Ok);
                     await box.ShowAsync();
@@ -520,13 +487,8 @@ namespace ImagePerfect.ViewModels
                         File.Move(imageVm.ImagePath, newImagePath);
 
                         //refresh UI
-                        images = await _imageMethods.GetAllImagesInFolder(imageVm.FolderId);
-                        Images.Clear();
-                        foreach (Image image in images)
-                        {
-                            ImageViewModel imageViewModel = await ImageMapper.GetImageVm(image);
-                            Images.Add(imageViewModel);
-                        }
+                        displayImages = await _imageMethods.GetAllImagesInFolder(imageVm.FolderId);
+                        RefreshImages();
                     }
                 }
             }
@@ -547,9 +509,9 @@ namespace ImagePerfect.ViewModels
             if (result == ButtonResult.Yes) 
             {
                 string pathThatContainsFolder = PathHelper.RemoveOneFolderFromPath(folderVm.FolderPath);
-                List<Image> images = await _imageMethods.GetAllImagesInFolder(pathThatContainsFolder);
-                List<Folder> folders = await _folderMethods.GetFoldersInDirectory(pathThatContainsFolder);
-                if (folders.Count == 1 && images.Count == 0)
+                displayImages = await _imageMethods.GetAllImagesInFolder(pathThatContainsFolder);
+                displayFolders = await _folderMethods.GetFoldersInDirectory(pathThatContainsFolder);
+                if (displayFolders.Count == 1 && displayImages.Count == 0)
                 {
                     var box = MessageBoxManager.GetMessageBoxStandard("Delete Folder", "This is the last folder in the current directory go back and delete the root folder", ButtonEnum.Ok);
                     await box.ShowAsync();
@@ -574,13 +536,8 @@ namespace ImagePerfect.ViewModels
                         Directory.Move(folderVm.FolderPath, newFolderPath);
 
                         //refresh UI
-                        folders = await _folderMethods.GetFoldersInDirectory(pathThatContainsFolder);
-                        LibraryFolders.Clear();
-                        foreach (Folder folder in folders)
-                        {
-                            FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(folder);
-                            LibraryFolders.Add(folderViewModel);
-                        }
+                        displayFolders = await _folderMethods.GetFoldersInDirectory(pathThatContainsFolder);
+                        RefreshFolders();
                     }
                 }
             }
@@ -602,20 +559,10 @@ namespace ImagePerfect.ViewModels
             if (success)
             {
                 //refresh UI
-                List<Folder> folders = await _folderMethods.GetFoldersInDirectory(CurrentDirectory);
-                LibraryFolders.Clear();
-                foreach (Folder folder in folders)
-                {
-                    FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(folder);
-                    LibraryFolders.Add(folderViewModel);
-                }
-                List<Image> imagesInDir = await _imageMethods.GetAllImagesInFolder(CurrentDirectory);
-                Images.Clear();
-                foreach (Image image in imagesInDir)
-                {
-                    ImageViewModel imageViewModel = await ImageMapper.GetImageVm(image);
-                    Images.Add(imageViewModel);
-                }
+                displayFolders = await _folderMethods.GetFoldersInDirectory(CurrentDirectory);
+                displayImages = await _imageMethods.GetAllImagesInFolder(CurrentDirectory);
+                RefreshFolders();
+                RefreshImages();
             }
             ShowLoading = false;
         }
