@@ -86,7 +86,7 @@ namespace ImagePerfect.Repository
             MySqlTransaction txn = await _connection.BeginTransactionAsync();
             string sql1 = @"UPDATE images Set ImageTags = @tags WHERE ImageId = @id";
             string sql2 = @"INSERT IGNORE INTO tags (TagName) VALUES (@newTag)";
-            rowsEffectedA = await _connection.ExecuteAsync(sql1, new { tags = image.ImageTags, id = image.ImageId }, transaction: txn);
+            //rowsEffectedA = await _connection.ExecuteAsync(sql1, new { tags = image.ImageTags, id = image.ImageId }, transaction: txn);
             rowsEffectedB = await _connection.ExecuteAsync(sql2, new { newTag = newTag }, transaction: txn);
             await txn.CommitAsync();
             await _connection.CloseAsync();
