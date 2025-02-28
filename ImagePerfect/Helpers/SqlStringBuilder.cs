@@ -103,10 +103,10 @@ namespace ImagePerfect.Helpers
             StringBuilder sb = new StringBuilder("UPDATE images SET ImageTags = CASE ");
             foreach (Image image in images) 
             {
-                if (image.ImageTags != "")
-                {
-                    sb.Append($"WHEN ImageId = {image.ImageId} THEN '{image.ImageTags}' ");
-                }
+                //if (image.ImageTags != "")
+                //{
+                //    sb.Append($"WHEN ImageId = {image.ImageId} THEN '{image.ImageTags}' ");
+                //}
                 sb.Append($"WHEN ImageId = {image.ImageId} THEN '' ");
             }
             sb.Append("ELSE ImageTags END, ImageRating = CASE ");

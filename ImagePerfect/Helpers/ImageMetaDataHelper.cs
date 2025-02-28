@@ -43,21 +43,21 @@ namespace ImagePerfect.Helpers
             {
                 //if keywords are in db and writen to file already this will double it up on the ImagePerfectImage object..
                 //So clear ImagePerfectImage object tags first
-                image.ImageTags = "";
-                foreach (var prop in imageInfo.Metadata.IptcProfile.Values)
-                {
-                    if(prop.Tag == IptcTag.Keywords)
-                    {
-                        if(image.ImageTags == "")
-                        {
-                            image.ImageTags = $"{prop.Value}";
-                        }
-                        else
-                        {
-                            image.ImageTags = $"{image.ImageTags},{prop.Value}";
-                        }
-                    }
-                }
+                //image.ImageTags = "";
+                //foreach (var prop in imageInfo.Metadata.IptcProfile.Values)
+                //{
+                //    if(prop.Tag == IptcTag.Keywords)
+                //    {
+                //        if(image.ImageTags == "")
+                //        {
+                //            image.ImageTags = $"{prop.Value}";
+                //        }
+                //        else
+                //        {
+                //            image.ImageTags = $"{image.ImageTags},{prop.Value}";
+                //        }
+                //    }
+                //}
             }
            
             //shotwell rating is in exifprofile
@@ -77,28 +77,28 @@ namespace ImagePerfect.Helpers
         //this will keep it in sync
         private static async void WriteKeywordToImage(ImageSharp.Image image, ImagePerfectImage imagePerfectImage)
         {
-            if (image.Metadata.IptcProfile == null)
-                image.Metadata.IptcProfile = new IptcProfile();
-            if (imagePerfectImage.ImageTags != "" && imagePerfectImage.ImageTags != null)
-            {
-                //remove all
-                image.Metadata.IptcProfile.RemoveValue(IptcTag.Keywords);
+            //if (image.Metadata.IptcProfile == null)
+            //    image.Metadata.IptcProfile = new IptcProfile();
+            //if (imagePerfectImage.ImageTags != "" && imagePerfectImage.ImageTags != null)
+            //{
+            //    //remove all
+            //    image.Metadata.IptcProfile.RemoveValue(IptcTag.Keywords);
 
-                string[] tags = imagePerfectImage.ImageTags.Split(",");
-                foreach (string tag in tags)
-                {
-                    //re-add
-                    image.Metadata.IptcProfile.SetValue(IptcTag.Keywords, tag);
-                }
-                await image.SaveAsync($"{imagePerfectImage.ImagePath}");
-            }
-            //just remove all if that is what we want -- this will be the case if the user removes the entire string in the UI
-            else if (imagePerfectImage.ImageTags == "" || imagePerfectImage.ImageTags == null)
-            {
-                //remove all
-                image.Metadata.IptcProfile.RemoveValue(IptcTag.Keywords);
-                await image.SaveAsync($"{imagePerfectImage.ImagePath}");
-            }
+            //    string[] tags = imagePerfectImage.ImageTags.Split(",");
+            //    foreach (string tag in tags)
+            //    {
+            //        //re-add
+            //        image.Metadata.IptcProfile.SetValue(IptcTag.Keywords, tag);
+            //    }
+            //    await image.SaveAsync($"{imagePerfectImage.ImagePath}");
+            //}
+            ////just remove all if that is what we want -- this will be the case if the user removes the entire string in the UI
+            //else if (imagePerfectImage.ImageTags == "" || imagePerfectImage.ImageTags == null)
+            //{
+            //    //remove all
+            //    image.Metadata.IptcProfile.RemoveValue(IptcTag.Keywords);
+            //    await image.SaveAsync($"{imagePerfectImage.ImagePath}");
+            //}
         }
 
         private static async void WriteRatingToImage(ImageSharp.Image image, ImagePerfectImage imagePerfectImage)

@@ -16,8 +16,8 @@ namespace ImagePerfect.Models
         [Column("FileName")]
         public string FileName { get; set; }
 
-        [Column("ImageTags")]
-        public string? ImageTags { get; set; }
+        //[Column("ImageTags")]
+        //public string? ImageTags { get; set; }
 
         [Column("ImageRating")]
         public int ImageRating { get; set; }

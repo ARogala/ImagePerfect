@@ -56,7 +56,7 @@ namespace ImagePerfect.Models
                         ImageId = 0,
                         ImagePath = PathHelper.FormatPathForDbStorage(imagePath),
                         FileName = Path.GetFileName(imagePath),
-                        ImageTags = null,
+                        //ImageTags = null,
                         ImageRating = 0,
                         ImageFolderPath = PathHelper.FormatPathForDbStorage(imageFolderPath),
                         ImageMetaDataScanned = 0,
