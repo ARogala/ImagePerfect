@@ -90,14 +90,20 @@ namespace ImagePerfect.Repository
         {
             int rowsEffectedA = 0;
             int rowsEffectedB = 0;
-            //await _connection.OpenAsync();
-            //MySqlTransaction txn = await _connection.BeginTransactionAsync();
-            //string sql1 = @"UPDATE folders SET FolderTags = @tags WHERE FolderId = @id";
-            //string sql2 = @"INSERT IGNORE INTO tags (TagName) VALUES (@newTag)";
-            //rowsEffectedA = await _connection.ExecuteAsync(sql1, new { tags = folder.FolderTags, id = folder.FolderId }, transaction: txn);
-            //rowsEffectedB = await _connection.ExecuteAsync(sql2, new { newTag = newTag }, transaction: txn);
-            //await txn.CommitAsync();
-            //await _connection.CloseAsync();
+            await _connection.OpenAsync();
+            MySqlTransaction txn = await _connection.BeginTransactionAsync();
+            //insert newTag if its already there IGNORE
+            string sql1 = @"INSERT IGNORE INTO tags (TagName) VALUES (@newTag)";
+            rowsEffectedA = await _connection.ExecuteAsync(sql1, new { newTag = newTag }, transaction: txn);
+            //get newTag id
+            string sql2 = @"SELECT TagId FROM tags WHERE TagName = @newTag";
+            int newTagId = await _connection.QuerySingleOrDefaultAsync<int>(sql2, new { newTag }, transaction: txn);
+            //insert into folder_tags_join
+            string sql3 = @"INSERT INTO folder_tags_join (FolderId, TagId) VALUES (@folderId, @tagId)";
+            rowsEffectedB = await _connection.ExecuteAsync(sql3, new { folderId = folder.FolderId, tagId = newTagId }, transaction: txn);
+
+            await txn.CommitAsync();
+            await _connection.CloseAsync();
             return rowsEffectedA + rowsEffectedB >= 1 ? true : false;
         }
     }
