@@ -355,15 +355,6 @@ namespace ImagePerfect.ViewModels
             {
                 return;
             }
-            //add NewTag to FolderTags
-            if (folderVm.FolderTags == "")
-            {
-                folderVm.FolderTags = folderVm.NewTag;
-            }
-            else
-            {
-                folderVm.FolderTags = folderVm.FolderTags + "," + folderVm.NewTag;
-            }
             Folder folder = FolderMapper.GetFolderFromVm(folderVm);
             //update folder table and tags table in db
             bool success = await _folderMethods.UpdateFolderTags(folder, folderVm.NewTag);
