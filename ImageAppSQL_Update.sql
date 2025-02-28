@@ -90,6 +90,19 @@ SELECT * FROM images
 JOIN image_tags_join ON image_tags_join.ImageId = images.ImageId
 JOIN tags ON image_tags_join.TagId = tags.TagId WHERE tags.TagName = "Tree";
 
+/*get all tags for folder*/
+SELECT TagName FROM folders
+	JOIN folder_tags_join ON folder_tags_join.FolderId = folders.FolderId
+	JOIN tags ON folder_tags_join.TagId = tags.TagId WHERE folders.FolderId = 1;
+
+SELECT * FROM folders 
+	JOIN folder_tags_join ON folder_tags_join.FolderId = folders.FolderId
+	JOIN tags ON folder_tags_join.TagId = tags.TagId WHERE REGEXP_LIKE(folders.FolderPath, 'C:\\\\Users\\\\arogala\\\\Documents\\\\CSharp\\\\SamplePicsApp\\\\[^\\\\]+\\\\?$') ORDER BY folders.FolderName;
+
+SELECT tags.TagId, tags.TagName, folders.FolderId FROM folders
+	JOIN folder_tags_join ON folder_tags_join.FolderId = folders.FolderId
+	JOIN tags ON folder_tags_join.TagId = tags.TagId WHERE folders.IsRoot = 1;
+
 
 /*
 https://stackoverflow.com/questions/66848547/mysql-error-code-3948-loading-local-data-is-disabled-this-must-be-enabled-on-b
