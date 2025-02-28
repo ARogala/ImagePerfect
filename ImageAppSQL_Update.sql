@@ -67,6 +67,10 @@ CREATE TABLE `folder_tags_join`(
 	CONSTRAINT `folder_tags_join_idfk_2` FOREIGN KEY (`TagId`) REFERENCES `tags` (`TagId`) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+/*
+ON DELETE CASCADE to delete all image_tags_join when an image is deleted
+ON DELETE CASCADE to delete all image_tags_join when an tag is deleted
+*/
 CREATE TABLE `image_tags_join`(
 	`ImageId` bigint unsigned NOT NULL,
 	`TagId` bigint unsigned NOT NULL,
@@ -75,6 +79,16 @@ CREATE TABLE `image_tags_join`(
 	CONSTRAINT `image_tags_join_ibfk_2` FOREIGN KEY (`TagId`) REFERENCES `tags` (`TagId`) ON DELETE CASCADE ON UPDATE CASCADE
 
 );
+
+/*get all tags for image*/
+SELECT * FROM images 
+JOIN image_tags_join ON image_tags_join.ImageId = images.ImageId
+JOIN tags ON image_tags_join.TagId = tags.TagId WHERE images.ImageId = 1;
+
+/*Get all images whith tag = Tree*/
+SELECT * FROM images 
+JOIN image_tags_join ON image_tags_join.ImageId = images.ImageId
+JOIN tags ON image_tags_join.TagId = tags.TagId WHERE tags.TagName = "Tree";
 
 
 /*

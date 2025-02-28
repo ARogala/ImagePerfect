@@ -25,9 +25,6 @@ namespace ImagePerfect.Models
         [Column("FolderDescription")]
         public string? FolderDescription { get; set; }
 
-        [Column("FolderTags")]
-        public string? FolderTags { get; set; }
-
         [Column("FolderRating")]
         public int FolderRating { get; set; }
 

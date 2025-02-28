@@ -90,14 +90,14 @@ namespace ImagePerfect.Repository
         {
             int rowsEffectedA = 0;
             int rowsEffectedB = 0;
-            await _connection.OpenAsync();
-            MySqlTransaction txn = await _connection.BeginTransactionAsync();
-            string sql1 = @"UPDATE folders SET FolderTags = @tags WHERE FolderId = @id";
-            string sql2 = @"INSERT IGNORE INTO tags (TagName) VALUES (@newTag)";
-            rowsEffectedA = await _connection.ExecuteAsync(sql1, new { tags = folder.FolderTags, id = folder.FolderId }, transaction: txn);
-            rowsEffectedB = await _connection.ExecuteAsync(sql2, new { newTag = newTag }, transaction: txn);
-            await txn.CommitAsync();
-            await _connection.CloseAsync();
+            //await _connection.OpenAsync();
+            //MySqlTransaction txn = await _connection.BeginTransactionAsync();
+            //string sql1 = @"UPDATE folders SET FolderTags = @tags WHERE FolderId = @id";
+            //string sql2 = @"INSERT IGNORE INTO tags (TagName) VALUES (@newTag)";
+            //rowsEffectedA = await _connection.ExecuteAsync(sql1, new { tags = folder.FolderTags, id = folder.FolderId }, transaction: txn);
+            //rowsEffectedB = await _connection.ExecuteAsync(sql2, new { newTag = newTag }, transaction: txn);
+            //await txn.CommitAsync();
+            //await _connection.CloseAsync();
             return rowsEffectedA + rowsEffectedB >= 1 ? true : false;
         }
     }
