@@ -28,7 +28,7 @@ namespace ImagePerfect.Repository
 	                            JOIN tags ON folder_tags_join.TagId = tags.TagId WHERE folders.IsRoot = 1;";
             if (rootFolder != null) 
             { 
-                List<Tag> tags = (List<Tag>)await _connection.QueryAsync<Tag>(sql2, transaction: txn);
+                List<FolderTag> tags = (List<FolderTag>)await _connection.QueryAsync<FolderTag>(sql2, transaction: txn);
                 rootFolder.Tags = tags;
             }
             await txn.CommitAsync();
@@ -55,13 +55,20 @@ namespace ImagePerfect.Repository
         }
 
         //Only gets the folders in the path -- the folder itself or any sub directories within each folder are not returned
-        public async Task<List<Folder>> GetFoldersInDirectory(string directoryPath)
+        public async Task<(List<Folder> folders, List<FolderTag> tags)> GetFoldersInDirectory(string directoryPath)
         {
+            await _connection.OpenAsync();
+            MySqlTransaction txn = await _connection.BeginTransactionAsync();
             string regExpString = PathHelper.GetRegExpStringAllFoldersInDirectory(directoryPath);
-            string sql = @"SELECT * FROM folders WHERE REGEXP_LIKE(FolderPath, '" + regExpString + "') ORDER BY FolderName;";
-            List<Folder> folders = (List<Folder>)await _connection.QueryAsync<Folder>(sql);
+            string sql1 = @"SELECT * FROM folders WHERE REGEXP_LIKE(FolderPath, '" + regExpString + "') ORDER BY FolderName;";
+            List<Folder> folders = (List<Folder>)await _connection.QueryAsync<Folder>(sql1, transaction: txn);
+            string sql2 = @"SELECT tags.TagId, tags.TagName, folders.FolderId FROM folders 
+                            JOIN folder_tags_join ON folder_tags_join.FolderId = folders.FolderId 
+                            JOIN tags ON folder_tags_join.TagId = tags.TagId WHERE REGEXP_LIKE(folders.FolderPath, '" + regExpString + "') ORDER BY folders.FolderId;";
+            List<FolderTag> tags = (List<FolderTag>)await _connection.QueryAsync<FolderTag>(sql2, transaction: txn);
+            await txn.CommitAsync();
             await _connection.CloseAsync();
-            return folders;
+            return (folders,tags);
         }
 
         //gets the folder itself as well as all folders and subfolders within. 
@@ -117,7 +124,7 @@ namespace ImagePerfect.Repository
             await _connection.CloseAsync();
             return rowsEffectedA + rowsEffectedB >= 1 ? true : false;
         }
-        public async Task<bool> DeleteFolderTag(Tag tag)
+        public async Task<bool> DeleteFolderTag(FolderTag tag)
         {
             int rowsEffected = 0;
             string sql = @"DELETE FROM folder_tags_join WHERE FolderId = @folderId AND TagId = @tagId";

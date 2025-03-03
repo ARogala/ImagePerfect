@@ -104,10 +104,14 @@ namespace ImagePerfect.ViewModels
                     //update lib folders to show the folder has moved
                     _libraryFolders.Clear();
                     string foldersDirectoryPath = PathHelper.RemoveOneFolderFromPath(folderVm.FolderPath);
-                    List<Folder> refreshFolders = await _folderMethods.GetFoldersInDirectory(foldersDirectoryPath);
-                    foreach (Folder folder in refreshFolders)
+                    (List<Folder> folders, List<FolderTag> tags) result = await _folderMethods.GetFoldersInDirectory(foldersDirectoryPath);
+                    List<Folder> refreshFolders = result.folders;
+                    List<FolderTag> displayFolderTags = result.tags;
+                    for (int i = 0; i < refreshFolders.Count; i++) 
                     {
-                        FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(folder);
+                        //need to map tags to folders
+                        refreshFolders[i] = FolderMapper.MapTagsToFolder(refreshFolders[i], displayFolderTags);
+                        FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(refreshFolders[i]);
                         _libraryFolders.Add(folderViewModel);
                     }
                 }
