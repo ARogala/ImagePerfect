@@ -52,7 +52,19 @@ namespace ImagePerfect.ObjectMappers
             return folder;
         }
 
-        private static string MapTagsListToString(List<Tag> tags)
+        public static Folder MapTagsToFolder(Folder folder, List<FolderTag> folderTags)
+        {
+            foreach (FolderTag folderTag in folderTags) 
+            { 
+                if(folderTag.FolderId == folder.FolderId)
+                {
+                    folder.Tags.Add(folderTag);
+                }
+            }
+            return folder;
+        }
+
+        private static string MapTagsListToString(List<FolderTag> tags)
         {
             string tagString = string.Empty;
             if(tags.Count == 0)

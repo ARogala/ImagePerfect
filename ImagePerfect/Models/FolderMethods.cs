@@ -25,7 +25,7 @@ namespace ImagePerfect.Models
             return await _unitOfWork.Folder.GetRootFolder();
         }
 
-        public async Task<List<Folder>> GetFoldersInDirectory(string directoryPath)
+        public async Task<(List<Folder> folders, List<FolderTag> tags)> GetFoldersInDirectory(string directoryPath)
         {
             return await _unitOfWork.Folder.GetFoldersInDirectory(directoryPath);
         }
@@ -70,7 +70,7 @@ namespace ImagePerfect.Models
             return await _unitOfWork.Folder.UpdateFolderTags(folder, newTag);
         }
 
-        public async Task<bool> DeleteFolderTag(Tag tag)
+        public async Task<bool> DeleteFolderTag(FolderTag tag)
         {
             return await _unitOfWork.Folder.DeleteFolderTag(tag);
         }

@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace ImagePerfect.Models
 {
     [Table("tags")]
-    public class Tag
+    public class FolderTag
     {
         [Key]
         [Column("TagId")]

@@ -62,7 +62,16 @@ namespace ImagePerfect.ViewModels
             {
                 _libraryFolders.Clear();
                 string foldersDirectoryPath = PathHelper.RemoveOneFolderFromPath(folderVm.FolderPath);
-                List<Folder> folders = await _folderMethods.GetFoldersInDirectory(foldersDirectoryPath);
+                (List<Folder> folders, List<FolderTag> tags) result = await _folderMethods.GetFoldersInDirectory(foldersDirectoryPath);
+                List<Folder> folders = result.folders;
+                List<FolderTag> displayFolderTags = result.tags;
+                for (int i = 0; i < folders.Count; i++)
+                {
+                    //need to map tags to folders
+                    folders[i] = FolderMapper.MapTagsToFolder(folders[i], displayFolderTags);
+                    FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(folders[i]);
+                    _libraryFolders.Add(folderViewModel);
+                }
                 foreach (Folder folder in folders) 
                 {
                     FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(folder);
