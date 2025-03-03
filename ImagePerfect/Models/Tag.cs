@@ -13,5 +13,8 @@ namespace ImagePerfect.Models
 
         [Column("TagName")]
         public string TagName { get; set; } = string.Empty;
+
+        [Column("FolderId")]
+        public int FolderId { get; set; }  
     }
 }
