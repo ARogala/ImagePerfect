@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ImagePerfect.Models
@@ -39,5 +40,8 @@ namespace ImagePerfect.Models
 
         [Column("AreImagesImported")]
         public bool AreImagesImported { get; set; }
+
+        //for many to many relationship folder_tags_join
+        public List<Tag> Tags { get; set; } = new List<Tag>();
     }
 }

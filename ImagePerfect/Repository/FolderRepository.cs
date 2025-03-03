@@ -19,8 +19,19 @@ namespace ImagePerfect.Repository
         //any Folder model specific database methods here
         public async Task<Folder?> GetRootFolder()
         {
-            string sql = @"SELECT * FROM folders WHERE IsRoot = True";
-            Folder? rootFolder = await _connection.QuerySingleOrDefaultAsync<Folder>(sql);
+            await _connection.OpenAsync();
+            MySqlTransaction txn = await _connection.BeginTransactionAsync();
+            string sql1 = @"SELECT * FROM folders WHERE IsRoot = 1";
+            Folder? rootFolder = await _connection.QuerySingleOrDefaultAsync<Folder>(sql1, transaction: txn);
+            string sql2 = @"SELECT tags.TagId, tags.TagName, folders.FolderId FROM folders
+	                            JOIN folder_tags_join ON folder_tags_join.FolderId = folders.FolderId
+	                            JOIN tags ON folder_tags_join.TagId = tags.TagId WHERE folders.IsRoot = 1;";
+            if (rootFolder != null) 
+            { 
+                List<Tag> tags = (List<Tag>)await _connection.QueryAsync<Tag>(sql2, transaction: txn);
+                rootFolder.Tags = tags;
+            }
+            await txn.CommitAsync();
             await _connection.CloseAsync();
             return rootFolder;
         }
@@ -105,6 +116,14 @@ namespace ImagePerfect.Repository
             await txn.CommitAsync();
             await _connection.CloseAsync();
             return rowsEffectedA + rowsEffectedB >= 1 ? true : false;
+        }
+        public async Task<bool> DeleteFolderTag(Tag tag)
+        {
+            int rowsEffected = 0;
+            string sql = @"DELETE FROM folder_tags_join WHERE FolderId = @folderId AND TagId = @tagId";
+            rowsEffected = await _connection.ExecuteAsync(sql, new { folderId = tag.FolderId, tagId = tag.TagId });
+            await _connection.CloseAsync();
+            return rowsEffected > 0 ? true : false;
         }
     }
 }

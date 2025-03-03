@@ -1,5 +1,7 @@
 using Avalonia.Media.Imaging;
 using ReactiveUI;
+using System.Collections.Generic;
+using ImagePerfect.Models;
 
 namespace ImagePerfect.ViewModels
 {
@@ -57,6 +59,7 @@ namespace ImagePerfect.ViewModels
 			get => _folderDescription;
 			set => this.RaiseAndSetIfChanged(ref _folderDescription, value);
 		}
+		//used to display the csv string on the Remove Tag TextBox
 		public string? FolderTags
 		{
 			get => _folderTags;
@@ -98,5 +101,8 @@ namespace ImagePerfect.ViewModels
 			get => _showImportImagesButton;
 			set => this.RaiseAndSetIfChanged(ref _showImportImagesButton, value);
 		}
+
+        //for many to many relationship folder_tags_join
+        public List<Tag> Tags { get; set; } = new List<Tag>();
 	}
 }

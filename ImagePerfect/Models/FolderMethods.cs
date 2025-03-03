@@ -69,5 +69,10 @@ namespace ImagePerfect.Models
         {
             return await _unitOfWork.Folder.UpdateFolderTags(folder, newTag);
         }
+
+        public async Task<bool> DeleteFolderTag(Tag tag)
+        {
+            return await _unitOfWork.Folder.DeleteFolderTag(tag);
+        }
     }
 }

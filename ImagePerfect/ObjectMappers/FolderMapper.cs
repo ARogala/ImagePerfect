@@ -2,6 +2,7 @@
 using ImagePerfect.Models;
 using ImagePerfect.ViewModels;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 
@@ -20,12 +21,14 @@ namespace ImagePerfect.ObjectMappers
                 CoverImageBitmap = folder.CoverImagePath == "" ? ImageHelper.LoadFromResource(new Uri("avares://ImagePerfect/Assets/computer-folder-dual-tone-icon.png")) : await ImageHelper.FormatImage(folder.CoverImagePath),
                 CoverImagePath = folder.CoverImagePath,
                 FolderDescription = folder.FolderDescription,
+                FolderTags = MapTagsListToString(folder.Tags),
                 FolderRating = folder.FolderRating,
                 HasFiles = folder.HasFiles,
                 IsRoot = folder.IsRoot,
                 FolderContentMetaDataScanned = folder.FolderContentMetaDataScanned,
                 AreImagesImported = folder.AreImagesImported,
                 ShowImportImagesButton = folder.HasFiles == true && folder.AreImagesImported == false ? true : false,
+                Tags = folder.Tags,
             };
             return folderViewModel;
         }
@@ -47,6 +50,27 @@ namespace ImagePerfect.ObjectMappers
                 AreImagesImported= folderVm.AreImagesImported,
             };
             return folder;
+        }
+
+        private static string MapTagsListToString(List<Tag> tags)
+        {
+            string tagString = string.Empty;
+            if(tags.Count == 0)
+            {
+                return tagString;
+            }
+            for (int i = 0; i < tags.Count; i++)
+            {
+                if (i == 0)
+                {
+                    tagString = tags[i].TagName;
+                }
+                else
+                {
+                    tagString = tagString + "," + tags[i].TagName;
+                }
+            }
+            return tagString;
         }
     }
 }

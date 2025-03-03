@@ -64,7 +64,7 @@ namespace ImagePerfect.ViewModels
                 AddFolderTag(folderVm);
             });
             EditFolderTagsCommand = ReactiveCommand.Create((FolderViewModel folderVm) => {
-                UpdateFolder(folderVm, "Tags");
+                EditFolderTag(folderVm);
             });
             AddFolderRatingCommand = ReactiveCommand.Create((FolderViewModel folderVm) => {
                 UpdateFolder(folderVm, "Rating");
@@ -348,6 +348,23 @@ namespace ImagePerfect.ViewModels
             }
         }
 
+        private async void EditFolderTag(FolderViewModel folderVm)
+        {
+            if(folderVm.FolderTags == null || folderVm.FolderTags == "") {  return; }
+            List<string> folderTags = folderVm.FolderTags.Split(",").ToList();
+            Tag? tagToRemove = null;
+            foreach(Tag tag in folderVm.Tags)
+            {
+                if (!folderTags.Contains(tag.TagName))
+                {
+                    tagToRemove = tag;
+                }
+            }
+            if (tagToRemove != null) 
+            {
+                await _folderMethods.DeleteFolderTag(tagToRemove);
+            }
+        }
         private async void AddFolderTag(FolderViewModel folderVm)
         {
             //click submit with empty input just return
