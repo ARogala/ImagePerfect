@@ -211,12 +211,6 @@ namespace ImagePerfect.ViewModels
                 ImageViewModel imageViewModel = await ImageMapper.GetImageVm(displayImages[i]);
                 Images.Add(imageViewModel);
             }
-            //foreach (Image image in displayImages)
-            //{
-            //    //need to map tags to images
-            //    ImageViewModel imageViewModel = await ImageMapper.GetImageVm(image);
-            //    Images.Add(imageViewModel);
-            //}
         }
         private async void Initialize()
         {
