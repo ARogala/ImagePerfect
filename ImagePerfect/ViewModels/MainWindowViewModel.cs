@@ -448,15 +448,6 @@ namespace ImagePerfect.ViewModels
             {
                 return;
             }
-            //add NewTag to ImageTags
-            if(imageVm.ImageTags == "")
-            {
-                imageVm.ImageTags = imageVm.NewTag;
-            }
-            else
-            {
-                imageVm.ImageTags = imageVm.ImageTags + "," + imageVm.NewTag;
-            }
             Image image = ImageMapper.GetImageFromVm(imageVm);
             //update image table and tags table in db
             bool success = await _imageMethods.UpdateImageTags(image, imageVm.NewTag);
