@@ -1,6 +1,7 @@
 ﻿using ImagePerfect.Helpers;
 using ImagePerfect.Models;
 using ImagePerfect.ViewModels;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace ImagePerfect.ObjectMappers
@@ -15,11 +16,12 @@ namespace ImagePerfect.ObjectMappers
                 ImageBitmap = await ImageHelper.FormatImage(image.ImagePath),
                 ImagePath = image.ImagePath,
                 FileName = image.FileName,
-                //ImageTags = image.ImageTags,
+                ImageTags = MapTagsListToString(image.Tags),
                 ImageRating = image.ImageRating,
                 ImageFolderPath = image.ImageFolderPath,
                 ImageMetaDataScanned = image.ImageMetaDataScanned,
                 FolderId = image.FolderId,
+                Tags = image.Tags,
             };
             return imageVm;
         }
@@ -31,13 +33,34 @@ namespace ImagePerfect.ObjectMappers
                 ImageId= imageVm.ImageId,
                 ImagePath = imageVm.ImagePath,
                 FileName = imageVm.FileName,
-                //ImageTags = imageVm.ImageTags,
                 ImageRating = imageVm.ImageRating,
                 ImageFolderPath = imageVm.ImageFolderPath,
                 ImageMetaDataScanned = imageVm.ImageMetaDataScanned,
                 FolderId = imageVm.FolderId,
+                Tags = imageVm.Tags,
             };
             return image;
+        }
+
+        private static string MapTagsListToString(List<ImageTag> tags)
+        {
+            string tagString = string.Empty;
+            if (tags.Count == 0) 
+            {
+                return tagString;
+            }
+            for (int i = 0; i < tags.Count; i++) 
+            {
+                if (i == 0)
+                {
+                    tagString = tags[i].TagName;
+                }
+                else
+                {
+                    tagString = tagString + "," + tags[i].TagName;
+                }
+            }
+            return tagString;
         }
     }
 }
