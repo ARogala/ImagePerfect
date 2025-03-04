@@ -42,6 +42,17 @@ namespace ImagePerfect.ObjectMappers
             return image;
         }
 
+        public static Image MapTagsToImage(Image image, List<ImageTag> imageTags)
+        {
+            foreach (ImageTag imageTag in imageTags)
+            {
+                if (imageTag.ImageId == image.ImageId)
+                {
+                    image.Tags.Add(imageTag);
+                }
+            }
+            return image;
+        }
         private static string MapTagsListToString(List<ImageTag> tags)
         {
             string tagString = string.Empty;

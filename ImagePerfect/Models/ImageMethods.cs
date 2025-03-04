@@ -16,12 +16,12 @@ namespace ImagePerfect.Models
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<List<Image>> GetAllImagesInFolder(int folderId)
+        public async Task<(List<Image> images, List<ImageTag> tags)> GetAllImagesInFolder(int folderId)
         {
             return await _unitOfWork.Image.GetAllImagesInFolder(folderId);
         }
 
-        public async Task<List<Image>> GetAllImagesInFolder(string folderPath)
+        public async Task<(List<Image> images, List<ImageTag> tags)> GetAllImagesInFolder(string folderPath)
         {
             return await _unitOfWork.Image.GetAllImagesInFolder(folderPath);
         }

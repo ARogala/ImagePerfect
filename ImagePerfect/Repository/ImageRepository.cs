@@ -20,20 +20,35 @@ namespace ImagePerfect.Repository
             _connection = db;
         }
         //any Image model specific database methods here
-        public async Task<List<Image>> GetAllImagesInFolder(int folderId)
+        public async Task<(List<Image> images, List<ImageTag> tags)> GetAllImagesInFolder(int folderId)
         {
-            string sql = @"SELECT * FROM images WHERE FolderId = @folderId ORDER BY FileName";
-            List<Image> allImagesInFolder = (List<Image>)await _connection.QueryAsync<Image>(sql, new { folderId });
+            await _connection.OpenAsync();
+            MySqlTransaction txn = await _connection.BeginTransactionAsync();
+            string sql1 = @"SELECT * FROM images WHERE FolderId = @folderId ORDER BY FileName";
+            List<Image> allImagesInFolder = (List<Image>)await _connection.QueryAsync<Image>(sql1, new { folderId }, transaction: txn);
+            string sql2 = @"SELECT tags.TagId, Tags.TagName, images.ImageId FROM images
+                            JOIN image_tags_join ON image_tags_join.ImageId = images.ImageId
+                            JOIN tags ON image_tags_join.TagId = tags.TagId WHERE images.FolderId = @folderId ORDER BY images.FileName;";
+            List<ImageTag> tags = (List<ImageTag>)await _connection.QueryAsync<ImageTag>(sql2, new { folderId }, transaction: txn);
+            await txn.CommitAsync();
             await _connection.CloseAsync();
-            return allImagesInFolder;
+            return (allImagesInFolder, tags);
         }
 
-        public async Task<List<Image>> GetAllImagesInFolder(string folderPath)
+        public async Task<(List<Image> images, List<ImageTag> tags)> GetAllImagesInFolder(string folderPath)
         {
-            string sql = @"SELECT * FROM images WHERE ImageFolderPath = @folderPath ORDER BY FileName";
-            List<Image> allImagesInFolder = (List<Image>)await _connection.QueryAsync<Image>(sql, new { folderPath });
+            await _connection.OpenAsync();
+            MySqlTransaction txn = await _connection.BeginTransactionAsync();
+
+            string sql1 = @"SELECT * FROM images WHERE ImageFolderPath = @folderPath ORDER BY FileName";
+            List<Image> allImagesInFolder = (List<Image>)await _connection.QueryAsync<Image>(sql1, new { folderPath }, transaction: txn);
+            string sql2 = @"SELECT tags.TagId, Tags.TagName, images.ImageId FROM images
+                            JOIN image_tags_join ON image_tags_join.ImageId = images.ImageId
+                            JOIN tags ON image_tags_join.TagId = tags.TagId WHERE images.ImageFolderPath = @folderPath ORDER BY images.FileName;";
+            List<ImageTag> tags = (List<ImageTag>)await _connection.QueryAsync<ImageTag>(sql2, new { folderPath }, transaction: txn);
+            await txn.CommitAsync();
             await _connection.CloseAsync();
-            return allImagesInFolder;
+            return (allImagesInFolder, tags);
         }
 
         public async Task<List<Image>> GetAllImagesInDirectoryTree(string directoryPath)

@@ -35,6 +35,7 @@ namespace ImagePerfect.ViewModels
         private List<Folder> displayFolders = new List<Folder>();
         private List<FolderTag> displayFolderTags = new List<FolderTag>();  
         private List<Image> displayImages = new List<Image>();
+        private List<ImageTag> displayImageTags = new List<ImageTag>(); 
 
         public MainWindowViewModel() { }
         public MainWindowViewModel(IUnitOfWork unitOfWork)
@@ -203,11 +204,19 @@ namespace ImagePerfect.ViewModels
         private async void RefreshImages()
         {
             Images.Clear();
-            foreach (Image image in displayImages)
+            for(int i = 0; i < displayImages.Count; i++)
             {
-                ImageViewModel imageViewModel = await ImageMapper.GetImageVm(image);
+                //need to map tags to images
+                displayImages[i] = ImageMapper.MapTagsToImage(displayImages[i], displayImageTags);
+                ImageViewModel imageViewModel = await ImageMapper.GetImageVm(displayImages[i]);
                 Images.Add(imageViewModel);
             }
+            //foreach (Image image in displayImages)
+            //{
+            //    //need to map tags to images
+            //    ImageViewModel imageViewModel = await ImageMapper.GetImageVm(image);
+            //    Images.Add(imageViewModel);
+            //}
         }
         private async void Initialize()
         {
@@ -252,7 +261,9 @@ namespace ImagePerfect.ViewModels
                 displayFolders = folderResult.folders;
                 displayFolderTags = folderResult.tags;
                 //folder may or may not have images but will just be an empty list if none.
-                displayImages = await _imageMethods.GetAllImagesInFolder(newPath);
+                (List<Image> images, List<ImageTag> tags) imageResult = await _imageMethods.GetAllImagesInFolder(newPath);
+                displayImages = imageResult.images;
+                displayImageTags = imageResult.tags;
                 //refresh UI
                 RefreshFolders();
                 RefreshImages();
@@ -272,7 +283,9 @@ namespace ImagePerfect.ViewModels
             displayFolders = folderResult.folders;
             displayFolderTags = folderResult.tags;
             //folder may or may not have images but will just be an empty list if none.
-            displayImages = await _imageMethods.GetAllImagesInFolder(newPath);
+            (List<Image> images, List<ImageTag> tags) imageResult = await _imageMethods.GetAllImagesInFolder(newPath);
+            displayImages = imageResult.images;
+            displayImageTags = imageResult.tags;    
             //refresh UI
             RefreshFolders();
             RefreshImages();
@@ -293,7 +306,9 @@ namespace ImagePerfect.ViewModels
             displayFolders = folderResult.folders;
             displayFolderTags = folderResult.tags;
             //folder may or may not have images but will just be an empty list if none.
-            displayImages = await _imageMethods.GetAllImagesInFolder(newPath);
+            (List<Image> images, List<ImageTag> tags) imageResult = await _imageMethods.GetAllImagesInFolder(newPath);
+            displayImages = imageResult.images;
+            displayImageTags = imageResult.tags;
             //refresh UI
             RefreshFolders();
             RefreshImages();
@@ -318,7 +333,9 @@ namespace ImagePerfect.ViewModels
                 (List<Folder> folders, List<FolderTag> tags) folderResult = await _folderMethods.GetFoldersInDirectory(currentFolder.FolderPath);
                 displayFolders = folderResult.folders;
                 displayFolderTags = folderResult.tags;
-                displayImages = await _imageMethods.GetAllImagesInFolder(currentFolder.FolderId);
+                (List<Image> images, List<ImageTag> tags) imageResult = await _imageMethods.GetAllImagesInFolder(currentFolder.FolderId);
+                displayImages = imageResult.images;
+                displayImageTags= imageResult.tags;
             }
             //refresh UI
             RefreshFolders();
@@ -436,6 +453,8 @@ namespace ImagePerfect.ViewModels
            
         }
 
+        //remove the tag from the image_tag_join table 
+        //Also need to remove imageMetaData
         private async void EditImageTag(ImageViewModel imageVm)
         {
             if(imageVm.ImageTags == null || imageVm.ImageTags == "")
@@ -507,9 +526,10 @@ namespace ImagePerfect.ViewModels
             var boxResult = await boxYesNo.ShowAsync();
             if (boxResult == ButtonResult.Yes) 
             {
-                (List<Folder> folders, List<FolderTag> tags) result = await _folderMethods.GetFoldersInDirectory(imageVm.ImageFolderPath);
-                displayFolders = result.folders;
-                displayImages = await _imageMethods.GetAllImagesInFolder(imageVm.FolderId);
+                (List<Folder> folders, List<FolderTag> tags) folderResult = await _folderMethods.GetFoldersInDirectory(imageVm.ImageFolderPath);
+                displayFolders = folderResult.folders;
+                (List<Image> images, List<ImageTag> tags) imageResultA = await _imageMethods.GetAllImagesInFolder(imageVm.FolderId);
+                displayImages = imageResultA.images;
                 if (displayImages.Count == 1 && displayFolders.Count == 0)
                 {
                     var box = MessageBoxManager.GetMessageBoxStandard("Delete Image", "This is the last image in the folder go back and delete the folder", ButtonEnum.Ok);
@@ -536,7 +556,9 @@ namespace ImagePerfect.ViewModels
                         File.Move(imageVm.ImagePath, newImagePath);
 
                         //refresh UI
-                        displayImages = await _imageMethods.GetAllImagesInFolder(imageVm.FolderId);
+                        (List<Image> images, List<ImageTag> tags) imageResultB = await _imageMethods.GetAllImagesInFolder(imageVm.FolderId);
+                        displayImages = imageResultB.images;
+                        displayImageTags = imageResultB.tags;
                         RefreshImages();
                     }
                 }
@@ -558,7 +580,8 @@ namespace ImagePerfect.ViewModels
             if (boxResult == ButtonResult.Yes) 
             {
                 string pathThatContainsFolder = PathHelper.RemoveOneFolderFromPath(folderVm.FolderPath);
-                displayImages = await _imageMethods.GetAllImagesInFolder(pathThatContainsFolder);
+                (List<Image> images, List<ImageTag> tags) imageResult = await _imageMethods.GetAllImagesInFolder(pathThatContainsFolder);
+                displayImages = imageResult.images;
                 (List<Folder> folders, List<FolderTag> tags) folderResultA = await _folderMethods.GetFoldersInDirectory(pathThatContainsFolder);
                 displayFolders = folderResultA.folders;
                 if (displayFolders.Count == 1 && displayImages.Count == 0)
@@ -601,7 +624,8 @@ namespace ImagePerfect.ViewModels
         {
             ShowLoading = true;
             //get all images at folder id
-            List<Image> images = await _imageMethods.GetAllImagesInFolder(folderVm.FolderId);
+            (List<Image> images, List<ImageTag> tags) imageResultA = await _imageMethods.GetAllImagesInFolder(folderVm.FolderId);
+            List<Image> images = imageResultA.images;
             //scan images for metadata
             List<Image> imagesPlusUpdatedMetaData = await ImageMetaDataHelper.ScanImagesForMetaData(images);
             //update database with metadata
@@ -614,7 +638,9 @@ namespace ImagePerfect.ViewModels
                 (List<Folder> folders, List<FolderTag> tags) folderResult = await _folderMethods.GetFoldersInDirectory(CurrentDirectory);
                 displayFolders = folderResult.folders;
                 displayFolderTags = folderResult.tags;
-                displayImages = await _imageMethods.GetAllImagesInFolder(CurrentDirectory);
+                (List<Image> images, List<ImageTag> tags) imageResultB = await _imageMethods.GetAllImagesInFolder(CurrentDirectory);
+                displayImages = imageResultB.images;
+                displayImageTags = imageResultB.tags;
                 RefreshFolders();
                 RefreshImages();
             }
