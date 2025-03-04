@@ -74,7 +74,7 @@ namespace ImagePerfect.ViewModels
                 AddImageTag(imageVm);
             });
             EditImageTagsCommand = ReactiveCommand.Create((ImageViewModel imageVm) => {
-                UpdateImage(imageVm, "Tags");
+                EditImageTag(imageVm);
             });
             AddImageRatingCommand = ReactiveCommand.Create((ImageViewModel imageVm) => {
                 UpdateImage(imageVm, "Rating");
@@ -412,7 +412,7 @@ namespace ImagePerfect.ViewModels
         /*
          *  The reason for having both UpdateImage and AddImagTag is because of the following
          *  1. In the UI I wanted to have the AutoCompleteBox with a quick way to select previously enterd tags
-         *  2. Looking for a quick way to do thay while trying to avoid makeing a JOIN table to link images with tags (this will make sql queries easier and should improve performace on very large datasets)
+         *  2. Looking for a quick way to do that
          *  3. wanted to maintain a quick way to remove a tag if one was entered in error. 
          *  4. Drawback will be the two methods here and i will want a way to remove individual tags from the tags table
          *  5. Also after scanning metadata tags list is out of sync
@@ -428,19 +428,42 @@ namespace ImagePerfect.ViewModels
                 await box.ShowAsync();
                 return;     
             }
-            //write tag or rating to image metadata
-            if(fieldUpdated == "Tags")
-            {
-                //write new tag to image metadata
-                ImageMetaDataHelper.WriteTagToImage(image);
-            }
-            else if (fieldUpdated == "Rating")
+            //write rating to image metadata
+            if (fieldUpdated == "Rating")
             {
                 ImageMetaDataHelper.AddRatingToImage(image);
             }
            
         }
-        //Add NewTags to the tags list, update ImageTags, and update image metadata
+
+        private async void EditImageTag(ImageViewModel imageVm)
+        {
+            if(imageVm.ImageTags == null || imageVm.ImageTags == "")
+            {
+                if(imageVm.Tags.Count == 1)
+                {
+                    await _imageMethods.DeleteImageTag(imageVm.Tags[0]);
+                }
+                else if(imageVm.Tags.Count == 0)
+                {
+                    return;
+                }
+            }
+            List<string> imageTags = imageVm.ImageTags.Split(",").ToList();
+            ImageTag tagToRemove = null;
+            foreach(ImageTag tag in imageVm.Tags)
+            {
+                if (!imageTags.Contains(tag.TagName))
+                {
+                    tagToRemove = tag;
+                }
+            }
+            if (tagToRemove != null) 
+            { 
+                await _imageMethods.DeleteImageTag(tagToRemove);
+            }
+        }
+        //update ImageTags in db, and update image metadata
         private async void AddImageTag(ImageViewModel imageVm)
         {
             //click submit with empty input just return

@@ -100,6 +100,15 @@ namespace ImagePerfect.Repository
 
         }
 
+        public async Task<bool> DeleteImageTag(ImageTag tag)
+        {
+            int rowsEffected = 0;
+            string sql = @"DELETE FROM image_tags_join WHERE ImageId = @imageId AND TagId = @tagId";
+            rowsEffected = await _connection.ExecuteAsync(sql, new { imageId = tag.ImageId, tagId = tag.TagId });
+            await _connection.CloseAsync();
+            return rowsEffected > 0 ? true : false;
+        }
+
         public async Task<List<string>> GetTagsList()
         {
             string sql = @"SELECT TagName FROM tags";
