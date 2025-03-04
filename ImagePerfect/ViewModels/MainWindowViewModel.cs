@@ -361,7 +361,17 @@ namespace ImagePerfect.ViewModels
 
         private async void EditFolderTag(FolderViewModel folderVm)
         {
-            if(folderVm.FolderTags == null || folderVm.FolderTags == "") {  return; }
+            if(folderVm.FolderTags == null || folderVm.FolderTags == "") 
+            {
+                if(folderVm.Tags.Count == 1)
+                {
+                    await _folderMethods.DeleteFolderTag(folderVm.Tags[0]);
+                }
+                else if (folderVm.Tags.Count == 0)
+                {
+                    return;
+                }
+            }
             List<string> folderTags = folderVm.FolderTags.Split(",").ToList();
             FolderTag? tagToRemove = null;
             foreach(FolderTag tag in folderVm.Tags)
