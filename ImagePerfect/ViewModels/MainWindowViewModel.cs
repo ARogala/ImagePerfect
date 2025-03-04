@@ -377,6 +377,9 @@ namespace ImagePerfect.ViewModels
                 if(folderVm.Tags.Count == 1)
                 {
                     await _folderMethods.DeleteFolderTag(folderVm.Tags[0]);
+                    (List<Folder> folders, List<FolderTag> tags) folderResult = await _folderMethods.GetFoldersInDirectory(CurrentDirectory);
+                    displayFolders = folderResult.folders;
+                    displayFolderTags = folderResult.tags;
                 }
                 else if (folderVm.Tags.Count == 0)
                 {
@@ -395,7 +398,12 @@ namespace ImagePerfect.ViewModels
             if (tagToRemove != null) 
             {
                 await _folderMethods.DeleteFolderTag(tagToRemove);
+                (List<Folder> folders, List<FolderTag> tags) folderResult = await _folderMethods.GetFoldersInDirectory(CurrentDirectory);
+                displayFolders = folderResult.folders;
+                displayFolderTags = folderResult.tags;
             }
+            //refresh UI
+            RefreshFolders();
         }
         private async void AddFolderTag(FolderViewModel folderVm)
         {
@@ -456,6 +464,9 @@ namespace ImagePerfect.ViewModels
                 if(imageVm.Tags.Count == 1)
                 {
                     await _imageMethods.DeleteImageTag(imageVm.Tags[0]);
+                    (List<Image> images, List<ImageTag> tags) imageResult = await _imageMethods.GetAllImagesInFolder(CurrentDirectory);
+                    displayImages = imageResult.images;
+                    displayImageTags = imageResult.tags;
                 }
                 else if(imageVm.Tags.Count == 0)
                 {
@@ -474,7 +485,11 @@ namespace ImagePerfect.ViewModels
             if (tagToRemove != null) 
             { 
                 await _imageMethods.DeleteImageTag(tagToRemove);
+                (List<Image> images, List<ImageTag> tags) imageResult = await _imageMethods.GetAllImagesInFolder(CurrentDirectory);
+                displayImages = imageResult.images;
+                displayImageTags = imageResult.tags;
             }
+            RefreshImages();
         }
         //update ImageTags in db, and update image metadata
         private async void AddImageTag(ImageViewModel imageVm)
@@ -492,6 +507,10 @@ namespace ImagePerfect.ViewModels
                 //Update TagsList to show in UI AutoCompleteBox clear NewTag in box as well
                 await GetTagsList();
                 imageVm.NewTag = "";
+                (List<Image> images, List<ImageTag> tags) imageResult = await _imageMethods.GetAllImagesInFolder(CurrentDirectory);
+                displayImages = imageResult.images;
+                displayImageTags = imageResult.tags;
+                RefreshImages();
                 //write new tag to image metadata
                 ImageMetaDataHelper.WriteTagToImage(image);
             }
