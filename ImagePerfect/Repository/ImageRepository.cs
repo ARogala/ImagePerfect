@@ -84,10 +84,16 @@ namespace ImagePerfect.Repository
             int rowsEffectedB = 0;
             await _connection.OpenAsync();
             MySqlTransaction txn = await _connection.BeginTransactionAsync();
-            string sql1 = @"UPDATE images Set ImageTags = @tags WHERE ImageId = @id";
-            string sql2 = @"INSERT IGNORE INTO tags (TagName) VALUES (@newTag)";
-            //rowsEffectedA = await _connection.ExecuteAsync(sql1, new { tags = image.ImageTags, id = image.ImageId }, transaction: txn);
-            rowsEffectedB = await _connection.ExecuteAsync(sql2, new { newTag = newTag }, transaction: txn);
+            //insert newTag if its already there IGNORE
+            string sql1 = @"INSERT IGNORE INTO tags (TagName) VALUES (@newTag)";
+            rowsEffectedA = await _connection.ExecuteAsync(sql1, new { newTag = newTag }, transaction: txn);
+            //get newTag id
+            string sql2 = @"SELECT TagId FROM tags WHERE TagName = @newTag";
+            int newTagId = await _connection.QuerySingleOrDefaultAsync<int>(sql2, new { newTag }, transaction: txn);
+            //insert into image_tags_join
+            string sql3 = @"INSERT INTO image_tags_join (ImageId, TagId) VALUES (@imageId, @tagId)";
+            rowsEffectedB = await _connection.ExecuteAsync(sql3, new { imageId = image.ImageId, tagId = newTagId }, transaction: txn);
+
             await txn.CommitAsync();
             await _connection.CloseAsync();
             return rowsEffectedA + rowsEffectedB >= 1 ? true : false;
