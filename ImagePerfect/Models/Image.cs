@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ImagePerfect.Models
@@ -16,9 +17,6 @@ namespace ImagePerfect.Models
         [Column("FileName")]
         public string FileName { get; set; }
 
-        //[Column("ImageTags")]
-        //public string? ImageTags { get; set; }
-
         [Column("ImageRating")]
         public int ImageRating { get; set; }
 
@@ -32,5 +30,7 @@ namespace ImagePerfect.Models
         [Column("FolderId")]
         public int FolderId { get; set; }
 
+        //for many to many relationship image_tags_join
+        public List<ImageTag> Tags { get; set; } = new List<ImageTag>();  
     }
 }
