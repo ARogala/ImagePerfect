@@ -48,6 +48,7 @@ namespace ImagePerfect.ObjectMappers
                 IsRoot = folderVm.IsRoot,
                 FolderContentMetaDataScanned= folderVm.FolderContentMetaDataScanned,
                 AreImagesImported= folderVm.AreImagesImported,
+                Tags = folderVm.Tags,
             };
             return folder;
         }
