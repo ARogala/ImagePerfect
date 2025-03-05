@@ -467,6 +467,8 @@ namespace ImagePerfect.ViewModels
                     (List<Image> images, List<ImageTag> tags) imageResult = await _imageMethods.GetAllImagesInFolder(CurrentDirectory);
                     displayImages = imageResult.images;
                     displayImageTags = imageResult.tags;
+                    //remove tag from image metadata
+                    await ImageMetaDataHelper.WriteTagToImage(imageVm);
                 }
                 else if(imageVm.Tags.Count == 0)
                 {
@@ -488,7 +490,10 @@ namespace ImagePerfect.ViewModels
                 (List<Image> images, List<ImageTag> tags) imageResult = await _imageMethods.GetAllImagesInFolder(CurrentDirectory);
                 displayImages = imageResult.images;
                 displayImageTags = imageResult.tags;
+                //remove tag from image metadata
+                await ImageMetaDataHelper.WriteTagToImage(imageVm);
             }
+            //refresh UI
             RefreshImages();
         }
         //update ImageTags in db, and update image metadata
@@ -499,20 +504,29 @@ namespace ImagePerfect.ViewModels
             {
                 return;
             }
+            //add NewTag to ImageTags
+            if (imageVm.ImageTags == "")
+            {
+                imageVm.ImageTags = imageVm.NewTag;
+            }
+            else
+            {
+                imageVm.ImageTags = imageVm.ImageTags + "," + imageVm.NewTag;
+            }
             Image image = ImageMapper.GetImageFromVm(imageVm);
             //update image table and tags table in db
             bool success = await _imageMethods.UpdateImageTags(image, imageVm.NewTag);
             if (success) 
             {
+                //write new tag to image metadata
+                await ImageMetaDataHelper.WriteTagToImage(imageVm);
                 //Update TagsList to show in UI AutoCompleteBox clear NewTag in box as well
                 await GetTagsList();
                 imageVm.NewTag = "";
                 (List<Image> images, List<ImageTag> tags) imageResult = await _imageMethods.GetAllImagesInFolder(CurrentDirectory);
                 displayImages = imageResult.images;
                 displayImageTags = imageResult.tags;
-                RefreshImages();
-                //write new tag to image metadata
-                ImageMetaDataHelper.WriteTagToImage(image);
+                RefreshImages();   
             }
         }
        
