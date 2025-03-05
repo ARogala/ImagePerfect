@@ -132,7 +132,7 @@ namespace ImagePerfect.Repository
             return tags;
         }
 
-        public async Task<bool> UpdateImageMetaData(string imageUpdateSql, int folderId)
+        public async Task<bool> UpdateImageRatingFromMetaData(string imageUpdateSql, int folderId)
         {
             string sql = @"UPDATE folders set FolderContentMetaDataScanned = 1 WHERE FolderId = @folderId";
             int rowsEffectedA = 0;
@@ -145,6 +145,29 @@ namespace ImagePerfect.Repository
             await txn.CommitAsync();
             await _connection.CloseAsync();
             return rowsEffectedA > 0 && rowsEffectedB > 0 ? true : false;
+
+        }
+        public async Task ClearImageTagsJoinForMetaData(Image image)
+        {
+            string sql = @"DELETE FROM image_tags_join WHERE ImageId = @imageId";
+            await _connection.ExecuteAsync(sql, new { imageId = image.ImageId });
+            await _connection.CloseAsync();
+        }
+        public async Task UpdateImageTagFromMetaData(ImageTag tag)
+        {
+            await _connection.OpenAsync();
+            MySqlTransaction txn = await _connection.BeginTransactionAsync();
+            
+            string sql1 = @"INSERT IGNORE INTO tags (TagName) VALUES (@newTag)";
+            await _connection.ExecuteAsync(sql1, new { newTag = tag.TagName }, transaction: txn);
+
+            string sql2 = @"SELECT TagId FROM tags WHERE TagName = @newTag";
+            int newTagId = await _connection.QuerySingleOrDefaultAsync<int>(sql2, new { newTag = tag.TagName }, transaction: txn);
+
+            string sql3 = @"INSERT INTO image_tags_join (ImageId, TagId) VALUES (@imageId, @tagId)";
+            await _connection.ExecuteAsync(sql3, new { imageId = tag.ImageId, tagId = newTagId }, transaction: txn);
+            await txn.CommitAsync();
+            await _connection.CloseAsync();
         }
     }
 }

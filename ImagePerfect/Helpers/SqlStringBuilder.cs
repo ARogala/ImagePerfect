@@ -100,17 +100,8 @@ namespace ImagePerfect.Helpers
 
         public static string BuildImageSqlForScanMetadata(List<Image> images)
         {
-            StringBuilder sb = new StringBuilder("UPDATE images SET ImageTags = CASE ");
+            StringBuilder sb = new StringBuilder("UPDATE images SET ImageRating = CASE ");
             foreach (Image image in images) 
-            {
-                //if (image.ImageTags != "")
-                //{
-                //    sb.Append($"WHEN ImageId = {image.ImageId} THEN '{image.ImageTags}' ");
-                //}
-                sb.Append($"WHEN ImageId = {image.ImageId} THEN '' ");
-            }
-            sb.Append("ELSE ImageTags END, ImageRating = CASE ");
-            foreach(Image image in images)
             {
                 sb.Append($"WHEN ImageId = {image.ImageId} THEN {image.ImageRating} ");
             }

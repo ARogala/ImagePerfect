@@ -37,30 +37,26 @@ namespace ImagePerfect.Helpers
             WriteRatingToImage(imageSharpImage, image);
         }
 
+        //adds the image metadata to the ImagePerfect Image object
         private static void UpdateMetadata(ImageSharp.ImageInfo imageInfo, ImagePerfectImage image)
         {
-          
+            image.Tags.Clear();
             if (imageInfo.Metadata.IptcProfile?.Values?.Any() == true)
             {
-                //if keywords are in db and writen to file already this will double it up on the ImagePerfectImage object..
-                //So clear ImagePerfectImage object tags first
-                //image.ImageTags = "";
-                //foreach (var prop in imageInfo.Metadata.IptcProfile.Values)
-                //{
-                //    if(prop.Tag == IptcTag.Keywords)
-                //    {
-                //        if(image.ImageTags == "")
-                //        {
-                //            image.ImageTags = $"{prop.Value}";
-                //        }
-                //        else
-                //        {
-                //            image.ImageTags = $"{image.ImageTags},{prop.Value}";
-                //        }
-                //    }
-                //}
+                foreach (var prop in imageInfo.Metadata.IptcProfile.Values)
+                {
+                    if (prop.Tag == IptcTag.Keywords)
+                    {
+                        ImageTag imageTag = new() 
+                        { 
+                            TagName = prop.Value,
+                            ImageId = image.ImageId,
+                        };
+                        image.Tags.Add(imageTag);
+                    }
+                }
             }
-           
+
             //shotwell rating is in exifprofile
             if (imageInfo.Metadata.ExifProfile?.Values?.Any() == true)
             {

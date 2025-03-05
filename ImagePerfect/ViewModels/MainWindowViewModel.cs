@@ -646,7 +646,23 @@ namespace ImagePerfect.ViewModels
             
         }
 
-        //after scanning metadata tags list is out of sync
+        /*
+         * complicated because tags are in image_tags_join table also the tags on image metadata may or may not be in the tags table in database
+         * goal is to take metadata from image and write to database. The two should be identical after this point. 
+         * With image metadata taking more importance because the app also writes tags and rating to image metadata -- so count that as the master record
+         * 
+         * Because ImageRating is on the images table and tags are on image_tags_join it is easy to update the ImageRating 
+         * in one database trip but the tags are much more complicated because the tag metadata from the image itself will not have
+         * the tagId needed for the database also these metadata tags may or may not be in the tags table.
+         * 
+         * thus for now the most efficient thing i could think to do was to update the ratings in one shot
+         * then since not every image will even have a tag only update the ones that have tags -- least amout of db round trips
+         * Also for the images that do have tags clear the image_tag_join table 1st so we dont double up on tags in the db. 
+         * 
+         * perfect heck no... But it works fine for a few hundred or maybe thousand images. 
+         * Really how many images are going to be on one folder? I am assuming at most maybe a few thousand
+         * 
+         */
         private async void ScanFolderImagesForMetaData(FolderViewModel folderVm)
         {
             ShowLoading = true;
@@ -655,9 +671,20 @@ namespace ImagePerfect.ViewModels
             List<Image> images = imageResultA.images;
             //scan images for metadata
             List<Image> imagesPlusUpdatedMetaData = await ImageMetaDataHelper.ScanImagesForMetaData(images);
-            //update database with metadata
-            string imageUpdateSql = SqlStringBuilder.BuildImageSqlForScanMetadata(imagesPlusUpdatedMetaData);
-            bool success = await _imageMethods.UpdateImageMetaData(imageUpdateSql, folderVm.FolderId);
+            string imageUpdateSql = SqlStringBuilder.BuildImageSqlForScanMetadata(imagesPlusUpdatedMetaData); 
+            bool success = await _imageMethods.UpdateImageRatingFromMetaData(imageUpdateSql, folderVm.FolderId);
+            foreach (Image image in imagesPlusUpdatedMetaData) 
+            {
+                if (image.Tags.Count > 0)
+                {
+                    //avoid duplicates
+                    await _imageMethods.ClearImageTagsJoinForMetaData(image);
+                    foreach (ImageTag tag in image.Tags)
+                    {
+                        await _imageMethods.UpdateImageTagFromMetaData(tag);
+                    }
+                }
+            }
             //show data scanned success
             if (success)
             {
@@ -673,7 +700,7 @@ namespace ImagePerfect.ViewModels
             }
             ShowLoading = false;
         }
-
+   
         /*
          A bit too much complexity at the moment. For now to add a new folder with images make that in the filesystem and use
          the current add new folders method. At some point i want to add this along with moving images.
