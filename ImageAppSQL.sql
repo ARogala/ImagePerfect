@@ -14,18 +14,17 @@ Bool is tinyint(1) 1 = true 0 = false
 CREATE TABLE `folders` (
 	`FolderId` bigint unsigned NOT NULL AUTO_INCREMENT,
 	`FolderName` Varchar(200) NOT NULL,
-  `FolderPath` Varchar(2000) NOT NULL,
-  `HasChildren` Bool,
-  `CoverImagePath` Varchar(2000),
-  `FolderDescription` Varchar(3000),
-  `FolderTags` Varchar(2000),
-  `FolderRating` tinyint unsigned,
-  `HasFiles` Bool,
-  `IsRoot` Bool,
-  `FolderContentMetaDataScanned` Bool,
-  `AreImagesImported` Bool,
+  	`FolderPath` Varchar(2000) NOT NULL,
+  	`HasChildren` Bool,
+	`CoverImagePath` Varchar(2000),
+	`FolderDescription` Varchar(3000),
+	`FolderRating` tinyint unsigned,
+	`HasFiles` Bool,
+	`IsRoot` Bool,
+	`FolderContentMetaDataScanned` Bool,
+	`AreImagesImported` Bool,
 	PRIMARY KEY (`FolderId`),
-	FULLTEXT KEY `fulltext` (`FolderName`,`FolderPath`, `FolderDescription`, `FolderTags`)
+	FULLTEXT KEY `fulltext` (`FolderName`,`FolderPath`, `FolderDescription`)
 );
 
 /*
@@ -43,14 +42,13 @@ CREATE TABLE `images` (
 	`ImageId` bigint unsigned NOT NULL AUTO_INCREMENT,
 	`ImagePath` Varchar(2000) NOT NULL,
 	`FileName` Varchar(500) NOT NULL,
-	`ImageTags` Varchar(2000),
 	`ImageRating` tinyint unsigned,
 	`ImageFolderPath` Varchar(2000) NOT NULL,
 	`ImageMetaDataScanned` Bool,
 	`FolderId` bigint unsigned DEFAULT NULL,
 	PRIMARY KEY (`ImageId`),
 	KEY `FolderId` (`FolderId`),
-	FULLTEXT KEY `fulltext` (`ImagePath`, `ImageTags`),
+	FULLTEXT KEY `fulltext` (`ImagePath`),
 	CONSTRAINT `images_ibfk_1` FOREIGN KEY (`FolderId`) REFERENCES `folders` (`FolderId`) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
@@ -60,6 +58,50 @@ CREATE TABLE `tags`(
 	PRIMARY KEY (`TagId`),
 	CONSTRAINT `tags_uq` UNIQUE (`TagName`)
 );
+
+CREATE TABLE `folder_tags_join`(
+	`FolderId` bigint unsigned NOT NULL,
+	`TagId` bigint unsigned NOT NULL,
+	PRIMARY KEY (`FolderId`, `TagId`),
+	CONSTRAINT `folder_tags_join_idfk_1` FOREIGN KEY (`FolderId`) REFERENCES `folders` (`FolderId`) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT `folder_tags_join_idfk_2` FOREIGN KEY (`TagId`) REFERENCES `tags` (`TagId`) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+/*
+ON DELETE CASCADE to delete all image_tags_join when an image is deleted
+ON DELETE CASCADE to delete all image_tags_join when an tag is deleted
+*/
+CREATE TABLE `image_tags_join`(
+	`ImageId` bigint unsigned NOT NULL,
+	`TagId` bigint unsigned NOT NULL,
+	PRIMARY KEY (`ImageId`, `TagId`),
+	CONSTRAINT `image_tags_join_ibfk_1` FOREIGN KEY (`ImageId`) REFERENCES `images` (`ImageId`) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT `image_tags_join_ibfk_2` FOREIGN KEY (`TagId`) REFERENCES `tags` (`TagId`) ON DELETE CASCADE ON UPDATE CASCADE
+
+);
+
+/*get all tags for image*/
+SELECT * FROM images 
+JOIN image_tags_join ON image_tags_join.ImageId = images.ImageId
+JOIN tags ON image_tags_join.TagId = tags.TagId WHERE images.ImageId = 1;
+
+/*Get all images whith tag = Tree*/
+SELECT * FROM images 
+JOIN image_tags_join ON image_tags_join.ImageId = images.ImageId
+JOIN tags ON image_tags_join.TagId = tags.TagId WHERE tags.TagName = "Tree";
+
+/*get all tags for folder*/
+SELECT TagName FROM folders
+	JOIN folder_tags_join ON folder_tags_join.FolderId = folders.FolderId
+	JOIN tags ON folder_tags_join.TagId = tags.TagId WHERE folders.FolderId = 1;
+
+SELECT * FROM folders 
+	JOIN folder_tags_join ON folder_tags_join.FolderId = folders.FolderId
+	JOIN tags ON folder_tags_join.TagId = tags.TagId WHERE REGEXP_LIKE(folders.FolderPath, 'C:\\\\Users\\\\arogala\\\\Documents\\\\CSharp\\\\SamplePicsApp\\\\[^\\\\]+\\\\?$') ORDER BY folders.FolderName;
+
+SELECT tags.TagId, tags.TagName, folders.FolderId FROM folders
+	JOIN folder_tags_join ON folder_tags_join.FolderId = folders.FolderId
+	JOIN tags ON folder_tags_join.TagId = tags.TagId WHERE folders.IsRoot = 1;
 
 
 /*
