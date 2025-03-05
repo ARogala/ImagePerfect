@@ -3,6 +3,7 @@ using ImageSharp = SixLabors.ImageSharp;
 using System.Collections.Generic;
 using System.Linq;
 using ImagePerfectImage = ImagePerfect.Models.Image;
+using ImagePerfect.ViewModels;
 using System.Diagnostics;
 using SixLabors.ImageSharp.Metadata.Profiles.Iptc;
 using SixLabors.ImageSharp.Metadata.Profiles.Exif;
@@ -24,10 +25,10 @@ namespace ImagePerfect.Helpers
             return images;
         }
 
-        public static async void WriteTagToImage(ImagePerfectImage image)
+        public static async Task WriteTagToImage(ImageViewModel imageVm)
         {
-            ImageSharp.Image imageSharpImage = await ImageSharp.Image.LoadAsync(image.ImagePath);
-            WriteKeywordToImage(imageSharpImage, image);
+            ImageSharp.Image imageSharpImage = await ImageSharp.Image.LoadAsync(imageVm.ImagePath);
+            await WriteKeywordToImage(imageSharpImage, imageVm);
         }
 
         public static async void AddRatingToImage(ImagePerfectImage image)
@@ -75,30 +76,30 @@ namespace ImagePerfect.Helpers
 
         //clear all the current keywords add the imagePerfect ones save
         //this will keep it in sync
-        private static async void WriteKeywordToImage(ImageSharp.Image image, ImagePerfectImage imagePerfectImage)
+        private static async Task WriteKeywordToImage(ImageSharp.Image image, ImageViewModel imagePerfectImage)
         {
-            //if (image.Metadata.IptcProfile == null)
-            //    image.Metadata.IptcProfile = new IptcProfile();
-            //if (imagePerfectImage.ImageTags != "" && imagePerfectImage.ImageTags != null)
-            //{
-            //    //remove all
-            //    image.Metadata.IptcProfile.RemoveValue(IptcTag.Keywords);
+            if (image.Metadata.IptcProfile == null)
+                image.Metadata.IptcProfile = new IptcProfile();
+            if (imagePerfectImage.ImageTags != "" && imagePerfectImage.ImageTags != null)
+            {
+                //remove all
+                image.Metadata.IptcProfile.RemoveValue(IptcTag.Keywords);
 
-            //    string[] tags = imagePerfectImage.ImageTags.Split(",");
-            //    foreach (string tag in tags)
-            //    {
-            //        //re-add
-            //        image.Metadata.IptcProfile.SetValue(IptcTag.Keywords, tag);
-            //    }
-            //    await image.SaveAsync($"{imagePerfectImage.ImagePath}");
-            //}
-            ////just remove all if that is what we want -- this will be the case if the user removes the entire string in the UI
-            //else if (imagePerfectImage.ImageTags == "" || imagePerfectImage.ImageTags == null)
-            //{
-            //    //remove all
-            //    image.Metadata.IptcProfile.RemoveValue(IptcTag.Keywords);
-            //    await image.SaveAsync($"{imagePerfectImage.ImagePath}");
-            //}
+                string[] tags = imagePerfectImage.ImageTags.Split(",");
+                foreach (string tag in tags)
+                {
+                    //re-add
+                    image.Metadata.IptcProfile.SetValue(IptcTag.Keywords, tag);
+                }
+                await image.SaveAsync($"{imagePerfectImage.ImagePath}");
+            }
+            //just remove all if that is what we want -- this will be the case if the user removes the entire string in the UI
+            else if (imagePerfectImage.ImageTags == "" || imagePerfectImage.ImageTags == null)
+            {
+                //remove all
+                image.Metadata.IptcProfile.RemoveValue(IptcTag.Keywords);
+                await image.SaveAsync($"{imagePerfectImage.ImagePath}");
+            }
         }
 
         private static async void WriteRatingToImage(ImageSharp.Image image, ImagePerfectImage imagePerfectImage)
