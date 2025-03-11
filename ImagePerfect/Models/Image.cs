@@ -31,6 +31,7 @@ namespace ImagePerfect.Models
         public int FolderId { get; set; }
 
         //for many to many relationship image_tags_join
+        [NotMapped]
         public List<ImageTag> Tags { get; set; } = new List<ImageTag>();  
     }
 }
