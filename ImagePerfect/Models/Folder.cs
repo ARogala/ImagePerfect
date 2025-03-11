@@ -42,6 +42,7 @@ namespace ImagePerfect.Models
         public bool AreImagesImported { get; set; }
 
         //for many to many relationship folder_tags_join
+        [NotMapped]
         public List<FolderTag> Tags { get; set; } = new List<FolderTag>();
     }
 }

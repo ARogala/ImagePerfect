@@ -215,7 +215,7 @@ namespace ImagePerfect.Repository
         private static IEnumerable<PropertyInfo> GetProperties(bool excludeKey = false)
         {
             var properties = typeof(T).GetProperties()
-                .Where(p => !excludeKey || p.GetCustomAttribute<KeyAttribute>() == null);
+                .Where(p => !excludeKey || p.GetCustomAttribute<KeyAttribute>() == null).Where(p=> p.GetCustomAttribute<NotMappedAttribute>() == null);
 
             return properties;
         }
