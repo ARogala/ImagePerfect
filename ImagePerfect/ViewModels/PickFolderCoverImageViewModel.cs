@@ -60,7 +60,6 @@ namespace ImagePerfect.ViewModels
             //update lib folders to show the new cover !!
             if (success)
             {
-                _libraryFolders.Clear();
                 string foldersDirectoryPath = PathHelper.RemoveOneFolderFromPath(folderVm.FolderPath);
                 (List<Folder> folders, List<FolderTag> tags) result = await _folderMethods.GetFoldersInDirectory(foldersDirectoryPath);
                 List<Folder> folders = result.folders;
@@ -70,12 +69,7 @@ namespace ImagePerfect.ViewModels
                     //need to map tags to folders
                     folders[i] = FolderMapper.MapTagsToFolder(folders[i], displayFolderTags);
                     FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(folders[i]);
-                    _libraryFolders.Add(folderViewModel);
-                }
-                foreach (Folder folder in folders) 
-                {
-                    FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(folder);
-                    _libraryFolders.Add(folderViewModel);
+                    _libraryFolders[i] = folderViewModel;
                 }
             }
         }

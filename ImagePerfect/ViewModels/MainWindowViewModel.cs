@@ -204,6 +204,23 @@ namespace ImagePerfect.ViewModels
                 LibraryFolders.Add(folderViewModel);
             }
         }
+
+        private async Task RefreshFolderProps(string path)
+        {
+            (List<Folder> folders, List<FolderTag> tags) folderResult = await _folderMethods.GetFoldersInDirectory(path);
+            displayFolders = folderResult.folders;
+            displayFolderTags = folderResult.tags;
+            for (int i = 0; i < displayFolders.Count; i++) 
+            {
+                //need to map tags to folders 
+                displayFolders[i] = FolderMapper.MapTagsToFolder(displayFolders[i], displayFolderTags);
+                FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(displayFolders[i]);
+                //will be in the same order unless delete/move or next back folder
+                //Any non destructive operation that does not affect the number or order of items returned from
+                //the sql query will be in the same order so just modify props for a much cleaner UI refresh
+                LibraryFolders[i] = folderViewModel;
+            }
+        }
         private async Task RefreshImages(string path = "", int folderId = 0)
         {
             (List<Image> images, List<ImageTag> tags) imageResult;
@@ -225,6 +242,29 @@ namespace ImagePerfect.ViewModels
                 displayImages[i] = ImageMapper.MapTagsToImage(displayImages[i], displayImageTags);
                 ImageViewModel imageViewModel = await ImageMapper.GetImageVm(displayImages[i]);
                 Images.Add(imageViewModel);
+            }
+        }
+
+        private async Task RefreshImageProps(string path = "", int folderId = 0)
+        {
+            (List<Image> images, List<ImageTag> tags) imageResult;
+            if (string.IsNullOrEmpty(path))
+            {
+                imageResult = await _imageMethods.GetAllImagesInFolder(folderId);
+            }
+            else
+            {
+                imageResult = await _imageMethods.GetAllImagesInFolder(path);
+            }
+            displayImages = imageResult.images;
+            displayImageTags = imageResult.tags;
+
+            for (int i = 0; i < displayImages.Count; i++)
+            {
+                //need to map tags to images
+                displayImages[i] = ImageMapper.MapTagsToImage(displayImages[i], displayImageTags);
+                ImageViewModel imageViewModel = await ImageMapper.GetImageVm(displayImages[i]);
+                Images[i] = imageViewModel;
             }
         }
         private async void Initialize()
@@ -267,8 +307,7 @@ namespace ImagePerfect.ViewModels
                 //remove one folder from path
                 newPath = PathHelper.RemoveOneFolderFromPath(imageFolderPath);
                 //refresh UI
-                await RefreshFolders(newPath);
-                await RefreshImages(newPath);
+                await RefreshFolderProps(newPath);
             }
         }
 
@@ -384,7 +423,7 @@ namespace ImagePerfect.ViewModels
                 await _folderMethods.DeleteFolderTag(tagToRemove);
             }
             //refresh UI
-            await RefreshFolders(CurrentDirectory);
+            await RefreshFolderProps(CurrentDirectory);
         }
         private async void AddFolderTag(FolderViewModel folderVm)
         {
@@ -402,7 +441,7 @@ namespace ImagePerfect.ViewModels
                 await GetTagsList();
                 folderVm.NewTag = "";
                 //refresh UI
-                await RefreshFolders(CurrentDirectory);
+                await RefreshFolderProps(CurrentDirectory);
             }
         }
 
@@ -458,7 +497,7 @@ namespace ImagePerfect.ViewModels
                 await ImageMetaDataHelper.WriteTagToImage(imageVm);
             }
             //refresh UI
-            await RefreshImages(CurrentDirectory);
+            await RefreshImageProps(CurrentDirectory);
         }
         //update ImageTags in db, and update image metadata
         private async void AddImageTag(ImageViewModel imageVm)
@@ -487,7 +526,7 @@ namespace ImagePerfect.ViewModels
                 //Update TagsList to show in UI AutoCompleteBox clear NewTag in box as well
                 await GetTagsList();
                 imageVm.NewTag = "";
-                await RefreshImages(CurrentDirectory);   
+                await RefreshImageProps(CurrentDirectory);   
             }
         }
        
@@ -644,8 +683,7 @@ namespace ImagePerfect.ViewModels
             if (success)
             {
                 //refresh UI
-                await RefreshFolders(CurrentDirectory);
-                await RefreshImages(CurrentDirectory);
+                await RefreshFolderProps(CurrentDirectory);
             }
             ShowLoading = false;
         }
