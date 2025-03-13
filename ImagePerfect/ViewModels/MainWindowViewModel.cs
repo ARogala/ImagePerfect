@@ -665,7 +665,7 @@ namespace ImagePerfect.ViewModels
             List<Image> images = imageResultA.images;
             //scan images for metadata
             List<Image> imagesPlusUpdatedMetaData = await ImageMetaDataHelper.ScanImagesForMetaData(images);
-            string imageUpdateSql = SqlStringBuilder.BuildImageSqlForScanMetadata(imagesPlusUpdatedMetaData); 
+            string imageUpdateSql = SqlStringBuilder.BuildImageSqlForScanMetadata(imagesPlusUpdatedMetaData);
             bool success = await _imageMethods.UpdateImageRatingFromMetaData(imageUpdateSql, folderVm.FolderId);
             foreach (Image image in imagesPlusUpdatedMetaData) 
             {
