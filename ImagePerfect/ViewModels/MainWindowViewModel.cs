@@ -36,6 +36,13 @@ namespace ImagePerfect.ViewModels
         private List<FolderTag> displayFolderTags = new List<FolderTag>();  
         private List<Image> displayImages = new List<Image>();
         private List<ImageTag> displayImageTags = new List<ImageTag>(); 
+        private int folderPageSize = 4;
+        private int totalFolderPages = 1;
+        private int currentFolderPage = 1;
+
+        private int imagePageSize = 10;
+        private int totalImagePages = 1;
+        private int currentImagePage = 1;
 
         public MainWindowViewModel() { }
         public MainWindowViewModel(IUnitOfWork unitOfWork)
@@ -94,6 +101,12 @@ namespace ImagePerfect.ViewModels
             });
             ScanFolderImagesForMetaDataCommand = ReactiveCommand.Create((FolderViewModel folderVm) => { 
                 ScanFolderImagesForMetaData(folderVm);
+            });
+            NextPageCommand = ReactiveCommand.Create(() => { 
+                NextPage();
+            });
+            PreviousPageCommand = ReactiveCommand.Create(() => { 
+                PreviousPage();
             });
             //CreateNewFolderCommand = ReactiveCommand.Create(() => { CreateNewFolder(); });
             Initialize();
@@ -188,7 +201,60 @@ namespace ImagePerfect.ViewModels
 
         public ReactiveCommand<FolderViewModel, Unit> ScanFolderImagesForMetaDataCommand { get; }
 
+        public ReactiveCommand<Unit, Unit> NextPageCommand { get; }
+
+        public ReactiveCommand<Unit, Unit> PreviousPageCommand { get; }
+
         //public ReactiveCommand<Unit, Unit> CreateNewFolderCommand { get; }
+
+        private List<Image> ImagePagination()
+        {
+            //same as FolderPagination
+            int offset = imagePageSize * (currentImagePage -1);
+            int totalImageCount = displayImages.Count;
+            if(totalImageCount == 0 || totalImageCount <= imagePageSize)
+                return displayImages;
+            totalImagePages = (int)Math.Ceiling(totalImageCount / (double)imagePageSize);
+            List<Image> displayImagesTemp;
+            if(currentImagePage == totalImagePages)
+            {
+                displayImagesTemp = displayImages.GetRange(offset, (totalImageCount - (totalImagePages - 1)*imagePageSize));
+            }
+            else
+            {
+                displayImagesTemp = displayImages.GetRange(offset, imagePageSize);
+            }
+            return displayImagesTemp;
+        }
+        private List<Folder> FolderPagination()
+        {
+            /* Example
+             * folderPageSize = 10
+             * offest = 10*1 for page = 2
+             * totalFolderCount = 14
+             * totalFolderPages = 2
+             */
+            int offest = folderPageSize * (currentFolderPage - 1);
+            int totalFolderCount = displayFolders.Count;
+            if (totalFolderCount == 0 || totalFolderCount <= folderPageSize) 
+                return displayFolders; 
+            totalFolderPages = (int)Math.Ceiling(totalFolderCount / (double)folderPageSize);
+            List<Folder> displayFoldersTemp;
+            if (currentFolderPage == totalFolderPages)
+            {
+                //on last page GetRange count CANNOT be folderPageSize or index out of range 
+                //thus following logical example above in a array of 14 elements the range count on the last page is 14 - 10
+                //formul used: totalFolderCount - ((totalFolderPages - 1)*folderPageSize)
+                //folderCount minus total folders on all but last page
+                //14 - 10
+                displayFoldersTemp = displayFolders.GetRange(offest, (totalFolderCount - (totalFolderPages - 1)*folderPageSize));
+            }
+            else
+            {
+                displayFoldersTemp = displayFolders.GetRange(offest, folderPageSize);
+            }
+            return displayFoldersTemp;
+        }
 
         private async Task RefreshFolders(string path)
         {
@@ -196,7 +262,8 @@ namespace ImagePerfect.ViewModels
             displayFolders = folderResult.folders;
             displayFolderTags = folderResult.tags;
             LibraryFolders.Clear();
-            for(int i = 0; i < displayFolders.Count; i++)
+            displayFolders = FolderPagination();
+            for (int i = 0; i < displayFolders.Count; i++)
             {
                 //need to map tags to folders 
                 displayFolders[i] = FolderMapper.MapTagsToFolder(displayFolders[i], displayFolderTags);
@@ -210,6 +277,7 @@ namespace ImagePerfect.ViewModels
             (List<Folder> folders, List<FolderTag> tags) folderResult = await _folderMethods.GetFoldersInDirectory(path);
             displayFolders = folderResult.folders;
             displayFolderTags = folderResult.tags;
+            displayFolders = FolderPagination();
             for (int i = 0; i < displayFolders.Count; i++) 
             {
                 //need to map tags to folders 
@@ -236,6 +304,7 @@ namespace ImagePerfect.ViewModels
             displayImageTags = imageResult.tags;
 
             Images.Clear();
+            displayImages = ImagePagination();
             for(int i = 0; i < displayImages.Count; i++)
             {
                 //need to map tags to images
@@ -258,7 +327,7 @@ namespace ImagePerfect.ViewModels
             }
             displayImages = imageResult.images;
             displayImageTags = imageResult.tags;
-
+            displayImages = ImagePagination();
             for (int i = 0; i < displayImages.Count; i++)
             {
                 //need to map tags to images
@@ -311,8 +380,12 @@ namespace ImagePerfect.ViewModels
             }
         }
 
+        //opens the previous directory location -- from image button
         private async void BackFolderFromImage(ImageViewModel imageVm)
         {
+            //not ideal but keeps pagination to the folder your in. When you go back or next start from page 1
+            currentFolderPage = 1;
+            currentImagePage = 1;
             /*
                 Similar to Back folders except these buttons are on the image and we only need to remove one folder
                 Not every folder has a folder so this is the quickest way for now to back out of a folder that only has images
@@ -325,8 +398,11 @@ namespace ImagePerfect.ViewModels
             await RefreshImages(newPath);
         }
 
+        //opens the previous directory location
         private async void BackFolder(FolderViewModel currentFolder)
         {
+            currentFolderPage = 1;
+            currentImagePage = 1;
             /*
                 tough to see but basically you need to remove two folders to build the regexp string
                 example if you are in /pictures/hiking/bearmountian and bearmountain folder has another folder saturday_2025_05_25
@@ -341,8 +417,26 @@ namespace ImagePerfect.ViewModels
             await RefreshImages(newPath);
         }
 
+        //loads the previous X elements in CurrentDirectory
+        private async void PreviousPage()
+        {
+            if(currentFolderPage > 1)
+            {
+                currentFolderPage = currentFolderPage - 1;
+                await RefreshFolders(CurrentDirectory);
+            }
+            if (currentImagePage > 1)
+            {
+                currentImagePage = currentImagePage - 1;
+                await RefreshImages(CurrentDirectory);
+            }
+        }
+
+        //opens the next directory locaion
         private async void NextFolder(FolderViewModel currentFolder)
         {
+            currentFolderPage = 1;
+            currentImagePage = 1;
             bool hasChildren = currentFolder.HasChildren;
             bool hasFiles = currentFolder.HasFiles;
             //set the current directory -- used to add new folder to location
@@ -362,6 +456,20 @@ namespace ImagePerfect.ViewModels
             }  
         }
 
+        //loads the next X elements in CurrentDirectory
+        private async void NextPage()
+        {
+            if (currentFolderPage < totalFolderPages)
+            {
+                currentFolderPage = currentFolderPage + 1;
+                await RefreshFolders(CurrentDirectory);
+            }
+            if(currentImagePage < totalImagePages)
+            {
+                currentImagePage = currentImagePage + 1;
+                await RefreshImages(CurrentDirectory);
+            }
+        }
         private async void DeleteLibrary()
         {
             var box = MessageBoxManager.GetMessageBoxStandard("Delete Library", "Are you sure you want to delete your library? The images on the file system will remain.", ButtonEnum.YesNo);
