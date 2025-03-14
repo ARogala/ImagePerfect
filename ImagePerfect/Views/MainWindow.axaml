@@ -22,14 +22,39 @@
 					<v:PickRootFolderView DataContext="{Binding PickRootFolder}" x:Name="PickRootFolder"/>
 					<Button Margin="0" Width="150" HorizontalContentAlignment="Center" Command="{Binding DeleteLibraryCommand}">Delete Library</Button>
 					<v:PickNewFoldersView DataContext="{Binding PickNewFolders}"/>
+					<Button Margin="0" Width="150" HorizontalContentAlignment="Center" Command="{Binding ToggleFiltersCommand}">Filters</Button>
 				</MenuItem>
 			</Menu>
 			<ProgressBar Margin="10" IsIndeterminate="True" IsVisible="{Binding #PickRootFolder((vm:PickRootFolderViewModel)DataContext).ShowLoading}"/>
 		</StackPanel>
-		<StackPanel Orientation="Vertical" Grid.Row="1">
-			<!--
-			Add some filters here
-			-->
+		<StackPanel Orientation="Vertical" Grid.Row="1" IsVisible="{Binding ShowFilters}">
+			<!--Filters-->
+			<Grid RowDefinitions="Auto, Auto, Auto" ColumnDefinitions="*, Auto, *, Auto" MaxWidth="800">
+				<NumericUpDown Grid.Row="0" Grid.Column="0" Minimum="1" Value="1" Maximum="5" Margin="5" ParsingNumberStyle="Integer" FormatString="0"/>
+				<Button Grid.Row="0" Grid.Column="1" Margin="5" Width="185" HorizontalContentAlignment="Center">
+					Filter Images on Rating
+				</Button>
+				<NumericUpDown Grid.Row="0" Grid.Column="2" Minimum="1" Value="1" Maximum="10" Margin="5" ParsingNumberStyle="Integer" FormatString="0"/>
+				<Button Grid.Row="0" Grid.Column="3" Margin="5" Width="185" HorizontalContentAlignment="Center">
+					Filter Folders on Rating
+				</Button>
+				<AutoCompleteBox Grid.Row="1" Grid.Column="0" Margin="5" FilterMode="StartsWith" ItemsSource="{Binding #Root.((vm:MainWindowViewModel)DataContext).TagsList}"/>
+				<Button Grid.Row="1" Grid.Column="1" Margin="5" Width="185" HorizontalContentAlignment="Center">
+					Filter Images on Tags
+				</Button>
+				<AutoCompleteBox Grid.Row="1" Grid.Column="2" Margin="5" FilterMode="StartsWith" ItemsSource="{Binding #Root.((vm:MainWindowViewModel)DataContext).TagsList}"/>
+				<Button Grid.Row="1" Grid.Column="3" Margin="5" Width="185" HorizontalContentAlignment="Center">
+					Filter Folders on Tags
+				</Button>
+				<TextBox Grid.Row="2" Grid.Column="0" Margin="5" />
+				<Button Grid.Row="2" Grid.Column="1" Margin="5" Width="185" HorizontalContentAlignment="Center">
+					Seach Folder Description
+				</Button>
+				<TextBox Grid.Row="2" Grid.Column="2" Margin="5"/>
+				<Button Grid.Row="2" Grid.Column="3" Margin="5" Width="185" HorizontalContentAlignment="Center">
+					Seach Folder Name
+				</Button>
+			</Grid>
 		</StackPanel>
 		<!--
 		<StackPanel Grid.Row="2" MaxWidth="400">
@@ -179,17 +204,27 @@
 				</ItemsControl>
 			</StackPanel>
 		</ScrollViewer>
-		<StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 10 0 0">
-			<Button Margin="2"
+		<StackPanel Grid.Row="5" Orientation="Vertical" HorizontalAlignment="Center" Margin="0 10 0 0">
+			
+
+			<Grid RowDefinitions="Auto" ColumnDefinitions="Auto, Auto, Auto, Auto">
+				<Button Margin="5" Grid.Row="0" Grid.Column="0"
 					Command="{Binding PreviousPageCommand}">
-				Previous Page
-			</Button>
-			<Button Margin="2"
-					Command="{Binding NextPageCommand}">
-				Next Page
-			</Button>
+					Previous Page
+				</Button>
+				<Button Margin="5" Grid.Row="0" Grid.Column="1"
+						Command="{Binding NextPageCommand}">
+					Next Page
+				</Button>
+				<NumericUpDown Minimum="1" Maximum="{Binding MaxPage}" Grid.Row="0" Grid.Column="2" Width="150" Margin="5" Value="{Binding MaxCurrentPage}" x:Name="PageNumber" ParsingNumberStyle="Integer" FormatString="0"/>
+				<Button HorizontalAlignment="Center" Margin="5" Grid.Row="0" Grid.Column="3"
+						Command="{Binding GoToPageCommand}"
+						CommandParameter="{Binding #PageNumber.Value}">
+					Go To Page
+				</Button>
+			</Grid>
 		</StackPanel>
-		<StackPanel Grid.Row="6" Orientation="Vertical" HorizontalAlignment="Center" Margin="0 10 0 10">
+		<StackPanel Grid.Row="6" Orientation="Vertical" HorizontalAlignment="Center" Margin="0 0 0 10">
 			<!--
 			<StackPanel Orientation="Horizontal">
 				<Label>Total Image Pages:</Label>
@@ -204,19 +239,12 @@
 				<TextBlock Text="{Binding CurrentFolderPage}"></TextBlock>
 			</StackPanel>
 			-->
-			<StackPanel Orientation="Horizontal">
+			<StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="2">
 				<Label>Total Pages:</Label>
-				<TextBlock Text="{Binding MaxPage}"></TextBlock>
+				<TextBlock Text="{Binding MaxPage}" VerticalAlignment="Center"></TextBlock>
 				<Label>Current Page:</Label>
-				<TextBlock Text="{Binding MaxCurrentPage}"></TextBlock>
+				<TextBlock Text="{Binding MaxCurrentPage}" VerticalAlignment="Center"></TextBlock>
 			</StackPanel>
-			
-			<NumericUpDown Minimum="1" Maximum="{Binding MaxPage}" Value="{Binding MaxCurrentPage}" x:Name="PageNumber" ParsingNumberStyle="Integer" FormatString="0"/>
-			<Button HorizontalAlignment="Center" Margin="0 5 0 5"
-					Command="{Binding GoToPageCommand}"
-					CommandParameter="{Binding #PageNumber.Value}">
-				Go To Page
-			</Button>
 		</StackPanel>
 	</Grid>
 </Window>

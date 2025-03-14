@@ -26,6 +26,7 @@ namespace ImagePerfect.ViewModels
         private readonly ImageCsvMethods _imageCsvMethods;
         private readonly ImageMethods _imageMethods;
         private bool _showLoading;
+        private bool _showFilters = false;
         private string _currentDirectory;
         private string _rootFolderLocation;
         private string _newFolderName;
@@ -118,10 +119,18 @@ namespace ImagePerfect.ViewModels
 
                 GoToPage(Decimal.ToInt32(pageNumber));
             });
+            ToggleFiltersCommand = ReactiveCommand.Create(() => { 
+                ToggleFilters();
+            });
             //CreateNewFolderCommand = ReactiveCommand.Create(() => { CreateNewFolder(); });
             Initialize();
         }
 
+        public bool ShowFilters
+        {
+            get => _showFilters;
+            set => this.RaiseAndSetIfChanged(ref _showFilters, value);  
+        }
         public int MaxCurrentPage
         {
             get => _maxCurrentPage;
@@ -248,8 +257,21 @@ namespace ImagePerfect.ViewModels
 
         public ReactiveCommand<decimal, Unit> GoToPageCommand { get; }
 
+        public ReactiveCommand<Unit, Unit> ToggleFiltersCommand { get; }
+
         //public ReactiveCommand<Unit, Unit> CreateNewFolderCommand { get; }
 
+        private void ToggleFilters()
+        {
+            if (ShowFilters)
+            {
+                ShowFilters = false;
+            }
+            else
+            {
+                ShowFilters = true;
+            }
+        }
         private List<Image> ImagePagination()
         {
             //same as FolderPagination
