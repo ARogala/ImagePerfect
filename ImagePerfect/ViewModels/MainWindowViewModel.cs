@@ -40,9 +40,15 @@ namespace ImagePerfect.ViewModels
         private int _totalFolderPages = 1;
         private int _currentFolderPage = 1;
 
-        private int imagePageSize = 10;
+        private int imagePageSize = 20;
         private int _totalImagePages = 1;
         private int _currentImagePage = 1;
+
+        //max value between TotalFolderPages or TotalImagePages
+        private int _maxPage = 1;
+
+        //max value between CurrentFolderPage or CurrentImagePage
+        private int _maxCurrentPage = 1;
 
         public MainWindowViewModel() { }
         public MainWindowViewModel(IUnitOfWork unitOfWork)
@@ -116,6 +122,16 @@ namespace ImagePerfect.ViewModels
             Initialize();
         }
 
+        public int MaxCurrentPage
+        {
+            get => _maxCurrentPage;
+            set => this.RaiseAndSetIfChanged(ref _maxCurrentPage, value);
+        }
+        public int MaxPage
+        {
+            get => _maxPage;
+            set => this.RaiseAndSetIfChanged(ref _maxPage, value);  
+        }
         public int TotalImagePages
         {
             get => _totalImagePages;
@@ -251,6 +267,8 @@ namespace ImagePerfect.ViewModels
             {
                 displayImagesTemp = displayImages.GetRange(offset, imagePageSize);
             }
+            MaxPage = Math.Max(TotalImagePages, TotalFolderPages);
+            MaxCurrentPage = Math.Max(CurrentImagePage, CurrentFolderPage);
             return displayImagesTemp;
         }
         private List<Folder> FolderPagination()
@@ -280,6 +298,8 @@ namespace ImagePerfect.ViewModels
             {
                 displayFoldersTemp = displayFolders.GetRange(offest, folderPageSize);
             }
+            MaxPage = Math.Max(TotalImagePages, TotalFolderPages);
+            MaxCurrentPage = Math.Max(CurrentImagePage, CurrentFolderPage);
             return displayFoldersTemp;
         }
 
@@ -415,6 +435,8 @@ namespace ImagePerfect.ViewModels
             TotalFolderPages = 1;
             CurrentImagePage = 1;
             TotalImagePages = 1;
+            MaxCurrentPage = 1;
+            MaxPage = 1;
             /*
                 Similar to Back folders except these buttons are on the image and we only need to remove one folder
                 Not every folder has a folder so this is the quickest way for now to back out of a folder that only has images
@@ -434,6 +456,8 @@ namespace ImagePerfect.ViewModels
             TotalFolderPages = 1;
             CurrentImagePage = 1;
             TotalImagePages = 1;
+            MaxCurrentPage = 1;
+            MaxPage = 1;
             /*
                 tough to see but basically you need to remove two folders to build the regexp string
                 example if you are in /pictures/hiking/bearmountian and bearmountain folder has another folder saturday_2025_05_25
@@ -470,6 +494,8 @@ namespace ImagePerfect.ViewModels
             TotalFolderPages = 1;
             CurrentImagePage = 1;
             TotalImagePages = 1;
+            MaxCurrentPage = 1;
+            MaxPage = 1;
             bool hasChildren = currentFolder.HasChildren;
             bool hasFiles = currentFolder.HasFiles;
             //set the current directory -- used to add new folder to location
