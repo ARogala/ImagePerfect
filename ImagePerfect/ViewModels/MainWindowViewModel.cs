@@ -63,6 +63,7 @@ namespace ImagePerfect.ViewModels
         }
         private filters currentFilter = filters.None;
         private int selectedRatingForFilter = 0;
+        private string tagForFilter = string.Empty;
 
         public MainWindowViewModel() { }
         public MainWindowViewModel(IUnitOfWork unitOfWork)
@@ -155,6 +156,16 @@ namespace ImagePerfect.ViewModels
                 MaxPage = 1;
                 selectedRatingForFilter = Decimal.ToInt32(rating);
                 await FilterFoldersOnRating(selectedRatingForFilter);
+            });
+            FilterImagesOnTagCommand = ReactiveCommand.Create(async (string tag) => { 
+                CurrentFolderPage = 1;
+                TotalFolderPages = 1;
+                CurrentImagePage = 1;
+                TotalImagePages = 1;
+                MaxCurrentPage = 1;
+                MaxPage = 1;
+                tagForFilter = tag;
+                await FilterImagesOnTag(tagForFilter);
             });
             //CreateNewFolderCommand = ReactiveCommand.Create(() => { CreateNewFolder(); });
             Initialize();
@@ -297,8 +308,28 @@ namespace ImagePerfect.ViewModels
 
         public ReactiveCommand<decimal, Task> FilterFoldersOnRatingCommand { get; }
 
+        public ReactiveCommand<string, Task> FilterImagesOnTagCommand { get; }
+
         //public ReactiveCommand<Unit, Unit> CreateNewFolderCommand { get; }
 
+        public async Task FilterImagesOnTag(string tag)
+        {
+            currentFilter = filters.ImageTagFilter;
+            (List<Image> images, List<ImageTag> tags) imageResult = await _imageMethods.GetAllImagesWithTag(tag);
+            displayImages = imageResult.images;
+            displayImageTags = imageResult.tags;
+
+            Images.Clear();
+            LibraryFolders.Clear();
+            displayImages = ImagePagination();
+            for (int i = 0; i < displayImages.Count; i++)
+            {
+                //need to map tags to images
+                displayImages[i] = ImageMapper.MapTagsToImage(displayImages[i], displayImageTags);
+                ImageViewModel imageViewModel = await ImageMapper.GetImageVm(displayImages[i]);
+                Images.Add(imageViewModel);
+            }
+        }
         public async Task FilterFoldersOnRating(int rating)
         {
             currentFilter = filters.FolderRatingFilter;

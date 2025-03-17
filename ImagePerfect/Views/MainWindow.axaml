@@ -46,8 +46,12 @@
 						CommandParameter="{Binding #FilterFolderRating.Value}">
 					Filter Folders on Rating
 				</Button>
-				<AutoCompleteBox Grid.Row="1" Grid.Column="0" Margin="5" FilterMode="StartsWith" ItemsSource="{Binding #Root.((vm:MainWindowViewModel)DataContext).TagsList}"/>
-				<Button Grid.Row="1" Grid.Column="1" Margin="5" Width="185" HorizontalContentAlignment="Center">
+				<AutoCompleteBox Grid.Row="1" Grid.Column="0" Margin="5" FilterMode="StartsWith" 
+								 ItemsSource="{Binding #Root.((vm:MainWindowViewModel)DataContext).TagsList}"
+								 x:Name="FilterImageTag"/>
+				<Button Grid.Row="1" Grid.Column="1" Margin="5" Width="185" HorizontalContentAlignment="Center"
+						Command="{Binding FilterImagesOnTagCommand}"
+						CommandParameter="{Binding #FilterImageTag.Text}">
 					Filter Images on Tags
 				</Button>
 				<AutoCompleteBox Grid.Row="1" Grid.Column="2" Margin="5" FilterMode="StartsWith" ItemsSource="{Binding #Root.((vm:MainWindowViewModel)DataContext).TagsList}"/>
