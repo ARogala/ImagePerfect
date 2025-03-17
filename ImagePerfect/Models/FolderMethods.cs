@@ -30,6 +30,11 @@ namespace ImagePerfect.Models
             return await _unitOfWork.Folder.GetFoldersInDirectory(directoryPath);
         }
 
+        public async Task<(List<Folder> folders, List<FolderTag> tags)> GetAllFoldersAtRating(int rating)
+        {
+            return await _unitOfWork.Folder.GetAllFoldersAtRating(rating);
+        }
+
         public async Task<List<Folder>> GetDirectoryTree(string directoryPath)
         {
             return await _unitOfWork.Folder.GetDirectoryTree(directoryPath);

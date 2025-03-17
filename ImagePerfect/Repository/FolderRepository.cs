@@ -71,6 +71,22 @@ namespace ImagePerfect.Repository
             return (folders,tags);
         }
 
+        public async Task<(List<Folder> folders, List<FolderTag> tags)> GetAllFoldersAtRating(int rating)
+        {
+            await _connection.OpenAsync();
+            MySqlTransaction txn = await _connection.BeginTransactionAsync();
+
+            string sql1 = @"SELECT * FROM folders WHERE FolderRating = @rating ORDER BY FolderName";
+            List<Folder> allFoldersAtRating = (List<Folder>)await _connection.QueryAsync<Folder>(sql1, new { rating }, transaction: txn);
+            string sql2 = @"SELECT tags.TagId, tags.TagName, folders.FolderId FROM folders 
+                            JOIN folder_tags_join ON folder_tags_join.FolderId = folders.FolderId 
+                            JOIN tags ON folder_tags_join.TagId = tags.TagId WHERE folders.FolderRating = @rating ORDER BY folders.FolderName;";
+            List<FolderTag> tags = (List<FolderTag>)await _connection.QueryAsync<FolderTag>(sql2, new { rating }, transaction: txn);
+            await txn.CommitAsync();
+            await _connection.CloseAsync();
+            return (allFoldersAtRating,tags);
+        }
+
         //gets the folder itself as well as all folders and subfolders within. 
         //the entire directory tree of the path
         public async Task<List<Folder>> GetDirectoryTree(string directoryPath)
