@@ -51,6 +51,19 @@ namespace ImagePerfect.ViewModels
         //max value between CurrentFolderPage or CurrentImagePage
         private int _maxCurrentPage = 1;
 
+        //Filters
+        private enum filters
+        {
+            None,
+            ImageRatingFilter,
+            FolderRatingFilter,
+            ImageTagFilter,
+            FolderTagFilter,
+            FolderDescriptionFilter
+        }
+        private filters currentFilter = filters.None;
+        private int selectedRatingForFilter = 0;
+
         public MainWindowViewModel() { }
         public MainWindowViewModel(IUnitOfWork unitOfWork)
         {
@@ -121,6 +134,16 @@ namespace ImagePerfect.ViewModels
             });
             ToggleFiltersCommand = ReactiveCommand.Create(() => { 
                 ToggleFilters();
+            });
+            FilterImagesOnRatingCommand = ReactiveCommand.Create(async (decimal rating) => {
+                CurrentFolderPage = 1;
+                TotalFolderPages = 1;
+                CurrentImagePage = 1;
+                TotalImagePages = 1;
+                MaxCurrentPage = 1;
+                MaxPage = 1;
+                selectedRatingForFilter = Decimal.ToInt32(rating);
+                await FilterImagesOnRating(selectedRatingForFilter);
             });
             //CreateNewFolderCommand = ReactiveCommand.Create(() => { CreateNewFolder(); });
             Initialize();
@@ -259,8 +282,28 @@ namespace ImagePerfect.ViewModels
 
         public ReactiveCommand<Unit, Unit> ToggleFiltersCommand { get; }
 
+        public ReactiveCommand<decimal, Task> FilterImagesOnRatingCommand { get; }
+
         //public ReactiveCommand<Unit, Unit> CreateNewFolderCommand { get; }
 
+        public async Task FilterImagesOnRating(int rating)
+        {
+            currentFilter = filters.ImageRatingFilter;
+            (List<Image> images, List<ImageTag> tags) imageResult = await _imageMethods.GetAllImagesAtRating(rating);
+            displayImages = imageResult.images;
+            displayImageTags = imageResult.tags;
+
+            Images.Clear();
+            LibraryFolders.Clear();
+            displayImages = ImagePagination();
+            for (int i = 0; i < displayImages.Count; i++)
+            {
+                //need to map tags to images
+                displayImages[i] = ImageMapper.MapTagsToImage(displayImages[i], displayImageTags);
+                ImageViewModel imageViewModel = await ImageMapper.GetImageVm(displayImages[i]);
+                Images.Add(imageViewModel);
+            }
+        }
         private void ToggleFilters()
         {
             if (ShowFilters)
@@ -327,6 +370,7 @@ namespace ImagePerfect.ViewModels
 
         private async Task RefreshFolders(string path)
         {
+            currentFilter = filters.None;
             (List<Folder> folders, List<FolderTag> tags) folderResult = await _folderMethods.GetFoldersInDirectory(path);
             displayFolders = folderResult.folders;
             displayFolderTags = folderResult.tags;
@@ -343,6 +387,7 @@ namespace ImagePerfect.ViewModels
 
         private async Task RefreshFolderProps(string path)
         {
+            currentFilter = filters.None;
             (List<Folder> folders, List<FolderTag> tags) folderResult = await _folderMethods.GetFoldersInDirectory(path);
             displayFolders = folderResult.folders;
             displayFolderTags = folderResult.tags;
@@ -360,6 +405,7 @@ namespace ImagePerfect.ViewModels
         }
         private async Task RefreshImages(string path = "", int folderId = 0)
         {
+            currentFilter = filters.None;
             (List<Image> images, List<ImageTag> tags) imageResult;
             if (string.IsNullOrEmpty(path))
             {
@@ -385,6 +431,7 @@ namespace ImagePerfect.ViewModels
 
         private async Task RefreshImageProps(string path = "", int folderId = 0)
         {
+            currentFilter = filters.None;
             (List<Image> images, List<ImageTag> tags) imageResult;
             if (string.IsNullOrEmpty(path))
             {
@@ -497,16 +544,42 @@ namespace ImagePerfect.ViewModels
         //loads the previous X elements in CurrentDirectory
         private async void PreviousPage()
         {
-            if(CurrentFolderPage > 1)
+            switch (currentFilter)
             {
-                CurrentFolderPage = CurrentFolderPage - 1;
-                await RefreshFolders(CurrentDirectory);
+                case filters.None:
+                    if (CurrentFolderPage > 1)
+                    {
+                        CurrentFolderPage = CurrentFolderPage - 1;
+                        await RefreshFolders(CurrentDirectory);
+                    }
+                    if (CurrentImagePage > 1)
+                    {
+                        CurrentImagePage = CurrentImagePage - 1;
+                        await RefreshImages(CurrentDirectory);
+                    }
+                    break;
+                case filters.ImageRatingFilter:
+                    if (CurrentFolderPage > 1)
+                    {
+                        CurrentFolderPage = CurrentFolderPage - 1;
+                        await FilterImagesOnRating(selectedRatingForFilter);
+                    }
+                    if (CurrentImagePage > 1)
+                    {
+                        CurrentImagePage = CurrentImagePage - 1;
+                        await FilterImagesOnRating(selectedRatingForFilter);
+                    }
+                    break;
+                case filters.FolderRatingFilter:
+                    break;
+                case filters.ImageTagFilter:
+                    break;
+                case filters.FolderTagFilter: 
+                    break;
+                case filters.FolderDescriptionFilter: 
+                    break;
             }
-            if (CurrentImagePage > 1)
-            {
-                CurrentImagePage = CurrentImagePage - 1;
-                await RefreshImages(CurrentDirectory);
-            }
+            
         }
 
         //opens the next directory locaion
@@ -540,15 +613,40 @@ namespace ImagePerfect.ViewModels
         //loads the next X elements in CurrentDirectory
         private async void NextPage()
         {
-            if (CurrentFolderPage < TotalFolderPages)
+            switch (currentFilter)
             {
-                CurrentFolderPage = CurrentFolderPage + 1;
-                await RefreshFolders(CurrentDirectory);
-            }
-            if(CurrentImagePage < TotalImagePages)
-            {
-                CurrentImagePage = CurrentImagePage + 1;
-                await RefreshImages(CurrentDirectory);
+                case filters.None:
+                    if (CurrentFolderPage < TotalFolderPages)
+                    {
+                        CurrentFolderPage = CurrentFolderPage + 1;
+                        await RefreshFolders(CurrentDirectory);
+                    }
+                    if (CurrentImagePage < TotalImagePages)
+                    {
+                        CurrentImagePage = CurrentImagePage + 1;
+                        await RefreshImages(CurrentDirectory);
+                    }
+                    break;
+                case filters.ImageRatingFilter:
+                    if (CurrentFolderPage < TotalFolderPages)
+                    {
+                        CurrentFolderPage = CurrentFolderPage + 1;
+                        await FilterImagesOnRating(selectedRatingForFilter);
+                    }
+                    if (CurrentImagePage < TotalImagePages)
+                    {
+                        CurrentImagePage = CurrentImagePage + 1;
+                        await FilterImagesOnRating(selectedRatingForFilter);
+                    }
+                    break;
+                case filters.FolderRatingFilter:
+                    break;
+                case filters.ImageTagFilter:
+                    break;
+                case filters.FolderTagFilter:
+                    break;
+                case filters.FolderDescriptionFilter:
+                    break;
             }
         }
 

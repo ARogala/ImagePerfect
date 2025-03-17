@@ -51,6 +51,22 @@ namespace ImagePerfect.Repository
             return (allImagesInFolder, tags);
         }
 
+        public async Task<(List<Image> images, List<ImageTag> tags)> GetAllImagesAtRating(int rating)
+        {
+            await _connection.OpenAsync();
+            MySqlTransaction txn = await _connection.BeginTransactionAsync();
+
+            string sql1 = @"SELECT * FROM images WHERE ImageRating = @rating ORDER BY FileName";
+            List<Image> allImagesAtRating = (List<Image>)await _connection.QueryAsync<Image>(sql1, new { rating }, transaction: txn);
+            string sql2 = @"SELECT tags.TagId, Tags.TagName, images.ImageId FROM images
+                            JOIN image_tags_join ON image_tags_join.ImageId = images.ImageId
+                            JOIN tags ON image_tags_join.TagId = tags.TagId WHERE images.ImageRating = @rating ORDER BY images.FileName;";
+            List<ImageTag> tags = (List<ImageTag>)await _connection.QueryAsync<ImageTag>(sql2, new { rating }, transaction: txn);
+            await txn.CommitAsync();
+            await _connection.CloseAsync();
+            return (allImagesAtRating, tags);
+        }
+
         public async Task<List<Image>> GetAllImagesInDirectoryTree(string directoryPath)
         {
             string regExpString = PathHelper.GetRegExpStringDirectoryTree(directoryPath);

@@ -30,8 +30,12 @@
 		<StackPanel Orientation="Vertical" Grid.Row="1" IsVisible="{Binding ShowFilters}">
 			<!--Filters-->
 			<Grid RowDefinitions="Auto, Auto, Auto" ColumnDefinitions="*, Auto, *, Auto" MaxWidth="800">
-				<NumericUpDown Grid.Row="0" Grid.Column="0" Minimum="1" Value="1" Maximum="5" Margin="5" ParsingNumberStyle="Integer" FormatString="0"/>
-				<Button Grid.Row="0" Grid.Column="1" Margin="5" Width="185" HorizontalContentAlignment="Center">
+				<NumericUpDown Grid.Row="0" Grid.Column="0" Minimum="1" Value="1" Maximum="5" 
+							   Margin="5" ParsingNumberStyle="Integer" FormatString="0"
+							   x:Name="FilterImageRating"/>
+				<Button Grid.Row="0" Grid.Column="1" Margin="5" Width="185" HorizontalContentAlignment="Center"
+						Command="{Binding FilterImagesOnRatingCommand}"
+						CommandParameter="{Binding #FilterImageRating.Value}">
 					Filter Images on Rating
 				</Button>
 				<NumericUpDown Grid.Row="0" Grid.Column="2" Minimum="1" Value="1" Maximum="10" Margin="5" ParsingNumberStyle="Integer" FormatString="0"/>
