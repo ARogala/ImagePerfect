@@ -145,6 +145,17 @@ namespace ImagePerfect.ViewModels
                 selectedRatingForFilter = Decimal.ToInt32(rating);
                 await FilterImagesOnRating(selectedRatingForFilter);
             });
+            FilterFoldersOnRatingCommand = ReactiveCommand.Create(async (decimal rating) =>
+            {
+                CurrentFolderPage = 1;
+                TotalFolderPages = 1;
+                CurrentImagePage = 1;
+                TotalImagePages = 1;
+                MaxCurrentPage = 1;
+                MaxPage = 1;
+                selectedRatingForFilter = Decimal.ToInt32(rating);
+                await FilterFoldersOnRating(selectedRatingForFilter);
+            });
             //CreateNewFolderCommand = ReactiveCommand.Create(() => { CreateNewFolder(); });
             Initialize();
         }
@@ -284,8 +295,28 @@ namespace ImagePerfect.ViewModels
 
         public ReactiveCommand<decimal, Task> FilterImagesOnRatingCommand { get; }
 
+        public ReactiveCommand<decimal, Task> FilterFoldersOnRatingCommand { get; }
+
         //public ReactiveCommand<Unit, Unit> CreateNewFolderCommand { get; }
 
+        public async Task FilterFoldersOnRating(int rating)
+        {
+            currentFilter = filters.FolderRatingFilter;
+            (List<Folder> folders, List<FolderTag> tags) folderResult = await _folderMethods.GetAllFoldersAtRating(rating);
+            displayFolders = folderResult.folders;
+            displayFolderTags = folderResult.tags;
+
+            Images.Clear();
+            LibraryFolders.Clear();
+            displayFolders = FolderPagination();
+            for (int i = 0; i < displayFolders.Count; i++)
+            {
+                //need to map tags to folders 
+                displayFolders[i] = FolderMapper.MapTagsToFolder(displayFolders[i], displayFolderTags);
+                FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(displayFolders[i]);
+                LibraryFolders.Add(folderViewModel);
+            }
+        }
         public async Task FilterImagesOnRating(int rating)
         {
             currentFilter = filters.ImageRatingFilter;
@@ -559,11 +590,6 @@ namespace ImagePerfect.ViewModels
                     }
                     break;
                 case filters.ImageRatingFilter:
-                    if (CurrentFolderPage > 1)
-                    {
-                        CurrentFolderPage = CurrentFolderPage - 1;
-                        await FilterImagesOnRating(selectedRatingForFilter);
-                    }
                     if (CurrentImagePage > 1)
                     {
                         CurrentImagePage = CurrentImagePage - 1;
@@ -571,6 +597,11 @@ namespace ImagePerfect.ViewModels
                     }
                     break;
                 case filters.FolderRatingFilter:
+                    if (CurrentFolderPage > 1)
+                    {
+                        CurrentFolderPage = CurrentFolderPage - 1;
+                        await FilterFoldersOnRating(selectedRatingForFilter);
+                    }
                     break;
                 case filters.ImageTagFilter:
                     break;
@@ -579,7 +610,6 @@ namespace ImagePerfect.ViewModels
                 case filters.FolderDescriptionFilter: 
                     break;
             }
-            
         }
 
         //opens the next directory locaion
@@ -628,11 +658,6 @@ namespace ImagePerfect.ViewModels
                     }
                     break;
                 case filters.ImageRatingFilter:
-                    if (CurrentFolderPage < TotalFolderPages)
-                    {
-                        CurrentFolderPage = CurrentFolderPage + 1;
-                        await FilterImagesOnRating(selectedRatingForFilter);
-                    }
                     if (CurrentImagePage < TotalImagePages)
                     {
                         CurrentImagePage = CurrentImagePage + 1;
@@ -640,6 +665,11 @@ namespace ImagePerfect.ViewModels
                     }
                     break;
                 case filters.FolderRatingFilter:
+                    if (CurrentFolderPage < TotalFolderPages)
+                    {
+                        CurrentFolderPage = CurrentFolderPage + 1;
+                        await FilterFoldersOnRating(selectedRatingForFilter);
+                    }
                     break;
                 case filters.ImageTagFilter:
                     break;
@@ -652,15 +682,40 @@ namespace ImagePerfect.ViewModels
 
         private async void GoToPage(int pageNumber)
         {
-            if (pageNumber <= TotalFolderPages) 
+            switch (currentFilter)
             {
-                CurrentFolderPage = pageNumber;
-                await RefreshFolders(CurrentDirectory);
-            }
-            if (pageNumber <= TotalImagePages)
-            {
-                CurrentImagePage = pageNumber;
-                await RefreshImages(CurrentDirectory);
+                case filters.None:
+                    if (pageNumber <= TotalFolderPages)
+                    {
+                        CurrentFolderPage = pageNumber;
+                        await RefreshFolders(CurrentDirectory);
+                    }
+                    if (pageNumber <= TotalImagePages)
+                    {
+                        CurrentImagePage = pageNumber;
+                        await RefreshImages(CurrentDirectory);
+                    }
+                    break;
+                case filters.ImageRatingFilter:
+                    if (pageNumber <= TotalImagePages)
+                    {
+                        CurrentImagePage = pageNumber;
+                        await FilterImagesOnRating(selectedRatingForFilter);
+                    }
+                    break;
+                case filters.FolderRatingFilter:
+                    if (pageNumber <= TotalFolderPages)
+                    {
+                        CurrentFolderPage = pageNumber;
+                        await FilterFoldersOnRating(selectedRatingForFilter);
+                    }
+                    break;
+                case filters.ImageTagFilter:
+                    break;
+                case filters.FolderTagFilter:
+                    break;
+                case filters.FolderDescriptionFilter:
+                    break;
             }
         }
         private async void DeleteLibrary()
