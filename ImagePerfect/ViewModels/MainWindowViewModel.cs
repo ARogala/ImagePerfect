@@ -635,6 +635,11 @@ namespace ImagePerfect.ViewModels
                     }
                     break;
                 case filters.ImageTagFilter:
+                    if (CurrentImagePage > 1)
+                    {
+                        CurrentImagePage = CurrentImagePage - 1;
+                        await FilterImagesOnTag(tagForFilter);
+                    }
                     break;
                 case filters.FolderTagFilter: 
                     break;
@@ -703,6 +708,11 @@ namespace ImagePerfect.ViewModels
                     }
                     break;
                 case filters.ImageTagFilter:
+                    if (CurrentImagePage < TotalImagePages)
+                    {
+                        CurrentImagePage = CurrentImagePage + 1;
+                        await FilterImagesOnTag(tagForFilter);
+                    }
                     break;
                 case filters.FolderTagFilter:
                     break;
@@ -742,6 +752,11 @@ namespace ImagePerfect.ViewModels
                     }
                     break;
                 case filters.ImageTagFilter:
+                    if (pageNumber <= TotalImagePages)
+                    {
+                        CurrentImagePage = pageNumber;
+                        await FilterImagesOnTag(tagForFilter);
+                    }
                     break;
                 case filters.FolderTagFilter:
                     break;
