@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Dapper;
 using System.Collections.Generic;
 using ImagePerfect.Helpers;
+using HarfBuzzSharp;
 
 namespace ImagePerfect.Repository
 {
@@ -103,6 +104,22 @@ namespace ImagePerfect.Repository
             await txn.CommitAsync();
             await _connection.CloseAsync();
             return (allFoldersWithTag, tags);
+        }
+
+        public async Task<(List<Folder> folders, List<FolderTag> tags)> GetAllFoldersWithDescriptionText(string text)
+        {
+            await _connection.OpenAsync();
+            MySqlTransaction txn = await _connection.BeginTransactionAsync();
+
+            string sql1 = @"SELECT * FROM folders WHERE MATCH(FolderName, FolderPath, FolderDescription) AGAINST(@text) ORDER BY FolderName";
+            List<Folder> allFoldersWithDescriptionText = (List<Folder>)await _connection.QueryAsync<Folder>(sql1, new { text }, transaction: txn);
+            string sql2 = @"SELECT tags.TagId, tags.TagName, folders.FolderId FROM folders
+                            JOIN folder_tags_join ON folder_tags_join.FolderId = folders.FolderId
+                            JOIN tags ON folder_tags_join.TagId = tags.TagId ORDER BY folders.FolderName;";
+            List<FolderTag> tags = (List<FolderTag>)await _connection.QueryAsync<FolderTag>(sql2, transaction: txn);
+            await txn.CommitAsync();
+            await _connection.CloseAsync();
+            return (allFoldersWithDescriptionText, tags);
         }
 
         //gets the folder itself as well as all folders and subfolders within. 
