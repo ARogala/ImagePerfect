@@ -140,8 +140,8 @@ namespace ImagePerfect.Repository
             //get newTag id
             string sql2 = @"SELECT TagId FROM tags WHERE TagName = @newTag";
             int newTagId = await _connection.QuerySingleOrDefaultAsync<int>(sql2, new { newTag }, transaction: txn);
-            //insert into image_tags_join
-            string sql3 = @"INSERT INTO image_tags_join (ImageId, TagId) VALUES (@imageId, @tagId)";
+            //insert into image_tags_join if its already there IGNORE
+            string sql3 = @"INSERT IGNORE INTO image_tags_join (ImageId, TagId) VALUES (@imageId, @tagId)";
             rowsEffectedB = await _connection.ExecuteAsync(sql3, new { imageId = image.ImageId, tagId = newTagId }, transaction: txn);
 
             await txn.CommitAsync();

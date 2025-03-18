@@ -820,7 +820,7 @@ namespace ImagePerfect.ViewModels
                 return;
             }
             Folder folder = FolderMapper.GetFolderFromVm(folderVm);
-            //update folder table and tags table in db
+            //update folder table and tags table in db -- success will be false if you try to input a duplicate tag
             bool success = await _folderMethods.UpdateFolderTags(folder, folderVm.NewTag);
             if (success)
             {
@@ -829,6 +829,10 @@ namespace ImagePerfect.ViewModels
                 folderVm.NewTag = "";
                 //refresh UI
                 await RefreshFolderProps(CurrentDirectory);
+            }
+            else
+            {
+                folderVm.NewTag = "";
             }
         }
 
@@ -894,17 +898,8 @@ namespace ImagePerfect.ViewModels
             {
                 return;
             }
-            //add NewTag to ImageTags
-            if (imageVm.ImageTags == "")
-            {
-                imageVm.ImageTags = imageVm.NewTag;
-            }
-            else
-            {
-                imageVm.ImageTags = imageVm.ImageTags + "," + imageVm.NewTag;
-            }
             Image image = ImageMapper.GetImageFromVm(imageVm);
-            //update image table and tags table in db
+            //update image table and tags table in db -- success will be false if you try to input a duplicate tag
             bool success = await _imageMethods.UpdateImageTags(image, imageVm.NewTag);
             if (success) 
             {
@@ -914,6 +909,10 @@ namespace ImagePerfect.ViewModels
                 await GetTagsList();
                 imageVm.NewTag = "";
                 await RefreshImageProps(CurrentDirectory);   
+            }
+            else
+            {
+                imageVm.NewTag = "";
             }
         }
        
