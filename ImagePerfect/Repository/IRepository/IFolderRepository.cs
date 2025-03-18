@@ -11,6 +11,7 @@ namespace ImagePerfect.Repository.IRepository
         Task<Folder?> GetRootFolder();
         Task<(List<Folder> folders, List<FolderTag> tags)> GetFoldersInDirectory(string directoryPath);
         Task<(List<Folder> folders, List<FolderTag> tags)> GetAllFoldersAtRating(int rating);
+        Task<(List<Folder> folders, List<FolderTag> tags)> GetAllFoldersWithTag(string tag);
         Task<List<Folder>> GetDirectoryTree(string directoryPath);
         Task<bool> AddCoverImage(string coverImagePath, int folderId);
         Task<bool> MoveFolder(string folderMoveSql, string imageMoveSql);

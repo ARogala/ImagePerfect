@@ -76,10 +76,9 @@ namespace ImagePerfect.Repository
                             JOIN image_tags_join ON image_tags_join.ImageId = images.ImageId
                             JOIN tags ON image_tags_join.TagId = tags.TagId WHERE tags.TagName = @tag ORDER BY images.FileName;";
             List<Image> allImagesWithTag = (List<Image>)await _connection.QueryAsync<Image>(sql1, new { tag }, transaction: txn);
-            //not ideal as this will only return the one tag for the images. They may have many tags. However not sure how else to do this 
             string sql2 = @"SELECT tags.TagId, Tags.TagName, images.ImageId FROM images 
                             JOIN image_tags_join ON image_tags_join.ImageId = images.ImageId
-                            JOIN tags ON image_tags_join.TagId = tags.TagId WHERE tags.TagName = @tag ORDER BY images.FileName;";
+                            JOIN tags ON image_tags_join.TagId = tags.TagId ORDER BY images.FileName;";
             List<ImageTag> tags = (List<ImageTag>)await _connection.QueryAsync<ImageTag>(sql2, new { tag }, transaction: txn);
             await txn.CommitAsync();
             await _connection.CloseAsync();
