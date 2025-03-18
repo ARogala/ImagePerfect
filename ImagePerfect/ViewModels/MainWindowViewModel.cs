@@ -64,6 +64,7 @@ namespace ImagePerfect.ViewModels
         private filters currentFilter = filters.None;
         private int selectedRatingForFilter = 0;
         private string tagForFilter = string.Empty;
+        private string textForFilter = string.Empty;
 
         public MainWindowViewModel() { }
         public MainWindowViewModel(IUnitOfWork unitOfWork)
@@ -176,6 +177,16 @@ namespace ImagePerfect.ViewModels
                 MaxPage = 1;
                 tagForFilter = tag;
                 await FilterFoldersOnTag(tagForFilter);
+            });
+            FilterFoldersOnDescriptionCommand = ReactiveCommand.Create(async (string text) => {
+                CurrentFolderPage = 1;
+                TotalFolderPages = 1;
+                CurrentImagePage = 1;
+                TotalImagePages = 1;
+                MaxCurrentPage = 1;
+                MaxPage = 1;
+                textForFilter = text;
+                await FilterFoldersOnDescription(textForFilter);
             });
             //CreateNewFolderCommand = ReactiveCommand.Create(() => { CreateNewFolder(); });
             Initialize();
@@ -322,8 +333,28 @@ namespace ImagePerfect.ViewModels
 
         public ReactiveCommand<string, Task> FilterFoldersOnTagCommand  { get; }
 
+        public ReactiveCommand<string, Task> FilterFoldersOnDescriptionCommand { get; }
+
         //public ReactiveCommand<Unit, Unit> CreateNewFolderCommand { get; }
 
+        public async Task FilterFoldersOnDescription(string text)
+        {
+            currentFilter = filters.FolderDescriptionFilter;
+            (List<Folder> folders, List<FolderTag> tags) folderResult = await _folderMethods.GetAllFoldersWithDescriptionText(text);
+            displayFolders = folderResult.folders;
+            displayFolderTags = folderResult.tags;
+
+            Images.Clear();
+            LibraryFolders.Clear();
+            displayFolders = FolderPagination();
+            for (int i = 0; i < displayFolders.Count; i++)
+            {
+                //need to map tags to folders 
+                displayFolders[i] = FolderMapper.MapTagsToFolder(displayFolders[i], displayFolderTags);
+                FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(displayFolders[i]);
+                LibraryFolders.Add(folderViewModel);
+            }
+        }
         public async Task FilterFoldersOnTag(string tag)
         {
             currentFilter = filters.FolderTagFilter;
@@ -678,7 +709,12 @@ namespace ImagePerfect.ViewModels
                         await FilterFoldersOnTag(tagForFilter);
                     }
                     break;
-                case filters.FolderDescriptionFilter: 
+                case filters.FolderDescriptionFilter:
+                    if (CurrentFolderPage > 1)
+                    {
+                        CurrentFolderPage = CurrentFolderPage - 1;
+                        await FilterFoldersOnDescription(textForFilter);
+                    }
                     break;
             }
         }
@@ -757,6 +793,11 @@ namespace ImagePerfect.ViewModels
                     }
                     break;
                 case filters.FolderDescriptionFilter:
+                    if (CurrentFolderPage < TotalFolderPages)
+                    {
+                        CurrentFolderPage = CurrentFolderPage + 1;
+                        await FilterFoldersOnDescription(textForFilter);
+                    }
                     break;
             }
         }
@@ -806,6 +847,11 @@ namespace ImagePerfect.ViewModels
                     }
                     break;
                 case filters.FolderDescriptionFilter:
+                    if (pageNumber <= TotalFolderPages)
+                    {
+                        CurrentFolderPage = pageNumber;
+                        await FilterFoldersOnDescription(textForFilter);
+                    }
                     break;
             }
         }
