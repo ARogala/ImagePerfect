@@ -146,7 +146,9 @@ namespace ImagePerfect.ViewModels
             {
                 ResetPagination();
                 selectedRatingForFilter = Decimal.ToInt32(rating);
-                await FilterFoldersOnRating(selectedRatingForFilter);
+                currentFilter = filters.FolderRatingFilter;
+                await RefreshFolders();
+                //await FilterFoldersOnRating(selectedRatingForFilter);
             });
             FilterImagesOnTagCommand = ReactiveCommand.Create(async (string tag) => {
                 ResetPagination();
@@ -156,12 +158,16 @@ namespace ImagePerfect.ViewModels
             FilterFoldersOnTagCommand = ReactiveCommand.Create(async (string tag) => {
                 ResetPagination();
                 tagForFilter = tag;
-                await FilterFoldersOnTag(tagForFilter);
+                currentFilter = filters.FolderTagFilter;
+                await RefreshFolders();
+                //await FilterFoldersOnTag(tagForFilter);
             });
             FilterFoldersOnDescriptionCommand = ReactiveCommand.Create(async (string text) => {
                 ResetPagination();
                 textForFilter = text;
-                await FilterFoldersOnDescription(textForFilter);
+                currentFilter = filters.FolderDescriptionFilter;
+                await RefreshFolders();
+                //await FilterFoldersOnDescription(textForFilter);
             });
             //CreateNewFolderCommand = ReactiveCommand.Create(() => { CreateNewFolder(); });
             Initialize();
@@ -312,42 +318,42 @@ namespace ImagePerfect.ViewModels
 
         //public ReactiveCommand<Unit, Unit> CreateNewFolderCommand { get; }
 
-        public async Task FilterFoldersOnDescription(string text)
-        {
-            currentFilter = filters.FolderDescriptionFilter;
-            (List<Folder> folders, List<FolderTag> tags) folderResult = await _folderMethods.GetAllFoldersWithDescriptionText(text);
-            displayFolders = folderResult.folders;
-            displayFolderTags = folderResult.tags;
+        //public async Task FilterFoldersOnDescription(string text)
+        //{
+        //    currentFilter = filters.FolderDescriptionFilter;
+        //    (List<Folder> folders, List<FolderTag> tags) folderResult = await _folderMethods.GetAllFoldersWithDescriptionText(text);
+        //    displayFolders = folderResult.folders;
+        //    displayFolderTags = folderResult.tags;
 
-            Images.Clear();
-            LibraryFolders.Clear();
-            displayFolders = FolderPagination();
-            for (int i = 0; i < displayFolders.Count; i++)
-            {
-                //need to map tags to folders 
-                displayFolders[i] = FolderMapper.MapTagsToFolder(displayFolders[i], displayFolderTags);
-                FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(displayFolders[i]);
-                LibraryFolders.Add(folderViewModel);
-            }
-        }
-        public async Task FilterFoldersOnTag(string tag)
-        {
-            currentFilter = filters.FolderTagFilter;
-            (List<Folder> folders, List<FolderTag> tags) folderResult = await _folderMethods.GetAllFoldersWithTag(tag);
-            displayFolders = folderResult.folders;
-            displayFolderTags = folderResult.tags;
+        //    Images.Clear();
+        //    LibraryFolders.Clear();
+        //    displayFolders = FolderPagination();
+        //    for (int i = 0; i < displayFolders.Count; i++)
+        //    {
+        //        //need to map tags to folders 
+        //        displayFolders[i] = FolderMapper.MapTagsToFolder(displayFolders[i], displayFolderTags);
+        //        FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(displayFolders[i]);
+        //        LibraryFolders.Add(folderViewModel);
+        //    }
+        //}
+        //public async Task FilterFoldersOnTag(string tag)
+        //{
+        //    currentFilter = filters.FolderTagFilter;
+        //    (List<Folder> folders, List<FolderTag> tags) folderResult = await _folderMethods.GetAllFoldersWithTag(tag);
+        //    displayFolders = folderResult.folders;
+        //    displayFolderTags = folderResult.tags;
 
-            Images.Clear();
-            LibraryFolders.Clear();
-            displayFolders = FolderPagination();
-            for (int i = 0; i < displayFolders.Count; i++)
-            {
-                //need to map tags to folders 
-                displayFolders[i] = FolderMapper.MapTagsToFolder(displayFolders[i], displayFolderTags);
-                FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(displayFolders[i]);
-                LibraryFolders.Add(folderViewModel);
-            }
-        }
+        //    Images.Clear();
+        //    LibraryFolders.Clear();
+        //    displayFolders = FolderPagination();
+        //    for (int i = 0; i < displayFolders.Count; i++)
+        //    {
+        //        //need to map tags to folders 
+        //        displayFolders[i] = FolderMapper.MapTagsToFolder(displayFolders[i], displayFolderTags);
+        //        FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(displayFolders[i]);
+        //        LibraryFolders.Add(folderViewModel);
+        //    }
+        //}
         public async Task FilterImagesOnTag(string tag)
         {
             currentFilter = filters.ImageTagFilter;
@@ -366,24 +372,24 @@ namespace ImagePerfect.ViewModels
                 Images.Add(imageViewModel);
             }
         }
-        public async Task FilterFoldersOnRating(int rating)
-        {
-            currentFilter = filters.FolderRatingFilter;
-            (List<Folder> folders, List<FolderTag> tags) folderResult = await _folderMethods.GetAllFoldersAtRating(rating);
-            displayFolders = folderResult.folders;
-            displayFolderTags = folderResult.tags;
+        //public async Task FilterFoldersOnRating(int rating)
+        //{
+        //    currentFilter = filters.FolderRatingFilter;
+        //    (List<Folder> folders, List<FolderTag> tags) folderResult = await _folderMethods.GetAllFoldersAtRating(rating);
+        //    displayFolders = folderResult.folders;
+        //    displayFolderTags = folderResult.tags;
 
-            Images.Clear();
-            LibraryFolders.Clear();
-            displayFolders = FolderPagination();
-            for (int i = 0; i < displayFolders.Count; i++)
-            {
-                //need to map tags to folders 
-                displayFolders[i] = FolderMapper.MapTagsToFolder(displayFolders[i], displayFolderTags);
-                FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(displayFolders[i]);
-                LibraryFolders.Add(folderViewModel);
-            }
-        }
+        //    Images.Clear();
+        //    LibraryFolders.Clear();
+        //    displayFolders = FolderPagination();
+        //    for (int i = 0; i < displayFolders.Count; i++)
+        //    {
+        //        //need to map tags to folders 
+        //        displayFolders[i] = FolderMapper.MapTagsToFolder(displayFolders[i], displayFolderTags);
+        //        FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(displayFolders[i]);
+        //        LibraryFolders.Add(folderViewModel);
+        //    }
+        //}
         public async Task FilterImagesOnRating(int rating)
         {
             currentFilter = filters.ImageRatingFilter;
@@ -476,22 +482,91 @@ namespace ImagePerfect.ViewModels
             MaxPage = 1;
         }
 
-        private async Task RefreshFolders(string path)
+        private async Task RefreshFolders(string path = "")
         {
-            currentFilter = filters.None;
-            (List<Folder> folders, List<FolderTag> tags) folderResult = await _folderMethods.GetFoldersInDirectory(path);
-            displayFolders = folderResult.folders;
-            displayFolderTags = folderResult.tags;
-            LibraryFolders.Clear();
-            displayFolders = FolderPagination();
-            for (int i = 0; i < displayFolders.Count; i++)
+            switch (currentFilter)
             {
-                //need to map tags to folders 
-                displayFolders[i] = FolderMapper.MapTagsToFolder(displayFolders[i], displayFolderTags);
-                FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(displayFolders[i]);
-                LibraryFolders.Add(folderViewModel);
+                case filters.None:
+                    (List<Folder> folders, List<FolderTag> tags) folderResult = await _folderMethods.GetFoldersInDirectory(CurrentDirectory);
+                    displayFolders = folderResult.folders;
+                    displayFolderTags = folderResult.tags;
+                    LibraryFolders.Clear();
+                    displayFolders = FolderPagination();
+                    for (int i = 0; i < displayFolders.Count; i++)
+                    {
+                        //need to map tags to folders 
+                        displayFolders[i] = FolderMapper.MapTagsToFolder(displayFolders[i], displayFolderTags);
+                        FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(displayFolders[i]);
+                        LibraryFolders.Add(folderViewModel);
+                    }
+                    break;
+                case filters.FolderRatingFilter:
+                    (List<Folder> folders, List<FolderTag> tags) folderRatingResult = await _folderMethods.GetAllFoldersAtRating(selectedRatingForFilter);
+                    displayFolders = folderRatingResult.folders;
+                    displayFolderTags = folderRatingResult.tags;
+
+                    Images.Clear();
+                    LibraryFolders.Clear();
+                    displayFolders = FolderPagination();
+                    for (int i = 0; i < displayFolders.Count; i++)
+                    {
+                        //need to map tags to folders 
+                        displayFolders[i] = FolderMapper.MapTagsToFolder(displayFolders[i], displayFolderTags);
+                        FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(displayFolders[i]);
+                        LibraryFolders.Add(folderViewModel);
+                    }
+                    break;
+                case filters.FolderTagFilter:
+                    (List<Folder> folders, List<FolderTag> tags) folderTagResult = await _folderMethods.GetAllFoldersWithTag(tagForFilter);
+                    displayFolders = folderTagResult.folders;
+                    displayFolderTags = folderTagResult.tags;
+
+                    Images.Clear();
+                    LibraryFolders.Clear();
+                    displayFolders = FolderPagination();
+                    for (int i = 0; i < displayFolders.Count; i++)
+                    {
+                        //need to map tags to folders 
+                        displayFolders[i] = FolderMapper.MapTagsToFolder(displayFolders[i], displayFolderTags);
+                        FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(displayFolders[i]);
+                        LibraryFolders.Add(folderViewModel);
+                    }
+                    break;
+                case filters.FolderDescriptionFilter:
+                    (List<Folder> folders, List<FolderTag> tags) folderDescriptionResult = await _folderMethods.GetAllFoldersWithDescriptionText(textForFilter);
+                    displayFolders = folderDescriptionResult.folders;
+                    displayFolderTags = folderDescriptionResult.tags;
+
+                    Images.Clear();
+                    LibraryFolders.Clear();
+                    displayFolders = FolderPagination();
+                    for (int i = 0; i < displayFolders.Count; i++)
+                    {
+                        //need to map tags to folders 
+                        displayFolders[i] = FolderMapper.MapTagsToFolder(displayFolders[i], displayFolderTags);
+                        FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(displayFolders[i]);
+                        LibraryFolders.Add(folderViewModel);
+                    }
+                    break;
             }
         }
+
+        //private async Task RefreshFolders(string path)
+        //{
+        //    currentFilter = filters.None;
+        //    (List<Folder> folders, List<FolderTag> tags) folderResult = await _folderMethods.GetFoldersInDirectory(path);
+        //    displayFolders = folderResult.folders;
+        //    displayFolderTags = folderResult.tags;
+        //    LibraryFolders.Clear();
+        //    displayFolders = FolderPagination();
+        //    for (int i = 0; i < displayFolders.Count; i++)
+        //    {
+        //        //need to map tags to folders 
+        //        displayFolders[i] = FolderMapper.MapTagsToFolder(displayFolders[i], displayFolderTags);
+        //        FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(displayFolders[i]);
+        //        LibraryFolders.Add(folderViewModel);
+        //    }
+        //}
 
         private async Task RefreshFolderProps(string path)
         {
@@ -617,7 +692,9 @@ namespace ImagePerfect.ViewModels
             //set the current directory -- used to add new folder to location
             CurrentDirectory = newPath;
             //refresh UI
-            await RefreshFolders(newPath);
+            //await RefreshFolders(newPath);
+            currentFilter = filters.None;
+            await RefreshFolders();
             await RefreshImages(newPath);
         }
 
@@ -635,63 +712,76 @@ namespace ImagePerfect.ViewModels
             //set the current directory -- used to add new folder to location
             CurrentDirectory = newPath;
             //refresh UI
-            await RefreshFolders(newPath);
+            //await RefreshFolders(newPath);
+            currentFilter = filters.None;
+            await RefreshFolders();
             await RefreshImages(newPath);
         }
 
         //loads the previous X elements in CurrentDirectory
         private async void PreviousPage()
         {
-            switch (currentFilter)
+            if (CurrentFolderPage > 1)
             {
-                case filters.None:
-                    if (CurrentFolderPage > 1)
-                    {
-                        CurrentFolderPage = CurrentFolderPage - 1;
-                        await RefreshFolders(CurrentDirectory);
-                    }
-                    if (CurrentImagePage > 1)
-                    {
-                        CurrentImagePage = CurrentImagePage - 1;
-                        await RefreshImages(CurrentDirectory);
-                    }
-                    break;
-                case filters.ImageRatingFilter:
-                    if (CurrentImagePage > 1)
-                    {
-                        CurrentImagePage = CurrentImagePage - 1;
-                        await FilterImagesOnRating(selectedRatingForFilter);
-                    }
-                    break;
-                case filters.FolderRatingFilter:
-                    if (CurrentFolderPage > 1)
-                    {
-                        CurrentFolderPage = CurrentFolderPage - 1;
-                        await FilterFoldersOnRating(selectedRatingForFilter);
-                    }
-                    break;
-                case filters.ImageTagFilter:
-                    if (CurrentImagePage > 1)
-                    {
-                        CurrentImagePage = CurrentImagePage - 1;
-                        await FilterImagesOnTag(tagForFilter);
-                    }
-                    break;
-                case filters.FolderTagFilter:
-                    if (CurrentFolderPage > 1)
-                    {
-                        CurrentFolderPage = CurrentFolderPage - 1;
-                        await FilterFoldersOnTag(tagForFilter);
-                    }
-                    break;
-                case filters.FolderDescriptionFilter:
-                    if (CurrentFolderPage > 1)
-                    {
-                        CurrentFolderPage = CurrentFolderPage - 1;
-                        await FilterFoldersOnDescription(textForFilter);
-                    }
-                    break;
+                CurrentFolderPage = CurrentFolderPage - 1;
+                //await RefreshFolders(CurrentDirectory);
+                await RefreshFolders();
             }
+            if (CurrentImagePage > 1)
+            {
+                CurrentImagePage = CurrentImagePage - 1;
+                await RefreshImages(CurrentDirectory);
+            }
+            //switch (currentFilter)
+            //{
+            //    case filters.None:
+            //        if (CurrentFolderPage > 1)
+            //        {
+            //            CurrentFolderPage = CurrentFolderPage - 1;
+            //            await RefreshFolders(CurrentDirectory);
+            //        }
+            //        if (CurrentImagePage > 1)
+            //        {
+            //            CurrentImagePage = CurrentImagePage - 1;
+            //            await RefreshImages(CurrentDirectory);
+            //        }
+            //        break;
+            //    case filters.ImageRatingFilter:
+            //        if (CurrentImagePage > 1)
+            //        {
+            //            CurrentImagePage = CurrentImagePage - 1;
+            //            await FilterImagesOnRating(selectedRatingForFilter);
+            //        }
+            //        break;
+            //    case filters.FolderRatingFilter:
+            //        if (CurrentFolderPage > 1)
+            //        {
+            //            CurrentFolderPage = CurrentFolderPage - 1;
+            //            await FilterFoldersOnRating(selectedRatingForFilter);
+            //        }
+            //        break;
+            //    case filters.ImageTagFilter:
+            //        if (CurrentImagePage > 1)
+            //        {
+            //            CurrentImagePage = CurrentImagePage - 1;
+            //            await FilterImagesOnTag(tagForFilter);
+            //        }
+            //        break;
+            //    case filters.FolderTagFilter:
+            //        if (CurrentFolderPage > 1)
+            //        {
+            //            CurrentFolderPage = CurrentFolderPage - 1;
+            //            await FilterFoldersOnTag(tagForFilter);
+            //        }
+            //        break;
+            //    case filters.FolderDescriptionFilter:
+            //        if (CurrentFolderPage > 1)
+            //        {
+            //            CurrentFolderPage = CurrentFolderPage - 1;
+            //            await FilterFoldersOnDescription(textForFilter);
+            //        }
+            //        break;
+            //}
         }
 
         //opens the next directory locaion
@@ -712,7 +802,9 @@ namespace ImagePerfect.ViewModels
             else
             {
                 //refresh UI
-                await RefreshFolders(currentFolder.FolderPath);
+                //await RefreshFolders(currentFolder.FolderPath);
+                currentFilter = filters.None;
+                await RefreshFolders();
                 await RefreshImages("", currentFolder.FolderId);
             }  
         }
@@ -720,110 +812,132 @@ namespace ImagePerfect.ViewModels
         //loads the next X elements in CurrentDirectory
         private async void NextPage()
         {
-            switch (currentFilter)
+            if (CurrentFolderPage < TotalFolderPages)
             {
-                case filters.None:
-                    if (CurrentFolderPage < TotalFolderPages)
-                    {
-                        CurrentFolderPage = CurrentFolderPage + 1;
-                        await RefreshFolders(CurrentDirectory);
-                    }
-                    if (CurrentImagePage < TotalImagePages)
-                    {
-                        CurrentImagePage = CurrentImagePage + 1;
-                        await RefreshImages(CurrentDirectory);
-                    }
-                    break;
-                case filters.ImageRatingFilter:
-                    if (CurrentImagePage < TotalImagePages)
-                    {
-                        CurrentImagePage = CurrentImagePage + 1;
-                        await FilterImagesOnRating(selectedRatingForFilter);
-                    }
-                    break;
-                case filters.FolderRatingFilter:
-                    if (CurrentFolderPage < TotalFolderPages)
-                    {
-                        CurrentFolderPage = CurrentFolderPage + 1;
-                        await FilterFoldersOnRating(selectedRatingForFilter);
-                    }
-                    break;
-                case filters.ImageTagFilter:
-                    if (CurrentImagePage < TotalImagePages)
-                    {
-                        CurrentImagePage = CurrentImagePage + 1;
-                        await FilterImagesOnTag(tagForFilter);
-                    }
-                    break;
-                case filters.FolderTagFilter:
-                    if (CurrentFolderPage < TotalFolderPages)
-                    {
-                        CurrentFolderPage = CurrentFolderPage + 1;
-                        await FilterFoldersOnTag(tagForFilter);
-                    }
-                    break;
-                case filters.FolderDescriptionFilter:
-                    if (CurrentFolderPage < TotalFolderPages)
-                    {
-                        CurrentFolderPage = CurrentFolderPage + 1;
-                        await FilterFoldersOnDescription(textForFilter);
-                    }
-                    break;
+                CurrentFolderPage = CurrentFolderPage + 1;
+                //await RefreshFolders(CurrentDirectory);
+                await RefreshFolders();
             }
+            if (CurrentImagePage < TotalImagePages)
+            {
+                CurrentImagePage = CurrentImagePage + 1;
+                await RefreshImages(CurrentDirectory);
+            }
+            //switch (currentFilter)
+            //{
+            //    case filters.None:
+            //        if (CurrentFolderPage < TotalFolderPages)
+            //        {
+            //            CurrentFolderPage = CurrentFolderPage + 1;
+            //            await RefreshFolders(CurrentDirectory);
+            //        }
+            //        if (CurrentImagePage < TotalImagePages)
+            //        {
+            //            CurrentImagePage = CurrentImagePage + 1;
+            //            await RefreshImages(CurrentDirectory);
+            //        }
+            //        break;
+            //    case filters.ImageRatingFilter:
+            //        if (CurrentImagePage < TotalImagePages)
+            //        {
+            //            CurrentImagePage = CurrentImagePage + 1;
+            //            await FilterImagesOnRating(selectedRatingForFilter);
+            //        }
+            //        break;
+            //    case filters.FolderRatingFilter:
+            //        if (CurrentFolderPage < TotalFolderPages)
+            //        {
+            //            CurrentFolderPage = CurrentFolderPage + 1;
+            //            await FilterFoldersOnRating(selectedRatingForFilter);
+            //        }
+            //        break;
+            //    case filters.ImageTagFilter:
+            //        if (CurrentImagePage < TotalImagePages)
+            //        {
+            //            CurrentImagePage = CurrentImagePage + 1;
+            //            await FilterImagesOnTag(tagForFilter);
+            //        }
+            //        break;
+            //    case filters.FolderTagFilter:
+            //        if (CurrentFolderPage < TotalFolderPages)
+            //        {
+            //            CurrentFolderPage = CurrentFolderPage + 1;
+            //            await FilterFoldersOnTag(tagForFilter);
+            //        }
+            //        break;
+            //    case filters.FolderDescriptionFilter:
+            //        if (CurrentFolderPage < TotalFolderPages)
+            //        {
+            //            CurrentFolderPage = CurrentFolderPage + 1;
+            //            await FilterFoldersOnDescription(textForFilter);
+            //        }
+            //        break;
+            //}
         }
 
         private async void GoToPage(int pageNumber)
         {
-            switch (currentFilter)
+            if (pageNumber <= TotalFolderPages)
             {
-                case filters.None:
-                    if (pageNumber <= TotalFolderPages)
-                    {
-                        CurrentFolderPage = pageNumber;
-                        await RefreshFolders(CurrentDirectory);
-                    }
-                    if (pageNumber <= TotalImagePages)
-                    {
-                        CurrentImagePage = pageNumber;
-                        await RefreshImages(CurrentDirectory);
-                    }
-                    break;
-                case filters.ImageRatingFilter:
-                    if (pageNumber <= TotalImagePages)
-                    {
-                        CurrentImagePage = pageNumber;
-                        await FilterImagesOnRating(selectedRatingForFilter);
-                    }
-                    break;
-                case filters.FolderRatingFilter:
-                    if (pageNumber <= TotalFolderPages)
-                    {
-                        CurrentFolderPage = pageNumber;
-                        await FilterFoldersOnRating(selectedRatingForFilter);
-                    }
-                    break;
-                case filters.ImageTagFilter:
-                    if (pageNumber <= TotalImagePages)
-                    {
-                        CurrentImagePage = pageNumber;
-                        await FilterImagesOnTag(tagForFilter);
-                    }
-                    break;
-                case filters.FolderTagFilter:
-                    if (pageNumber <= TotalFolderPages)
-                    {
-                        CurrentFolderPage = pageNumber;
-                        await FilterFoldersOnTag(tagForFilter);
-                    }
-                    break;
-                case filters.FolderDescriptionFilter:
-                    if (pageNumber <= TotalFolderPages)
-                    {
-                        CurrentFolderPage = pageNumber;
-                        await FilterFoldersOnDescription(textForFilter);
-                    }
-                    break;
+                CurrentFolderPage = pageNumber;
+                //await RefreshFolders(CurrentDirectory);
+                await RefreshFolders();
             }
+            if (pageNumber <= TotalImagePages)
+            {
+                CurrentImagePage = pageNumber;
+                await RefreshImages(CurrentDirectory);
+            }
+            //switch (currentFilter)
+            //{
+            //    case filters.None:
+            //        if (pageNumber <= TotalFolderPages)
+            //        {
+            //            CurrentFolderPage = pageNumber;
+            //            await RefreshFolders(CurrentDirectory);
+            //        }
+            //        if (pageNumber <= TotalImagePages)
+            //        {
+            //            CurrentImagePage = pageNumber;
+            //            await RefreshImages(CurrentDirectory);
+            //        }
+            //        break;
+            //    case filters.ImageRatingFilter:
+            //        if (pageNumber <= TotalImagePages)
+            //        {
+            //            CurrentImagePage = pageNumber;
+            //            await FilterImagesOnRating(selectedRatingForFilter);
+            //        }
+            //        break;
+            //    case filters.FolderRatingFilter:
+            //        if (pageNumber <= TotalFolderPages)
+            //        {
+            //            CurrentFolderPage = pageNumber;
+            //            await FilterFoldersOnRating(selectedRatingForFilter);
+            //        }
+            //        break;
+            //    case filters.ImageTagFilter:
+            //        if (pageNumber <= TotalImagePages)
+            //        {
+            //            CurrentImagePage = pageNumber;
+            //            await FilterImagesOnTag(tagForFilter);
+            //        }
+            //        break;
+            //    case filters.FolderTagFilter:
+            //        if (pageNumber <= TotalFolderPages)
+            //        {
+            //            CurrentFolderPage = pageNumber;
+            //            await FilterFoldersOnTag(tagForFilter);
+            //        }
+            //        break;
+            //    case filters.FolderDescriptionFilter:
+            //        if (pageNumber <= TotalFolderPages)
+            //        {
+            //            CurrentFolderPage = pageNumber;
+            //            await FilterFoldersOnDescription(textForFilter);
+            //        }
+            //        break;
+            //}
         }
         private async void DeleteLibrary()
         {
