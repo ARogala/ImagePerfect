@@ -138,53 +138,28 @@ namespace ImagePerfect.ViewModels
                 ToggleFilters();
             });
             FilterImagesOnRatingCommand = ReactiveCommand.Create(async (decimal rating) => {
-                CurrentFolderPage = 1;
-                TotalFolderPages = 1;
-                CurrentImagePage = 1;
-                TotalImagePages = 1;
-                MaxCurrentPage = 1;
-                MaxPage = 1;
+                ResetPagination();
                 selectedRatingForFilter = Decimal.ToInt32(rating);
                 await FilterImagesOnRating(selectedRatingForFilter);
             });
             FilterFoldersOnRatingCommand = ReactiveCommand.Create(async (decimal rating) =>
             {
-                CurrentFolderPage = 1;
-                TotalFolderPages = 1;
-                CurrentImagePage = 1;
-                TotalImagePages = 1;
-                MaxCurrentPage = 1;
-                MaxPage = 1;
+                ResetPagination();
                 selectedRatingForFilter = Decimal.ToInt32(rating);
                 await FilterFoldersOnRating(selectedRatingForFilter);
             });
-            FilterImagesOnTagCommand = ReactiveCommand.Create(async (string tag) => { 
-                CurrentFolderPage = 1;
-                TotalFolderPages = 1;
-                CurrentImagePage = 1;
-                TotalImagePages = 1;
-                MaxCurrentPage = 1;
-                MaxPage = 1;
+            FilterImagesOnTagCommand = ReactiveCommand.Create(async (string tag) => {
+                ResetPagination();
                 tagForFilter = tag;
                 await FilterImagesOnTag(tagForFilter);
             });
             FilterFoldersOnTagCommand = ReactiveCommand.Create(async (string tag) => {
-                CurrentFolderPage = 1;
-                TotalFolderPages = 1;
-                CurrentImagePage = 1;
-                TotalImagePages = 1;
-                MaxCurrentPage = 1;
-                MaxPage = 1;
+                ResetPagination();
                 tagForFilter = tag;
                 await FilterFoldersOnTag(tagForFilter);
             });
             FilterFoldersOnDescriptionCommand = ReactiveCommand.Create(async (string text) => {
-                CurrentFolderPage = 1;
-                TotalFolderPages = 1;
-                CurrentImagePage = 1;
-                TotalImagePages = 1;
-                MaxCurrentPage = 1;
-                MaxPage = 1;
+                ResetPagination();
                 textForFilter = text;
                 await FilterFoldersOnDescription(textForFilter);
             });
@@ -491,6 +466,16 @@ namespace ImagePerfect.ViewModels
             return displayFoldersTemp;
         }
 
+        private void ResetPagination()
+        {
+            CurrentFolderPage = 1;
+            TotalFolderPages = 1;
+            CurrentImagePage = 1;
+            TotalImagePages = 1;
+            MaxCurrentPage = 1;
+            MaxPage = 1;
+        }
+
         private async Task RefreshFolders(string path)
         {
             currentFilter = filters.None;
@@ -623,12 +608,7 @@ namespace ImagePerfect.ViewModels
         private async void BackFolderFromImage(ImageViewModel imageVm)
         {
             //not ideal but keeps pagination to the folder your in. When you go back or next start from page 1
-            CurrentFolderPage = 1;
-            TotalFolderPages = 1;
-            CurrentImagePage = 1;
-            TotalImagePages = 1;
-            MaxCurrentPage = 1;
-            MaxPage = 1;
+            ResetPagination();
             /*
                 Similar to Back folders except these buttons are on the image and we only need to remove one folder
                 Not every folder has a folder so this is the quickest way for now to back out of a folder that only has images
@@ -644,12 +624,7 @@ namespace ImagePerfect.ViewModels
         //opens the previous directory location
         private async void BackFolder(FolderViewModel currentFolder)
         {
-            CurrentFolderPage = 1;
-            TotalFolderPages = 1;
-            CurrentImagePage = 1;
-            TotalImagePages = 1;
-            MaxCurrentPage = 1;
-            MaxPage = 1;
+            ResetPagination();
             /*
                 tough to see but basically you need to remove two folders to build the regexp string
                 example if you are in /pictures/hiking/bearmountian and bearmountain folder has another folder saturday_2025_05_25
@@ -722,12 +697,7 @@ namespace ImagePerfect.ViewModels
         //opens the next directory locaion
         private async void NextFolder(FolderViewModel currentFolder)
         {
-            CurrentFolderPage = 1;
-            TotalFolderPages = 1;
-            CurrentImagePage = 1;
-            TotalImagePages = 1;
-            MaxCurrentPage = 1;
-            MaxPage = 1;
+            ResetPagination();
             bool hasChildren = currentFolder.HasChildren;
             bool hasFiles = currentFolder.HasFiles;
             //set the current directory -- used to add new folder to location
