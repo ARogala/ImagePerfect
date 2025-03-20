@@ -452,14 +452,10 @@ namespace ImagePerfect.ViewModels
                     break;
             }
         }
-        private async Task RefreshFolderProps(string path)
+
+        private async Task MapTagsToFoldersUpdateObservable()
         {
-            currentFilter = filters.None;
-            (List<Folder> folders, List<FolderTag> tags) folderResult = await _folderMethods.GetFoldersInDirectory(path);
-            displayFolders = folderResult.folders;
-            displayFolderTags = folderResult.tags;
-            displayFolders = FolderPagination();
-            for (int i = 0; i < displayFolders.Count; i++) 
+            for (int i = 0; i < displayFolders.Count; i++)
             {
                 //need to map tags to folders 
                 displayFolders[i] = FolderMapper.MapTagsToFolder(displayFolders[i], displayFolderTags);
@@ -468,6 +464,40 @@ namespace ImagePerfect.ViewModels
                 //Any non destructive operation that does not affect the number or order of items returned from
                 //the sql query will be in the same order so just modify props for a much cleaner UI refresh
                 LibraryFolders[i] = folderViewModel;
+            }
+        }
+        private async Task RefreshFolderProps(string path)
+        {
+            switch (currentFilter)
+            {
+                case filters.None:
+                    (List<Folder> folders, List<FolderTag> tags) folderResult = await _folderMethods.GetFoldersInDirectory(path);
+                    displayFolders = folderResult.folders;
+                    displayFolderTags = folderResult.tags;
+                    displayFolders = FolderPagination();
+                    await MapTagsToFoldersUpdateObservable();
+                    break;
+                case filters.FolderRatingFilter:
+                    (List<Folder> folders, List<FolderTag> tags) folderRatingResult = await _folderMethods.GetAllFoldersAtRating(selectedRatingForFilter);
+                    displayFolders = folderRatingResult.folders;
+                    displayFolderTags = folderRatingResult.tags;
+                    displayFolders = FolderPagination();
+                    await MapTagsToFoldersUpdateObservable();
+                    break;
+                case filters.FolderTagFilter:
+                    (List<Folder> folders, List<FolderTag> tags) folderTagResult = await _folderMethods.GetAllFoldersWithTag(tagForFilter);
+                    displayFolders = folderTagResult.folders;
+                    displayFolderTags = folderTagResult.tags;
+                    displayFolders = FolderPagination();
+                    await MapTagsToFoldersUpdateObservable();
+                    break;
+                case filters.FolderDescriptionFilter:
+                    (List<Folder> folders, List<FolderTag> tags) folderDescriptionResult = await _folderMethods.GetAllFoldersWithDescriptionText(textForFilter);
+                    displayFolders = folderDescriptionResult.folders;
+                    displayFolderTags = folderDescriptionResult.tags;
+                    displayFolders = FolderPagination();
+                    await MapTagsToFoldersUpdateObservable();
+                    break;
             }
         }
 
@@ -755,8 +785,6 @@ namespace ImagePerfect.ViewModels
             {
                 await _folderMethods.DeleteFolderTag(tagToRemove);
             }
-            //refresh UI
-            await RefreshFolderProps(CurrentDirectory);
         }
         private async void AddFolderTag(FolderViewModel folderVm)
         {
