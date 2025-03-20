@@ -390,6 +390,16 @@ namespace ImagePerfect.ViewModels
             MaxPage = 1;
         }
 
+        private async Task MapTagsToFoldersAddToObservable()
+        {
+            for (int i = 0; i < displayFolders.Count; i++)
+            {
+                //need to map tags to folders 
+                displayFolders[i] = FolderMapper.MapTagsToFolder(displayFolders[i], displayFolderTags);
+                FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(displayFolders[i]);
+                LibraryFolders.Add(folderViewModel);
+            }
+        }
         private async Task RefreshFolders(string path = "")
         {
             switch (currentFilter)
@@ -408,13 +418,7 @@ namespace ImagePerfect.ViewModels
                     displayFolderTags = folderResult.tags;
                     LibraryFolders.Clear();
                     displayFolders = FolderPagination();
-                    for (int i = 0; i < displayFolders.Count; i++)
-                    {
-                        //need to map tags to folders 
-                        displayFolders[i] = FolderMapper.MapTagsToFolder(displayFolders[i], displayFolderTags);
-                        FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(displayFolders[i]);
-                        LibraryFolders.Add(folderViewModel);
-                    }
+                    await MapTagsToFoldersAddToObservable();
                     break;
                 case filters.FolderRatingFilter:
                     (List<Folder> folders, List<FolderTag> tags) folderRatingResult = await _folderMethods.GetAllFoldersAtRating(selectedRatingForFilter);
@@ -424,13 +428,7 @@ namespace ImagePerfect.ViewModels
                     Images.Clear();
                     LibraryFolders.Clear();
                     displayFolders = FolderPagination();
-                    for (int i = 0; i < displayFolders.Count; i++)
-                    {
-                        //need to map tags to folders 
-                        displayFolders[i] = FolderMapper.MapTagsToFolder(displayFolders[i], displayFolderTags);
-                        FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(displayFolders[i]);
-                        LibraryFolders.Add(folderViewModel);
-                    }
+                    await MapTagsToFoldersAddToObservable();
                     break;
                 case filters.FolderTagFilter:
                     (List<Folder> folders, List<FolderTag> tags) folderTagResult = await _folderMethods.GetAllFoldersWithTag(tagForFilter);
@@ -440,13 +438,7 @@ namespace ImagePerfect.ViewModels
                     Images.Clear();
                     LibraryFolders.Clear();
                     displayFolders = FolderPagination();
-                    for (int i = 0; i < displayFolders.Count; i++)
-                    {
-                        //need to map tags to folders 
-                        displayFolders[i] = FolderMapper.MapTagsToFolder(displayFolders[i], displayFolderTags);
-                        FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(displayFolders[i]);
-                        LibraryFolders.Add(folderViewModel);
-                    }
+                    await MapTagsToFoldersAddToObservable();
                     break;
                 case filters.FolderDescriptionFilter:
                     (List<Folder> folders, List<FolderTag> tags) folderDescriptionResult = await _folderMethods.GetAllFoldersWithDescriptionText(textForFilter);
@@ -456,13 +448,7 @@ namespace ImagePerfect.ViewModels
                     Images.Clear();
                     LibraryFolders.Clear();
                     displayFolders = FolderPagination();
-                    for (int i = 0; i < displayFolders.Count; i++)
-                    {
-                        //need to map tags to folders 
-                        displayFolders[i] = FolderMapper.MapTagsToFolder(displayFolders[i], displayFolderTags);
-                        FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(displayFolders[i]);
-                        LibraryFolders.Add(folderViewModel);
-                    }
+                    await MapTagsToFoldersAddToObservable();
                     break;
             }
         }
