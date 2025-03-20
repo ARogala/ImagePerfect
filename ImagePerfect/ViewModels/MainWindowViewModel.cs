@@ -470,6 +470,17 @@ namespace ImagePerfect.ViewModels
                 LibraryFolders[i] = folderViewModel;
             }
         }
+
+        private async Task MapTagsToImagesAddToObservable()
+        {
+            for (int i = 0; i < displayImages.Count; i++)
+            {
+                //need to map tags to images
+                displayImages[i] = ImageMapper.MapTagsToImage(displayImages[i], displayImageTags);
+                ImageViewModel imageViewModel = await ImageMapper.GetImageVm(displayImages[i]);
+                Images.Add(imageViewModel);
+            }
+        }
         private async Task RefreshImages(string path = "", int folderId = 0)
         {
             switch (currentFilter)
@@ -489,13 +500,7 @@ namespace ImagePerfect.ViewModels
 
                     Images.Clear();
                     displayImages = ImagePagination();
-                    for (int i = 0; i < displayImages.Count; i++)
-                    {
-                        //need to map tags to images
-                        displayImages[i] = ImageMapper.MapTagsToImage(displayImages[i], displayImageTags);
-                        ImageViewModel imageViewModel = await ImageMapper.GetImageVm(displayImages[i]);
-                        Images.Add(imageViewModel);
-                    }
+                    await MapTagsToImagesAddToObservable();
                     break;
                 case filters.ImageRatingFilter:
                     (List<Image> images, List<ImageTag> tags) imageRatingResult = await _imageMethods.GetAllImagesAtRating(selectedRatingForFilter);
@@ -505,13 +510,7 @@ namespace ImagePerfect.ViewModels
                     Images.Clear();
                     LibraryFolders.Clear();
                     displayImages = ImagePagination();
-                    for (int i = 0; i < displayImages.Count; i++)
-                    {
-                        //need to map tags to images
-                        displayImages[i] = ImageMapper.MapTagsToImage(displayImages[i], displayImageTags);
-                        ImageViewModel imageViewModel = await ImageMapper.GetImageVm(displayImages[i]);
-                        Images.Add(imageViewModel);
-                    }
+                    await MapTagsToImagesAddToObservable();
                     break;
                 case filters.ImageTagFilter:
                     (List<Image> images, List<ImageTag> tags) imageTagResult = await _imageMethods.GetAllImagesWithTag(tagForFilter);
@@ -521,13 +520,7 @@ namespace ImagePerfect.ViewModels
                     Images.Clear();
                     LibraryFolders.Clear();
                     displayImages = ImagePagination();
-                    for (int i = 0; i < displayImages.Count; i++)
-                    {
-                        //need to map tags to images
-                        displayImages[i] = ImageMapper.MapTagsToImage(displayImages[i], displayImageTags);
-                        ImageViewModel imageViewModel = await ImageMapper.GetImageVm(displayImages[i]);
-                        Images.Add(imageViewModel);
-                    }
+                    await MapTagsToImagesAddToObservable();
                     break;
             }
         }
