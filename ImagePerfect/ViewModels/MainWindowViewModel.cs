@@ -554,27 +554,50 @@ namespace ImagePerfect.ViewModels
                     break;
             }
         }
-        private async Task RefreshImageProps(string path = "", int folderId = 0)
+
+        private async Task MapTagsToImagesUpdateObservable()
         {
-            currentFilter = filters.None;
-            (List<Image> images, List<ImageTag> tags) imageResult;
-            if (string.IsNullOrEmpty(path))
-            {
-                imageResult = await _imageMethods.GetAllImagesInFolder(folderId);
-            }
-            else
-            {
-                imageResult = await _imageMethods.GetAllImagesInFolder(path);
-            }
-            displayImages = imageResult.images;
-            displayImageTags = imageResult.tags;
-            displayImages = ImagePagination();
             for (int i = 0; i < displayImages.Count; i++)
             {
                 //need to map tags to images
                 displayImages[i] = ImageMapper.MapTagsToImage(displayImages[i], displayImageTags);
                 ImageViewModel imageViewModel = await ImageMapper.GetImageVm(displayImages[i]);
                 Images[i] = imageViewModel;
+            }
+        }
+        private async Task RefreshImageProps(string path = "", int folderId = 0)
+        {
+            switch (currentFilter)
+            {
+                case filters.None:
+                    (List<Image> images, List<ImageTag> tags) imageResult;
+                    if (string.IsNullOrEmpty(path))
+                    {
+                        imageResult = await _imageMethods.GetAllImagesInFolder(folderId);
+                    }
+                    else
+                    {
+                        imageResult = await _imageMethods.GetAllImagesInFolder(path);
+                    }
+                    displayImages = imageResult.images;
+                    displayImageTags = imageResult.tags;
+                    displayImages = ImagePagination();
+                    await MapTagsToImagesUpdateObservable();
+                    break;
+                case filters.ImageRatingFilter:
+                    (List<Image> images, List<ImageTag> tags) imageRatingResult = await _imageMethods.GetAllImagesAtRating(selectedRatingForFilter);
+                    displayImages = imageRatingResult.images;
+                    displayImageTags = imageRatingResult.tags;
+                    displayImages = ImagePagination();
+                    await MapTagsToImagesUpdateObservable();
+                    break;
+                case filters.ImageTagFilter:
+                    (List<Image> images, List<ImageTag> tags) imageTagResult = await _imageMethods.GetAllImagesWithTag(tagForFilter);
+                    displayImages = imageTagResult.images;
+                    displayImageTags = imageTagResult.tags;
+                    displayImages = ImagePagination();
+                    await MapTagsToImagesUpdateObservable();
+                    break;
             }
         }
         private async void Initialize()
@@ -861,8 +884,6 @@ namespace ImagePerfect.ViewModels
                 //remove tag from image metadata
                 await ImageMetaDataHelper.WriteTagToImage(imageVm);
             }
-            //refresh UI
-            await RefreshImageProps(CurrentDirectory);
         }
         //update ImageTags in db, and update image metadata
         private async void AddImageTag(ImageViewModel imageVm)
