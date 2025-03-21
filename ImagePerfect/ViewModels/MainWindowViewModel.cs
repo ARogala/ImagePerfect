@@ -893,6 +893,15 @@ namespace ImagePerfect.ViewModels
             {
                 return;
             }
+            //add NewTag to ImageTags -- KEEP!! THIS IS NEEDED TO WRITE METADATA
+            if (string.IsNullOrEmpty(imageVm.ImageTags))
+            {
+                imageVm.ImageTags = imageVm.NewTag;
+            }
+            else
+            {
+                imageVm.ImageTags = imageVm.ImageTags + "," + imageVm.NewTag;
+            }
             Image image = ImageMapper.GetImageFromVm(imageVm);
             //update image table and tags table in db -- success will be false if you try to input a duplicate tag
             bool success = await _imageMethods.UpdateImageTags(image, imageVm.NewTag);
@@ -905,6 +914,7 @@ namespace ImagePerfect.ViewModels
                 imageVm.NewTag = "";
                 await RefreshImageProps(CurrentDirectory);   
             }
+            //clear NewTag in box if try to input duplicate tag
             else
             {
                 imageVm.NewTag = "";
