@@ -253,13 +253,15 @@ namespace ImagePerfect.ViewModels
             get => _rootFolderLocation;
             set => _rootFolderLocation = value;
         }
-        public PickRootFolderViewModel PickRootFolder { get => new PickRootFolderViewModel(_unitOfWork, LibraryFolders); }
 
-        public PickNewFoldersViewModel PickNewFolders { get => new PickNewFoldersViewModel(_unitOfWork, LibraryFolders); }
+        //pass in this MainWindowViewModel so we can refresh UI
+        public PickRootFolderViewModel PickRootFolder { get => new PickRootFolderViewModel(_unitOfWork, this); }
 
-        public PickMoveToFolderViewModel PickMoveToFolder { get => new PickMoveToFolderViewModel(_unitOfWork, LibraryFolders); }
+        public PickNewFoldersViewModel PickNewFolders { get => new PickNewFoldersViewModel(_unitOfWork, this); }
 
-        public PickFolderCoverImageViewModel PickCoverImage { get => new PickFolderCoverImageViewModel(_unitOfWork, LibraryFolders); }
+        public PickMoveToFolderViewModel PickMoveToFolder { get => new PickMoveToFolderViewModel(_unitOfWork, this); }
+
+        public PickFolderCoverImageViewModel PickCoverImage { get => new PickFolderCoverImageViewModel(_unitOfWork, this); }
 
         public ObservableCollection<FolderViewModel> LibraryFolders { get; } = new ObservableCollection<FolderViewModel>();
 
@@ -400,7 +402,9 @@ namespace ImagePerfect.ViewModels
                 LibraryFolders.Add(folderViewModel);
             }
         }
-        private async Task RefreshFolders(string path = "")
+
+        //public so we can call from other view models
+        public async Task RefreshFolders(string path = "")
         {
             switch (currentFilter)
             {
@@ -466,7 +470,9 @@ namespace ImagePerfect.ViewModels
                 LibraryFolders[i] = folderViewModel;
             }
         }
-        private async Task RefreshFolderProps(string path)
+        
+        //public so we can call from other view models
+        public async Task RefreshFolderProps(string path)
         {
             switch (currentFilter)
             {

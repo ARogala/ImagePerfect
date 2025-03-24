@@ -1,13 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using ImagePerfect.Helpers;
 using ImagePerfect.Models;
-using ImagePerfect.ObjectMappers;
 using ImagePerfect.Repository.IRepository;
 using MsBox.Avalonia.Enums;
 using MsBox.Avalonia;
@@ -19,11 +16,11 @@ namespace ImagePerfect.ViewModels
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly FolderMethods _folderMethods;
-        private ObservableCollection<FolderViewModel> _libraryFolders;
-        public PickFolderCoverImageViewModel(IUnitOfWork unitOfWork, ObservableCollection<FolderViewModel> LibraryFolders)
+        private readonly MainWindowViewModel _mainWindowViewModel;
+        public PickFolderCoverImageViewModel(IUnitOfWork unitOfWork, MainWindowViewModel mainWindowViewModel)
         {
             _unitOfWork = unitOfWork;
-            _libraryFolders = LibraryFolders;
+            _mainWindowViewModel = mainWindowViewModel;
             _folderMethods = new FolderMethods(_unitOfWork);
             _SelectCoverImageInteraction = new Interaction<string, List<string>?>();
             SelectCoverImageCommand = ReactiveCommand.CreateFromTask((FolderViewModel folderVm) => SelectCoverImage(folderVm));
@@ -61,16 +58,7 @@ namespace ImagePerfect.ViewModels
             if (success)
             {
                 string foldersDirectoryPath = PathHelper.RemoveOneFolderFromPath(folderVm.FolderPath);
-                (List<Folder> folders, List<FolderTag> tags) result = await _folderMethods.GetFoldersInDirectory(foldersDirectoryPath);
-                List<Folder> folders = result.folders;
-                List<FolderTag> displayFolderTags = result.tags;
-                for (int i = 0; i < folders.Count; i++)
-                {
-                    //need to map tags to folders
-                    folders[i] = FolderMapper.MapTagsToFolder(folders[i], displayFolderTags);
-                    FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(folders[i]);
-                    _libraryFolders[i] = folderViewModel;
-                }
+                await _mainWindowViewModel.RefreshFolderProps(foldersDirectoryPath);
             }
         }
     }

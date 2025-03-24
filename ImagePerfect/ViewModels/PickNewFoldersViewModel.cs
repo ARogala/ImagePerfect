@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -10,8 +9,6 @@ using MsBox.Avalonia.Enums;
 using MsBox.Avalonia;
 using ReactiveUI;
 using ImagePerfect.Helpers;
-using System.Collections.ObjectModel;
-using ImagePerfect.ObjectMappers;
 
 namespace ImagePerfect.ViewModels
 {
@@ -20,13 +17,13 @@ namespace ImagePerfect.ViewModels
         private readonly IUnitOfWork _unitOfWork;
         private readonly FolderCsvMethods _folderCsvMethods;
         private readonly FolderMethods _folderMethods;
-        private ObservableCollection<FolderViewModel> _libraryFolders;
-        public PickNewFoldersViewModel(IUnitOfWork unitOfWork, ObservableCollection<FolderViewModel> LibraryFolders) 
+        private readonly MainWindowViewModel _mainWindowViewModel;
+        public PickNewFoldersViewModel(IUnitOfWork unitOfWork, MainWindowViewModel mainWindowViewModel) 
 		{
             _unitOfWork = unitOfWork;
             _folderMethods = new FolderMethods(_unitOfWork);
             _folderCsvMethods = new FolderCsvMethods(_unitOfWork);
-            _libraryFolders = LibraryFolders;
+            _mainWindowViewModel = mainWindowViewModel;
             _SelectNewFoldersInteraction = new Interaction<string, List<string>?>();
 			SelectNewFoldersCommand = ReactiveCommand.CreateFromTask(SelectNewFolders);
 		}
@@ -63,6 +60,7 @@ namespace ImagePerfect.ViewModels
                 await box.ShowAsync();
                 return;
             }
+            _mainWindowViewModel.ShowLoading = true;
             //build csv
             bool csvIsSet = await FolderCsvMethods.AddNewFoldersCsv(_NewFolders, false);
             //write csv to database
@@ -70,10 +68,9 @@ namespace ImagePerfect.ViewModels
             {
                 await _folderCsvMethods.AddFolderCsv();
                 //reload the page
-                _libraryFolders.Clear();
-                FolderViewModel rootFolderVm = await FolderMapper.GetFolderVm(rootFolder);
-                _libraryFolders.Add(rootFolderVm);
+                await _mainWindowViewModel.RefreshFolders();
             }
+            _mainWindowViewModel.ShowLoading = false;
         }
     }
 }
