@@ -9,11 +9,7 @@ using MsBox.Avalonia;
 using ReactiveUI;
 using ImagePerfect.Models;
 using ImagePerfect.Repository.IRepository;
-using ImagePerfect.Repository;
-using System.Diagnostics;
 using System.IO;
-using System.Collections.ObjectModel;
-using ImagePerfect.ObjectMappers;
 
 namespace ImagePerfect.ViewModels
 {
@@ -22,11 +18,11 @@ namespace ImagePerfect.ViewModels
         private readonly IUnitOfWork _unitOfWork;
         private readonly FolderMethods _folderMethods;
         private readonly ImageMethods _imageMethods;
-        private ObservableCollection<FolderViewModel> _libraryFolders;
-        public PickMoveToFolderViewModel(IUnitOfWork unitOfWork, ObservableCollection<FolderViewModel> LibraryFolders) 
+        private readonly MainWindowViewModel _mainWindowViewModel;
+        public PickMoveToFolderViewModel(IUnitOfWork unitOfWork, MainWindowViewModel mainWindowViewModel) 
 		{
             _unitOfWork = unitOfWork;
-            _libraryFolders = LibraryFolders;
+            _mainWindowViewModel = mainWindowViewModel;
             _folderMethods = new FolderMethods(_unitOfWork);
             _imageMethods = new ImageMethods(_unitOfWork);
 
@@ -81,7 +77,7 @@ namespace ImagePerfect.ViewModels
                 await box.ShowAsync();
                 return;
             }
-          
+            _mainWindowViewModel.ShowLoading = true;
             //pull current folder and sub folders from db
             List<Folder> folders = await _folderMethods.GetDirectoryTree(folderVm.FolderPath);
             List<Image> images = await _imageMethods.GetAllImagesInDirectoryTree(folderVm.FolderPath);
@@ -102,23 +98,14 @@ namespace ImagePerfect.ViewModels
                 {
                     Directory.Move(folderVm.FolderPath, PathHelper.AddNewFolderNameToPathForDirectoryMoveFolder(newFolderPath, folderVm.FolderName));
                     //update lib folders to show the folder has moved
-                    _libraryFolders.Clear();
                     string foldersDirectoryPath = PathHelper.RemoveOneFolderFromPath(folderVm.FolderPath);
-                    (List<Folder> folders, List<FolderTag> tags) result = await _folderMethods.GetFoldersInDirectory(foldersDirectoryPath);
-                    List<Folder> refreshFolders = result.folders;
-                    List<FolderTag> displayFolderTags = result.tags;
-                    for (int i = 0; i < refreshFolders.Count; i++) 
-                    {
-                        //need to map tags to folders
-                        refreshFolders[i] = FolderMapper.MapTagsToFolder(refreshFolders[i], displayFolderTags);
-                        FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(refreshFolders[i]);
-                        _libraryFolders.Add(folderViewModel);
-                    }
+                    await _mainWindowViewModel.RefreshFolders(foldersDirectoryPath);
                 }
                 catch (Exception e)
                 {
                     var box = MessageBoxManager.GetMessageBoxStandard("Move Folder", "Sorry something went wrong", ButtonEnum.Ok);
                     await box.ShowAsync();
+                    _mainWindowViewModel.ShowLoading = false;
                     return;
                 }
             }
@@ -126,8 +113,10 @@ namespace ImagePerfect.ViewModels
             {
                 var box = MessageBoxManager.GetMessageBoxStandard("Move Folder", "Sorry something went wrong", ButtonEnum.Ok);
                 await box.ShowAsync();
+                _mainWindowViewModel.ShowLoading = false;
                 return;
             }
+            _mainWindowViewModel.ShowLoading = false;
         }
     }
 }

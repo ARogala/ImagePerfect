@@ -4,12 +4,8 @@ using System.Reactive.Linq;
 using System.Reactive;
 using System.Threading.Tasks;
 using ReactiveUI;
-using System.Diagnostics;
 using ImagePerfect.Models;
 using ImagePerfect.Repository.IRepository;
-using System.Collections.ObjectModel;
-using ImagePerfect.Helpers;
-using Avalonia;
 using MsBox.Avalonia.Enums;
 using MsBox.Avalonia;
 using ImagePerfect.ObjectMappers;
@@ -21,18 +17,16 @@ namespace ImagePerfect.ViewModels
         private readonly IUnitOfWork _unitOfWork;
         private readonly FolderCsvMethods _folderCsvMethods;
         private readonly FolderMethods _folderMethods;
-        private bool _showLoading;
-        private ObservableCollection<FolderViewModel> _libraryFolders;
+        private readonly MainWindowViewModel _mainWindowViewModel;
            
-        public PickRootFolderViewModel(IUnitOfWork unitOfWork, ObservableCollection<FolderViewModel> LibraryFolders) 
+        public PickRootFolderViewModel(IUnitOfWork unitOfWork, MainWindowViewModel mainWindowViewModel) 
 		{
             _unitOfWork = unitOfWork;
-            _libraryFolders = LibraryFolders;
             _folderMethods = new FolderMethods(_unitOfWork);
             _folderCsvMethods = new FolderCsvMethods(_unitOfWork);
             _SelectFolderInteraction = new Interaction<string, List<string>?>();
-            _showLoading = false;
             SelectLibraryFolderCommand = ReactiveCommand.CreateFromTask(SelectLibraryFolder);
+            _mainWindowViewModel = mainWindowViewModel;
         }
 
         private List<string>? _RootFolderPath;
@@ -43,11 +37,6 @@ namespace ImagePerfect.ViewModels
 
         public ReactiveCommand<Unit, Unit> SelectLibraryFolderCommand { get; }
 
-        public bool ShowLoading
-        {
-            get => _showLoading;
-            set => this.RaiseAndSetIfChanged(ref _showLoading, value);   
-        }
         private async Task SelectLibraryFolder()
         {
             Folder? rootFolder = await _folderMethods.GetRootFolder();
@@ -65,7 +54,7 @@ namespace ImagePerfect.ViewModels
                 return;
             }
             
-            ShowLoading = true;
+            _mainWindowViewModel.ShowLoading = true;
             //build csv
             bool csvIsSet = await FolderCsvMethods.AddNewFoldersCsv(_RootFolderPath, true);
             //write csv to database
@@ -77,10 +66,10 @@ namespace ImagePerfect.ViewModels
                 if (rootFolder != null)
                 {
                     FolderViewModel rootFolderVm = await FolderMapper.GetFolderVm(rootFolder);
-                    _libraryFolders.Add(rootFolderVm);
+                    _mainWindowViewModel.LibraryFolders.Add(rootFolderVm);
                 }
             }
-            ShowLoading = false;
+            _mainWindowViewModel.ShowLoading = false;
         }
     }
 }

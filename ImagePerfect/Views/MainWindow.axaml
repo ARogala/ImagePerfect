@@ -17,15 +17,13 @@
 	<Grid ColumnDefinitions="*" RowDefinitions="Auto,Auto,Auto,Auto,*,Auto,Auto" x:Name="Root">
 		<StackPanel Grid.Row="0">
 			<Menu>
-				<!--Menu has to be open for root folder picker to bind to progress bar othewise progress bar visible shows true-->
-				<MenuItem Header="_File" IsSubMenuOpen="True">
+				<MenuItem Header="_File">
 					<v:PickRootFolderView DataContext="{Binding PickRootFolder}" x:Name="PickRootFolder"/>
 					<Button Margin="0" Width="150" HorizontalContentAlignment="Center" Command="{Binding DeleteLibraryCommand}">Delete Library</Button>
 					<v:PickNewFoldersView DataContext="{Binding PickNewFolders}"/>
 					<Button Margin="0" Width="150" HorizontalContentAlignment="Center" Command="{Binding ToggleFiltersCommand}">Filters</Button>
 				</MenuItem>
 			</Menu>
-			<ProgressBar Margin="10" IsIndeterminate="True" IsVisible="{Binding #PickRootFolder((vm:PickRootFolderViewModel)DataContext).ShowLoading}"/>
 		</StackPanel>
 		<StackPanel Orientation="Vertical" Grid.Row="1" IsVisible="{Binding ShowFilters}">
 			<!--Filters-->
