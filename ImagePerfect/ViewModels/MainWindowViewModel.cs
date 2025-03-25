@@ -168,6 +168,10 @@ namespace ImagePerfect.ViewModels
                 currentFilter = filters.FolderDescriptionFilter;
                 await RefreshFolders();
             });
+            LoadCurrentDirectoryCommand = ReactiveCommand.Create(async () =>
+            {
+                await LoadCurrentDirectory();
+            });
             //CreateNewFolderCommand = ReactiveCommand.Create(() => { CreateNewFolder(); });
             Initialize();
         }
@@ -245,7 +249,7 @@ namespace ImagePerfect.ViewModels
         public string CurrentDirectory
         {
             get => _currentDirectory;
-            set => _currentDirectory = value;
+            set => this.RaiseAndSetIfChanged(ref _currentDirectory, value);
         }
 
         public string RootFolderLocation
@@ -317,7 +321,16 @@ namespace ImagePerfect.ViewModels
 
         public ReactiveCommand<string, Task> FilterFoldersOnDescriptionCommand { get; }
 
+        public ReactiveCommand<Unit, Task> LoadCurrentDirectoryCommand { get; }
+
         //public ReactiveCommand<Unit, Unit> CreateNewFolderCommand { get; }
+
+        private async Task LoadCurrentDirectory()
+        {
+            currentFilter = filters.None;
+            await RefreshFolders(CurrentDirectory);
+            await RefreshImages(CurrentDirectory);
+        }
         private void ToggleFilters()
         {
             if (ShowFilters)
