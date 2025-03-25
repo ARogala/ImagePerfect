@@ -18,5 +18,6 @@ namespace ImagePerfect.Repository.IRepository
         Task<bool> MoveFolder(string folderMoveSql, string imageMoveSql);
         Task<bool> UpdateFolderTags(Folder folder, string newTag);
         Task<bool> DeleteFolderTag(FolderTag tag);
+        Task<bool> DeleteLibrary();
     }
 }

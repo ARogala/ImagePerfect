@@ -183,5 +183,27 @@ namespace ImagePerfect.Repository
             await _connection.CloseAsync();
             return rowsEffected > 0 ? true : false;
         }
+
+        public async Task<bool> DeleteLibrary()
+        {
+            int rowsEffected = 0;
+            await _connection.OpenAsync();
+            MySqlTransaction txn = await _connection.BeginTransactionAsync();
+            string sql1 = @"DELETE FROM folders WHERE FolderId >= 1";
+            string sql2 = @"ALTER TABLE folders AUTO_INCREMENT = 1";
+            string sql3 = @"ALTER TABLE images AUTO_INCREMENT = 1";
+            string sql4 = @"DELETE FROM tags WHERE TagId >= 1";
+            string sql5 = @"ALTER TABLE tags AUTO_INCREMENT = 1";
+
+            rowsEffected = await _connection.ExecuteAsync(sql1, transaction: txn);
+            await _connection.ExecuteAsync(sql2, transaction: txn);
+            await _connection.ExecuteAsync(sql3, transaction: txn);
+            await _connection.ExecuteAsync(sql4, transaction: txn);
+            await _connection.ExecuteAsync(sql5, transaction: txn);
+
+            await txn.CommitAsync();
+            await _connection.CloseAsync();
+            return rowsEffected > 0 ? true : false;
+        }
     }
 }
