@@ -37,6 +37,7 @@ namespace ImagePerfect.ViewModels
         private List<FolderTag> displayFolderTags = new List<FolderTag>();  
         private List<Image> displayImages = new List<Image>();
         private List<ImageTag> displayImageTags = new List<ImageTag>(); 
+        //pagination
         private int folderPageSize = 4;
         private int _totalFolderPages = 1;
         private int _currentFolderPage = 1;
@@ -44,10 +45,8 @@ namespace ImagePerfect.ViewModels
         private int imagePageSize = 20;
         private int _totalImagePages = 1;
         private int _currentImagePage = 1;
-
         //max value between TotalFolderPages or TotalImagePages
         private int _maxPage = 1;
-
         //max value between CurrentFolderPage or CurrentImagePage
         private int _maxCurrentPage = 1;
 
@@ -65,6 +64,9 @@ namespace ImagePerfect.ViewModels
         private int selectedRatingForFilter = 0;
         private string tagForFilter = string.Empty;
         private string textForFilter = string.Empty;
+
+        //max of 600 min of 300
+        private int _maxImageWidth = 600;
 
         public MainWindowViewModel() { }
         public MainWindowViewModel(IUnitOfWork unitOfWork)
@@ -143,8 +145,7 @@ namespace ImagePerfect.ViewModels
                 currentFilter = filters.ImageRatingFilter;
                 await RefreshImages();
             });
-            FilterFoldersOnRatingCommand = ReactiveCommand.Create(async (decimal rating) =>
-            {
+            FilterFoldersOnRatingCommand = ReactiveCommand.Create(async (decimal rating) => {
                 ResetPagination();
                 selectedRatingForFilter = Decimal.ToInt32(rating);
                 currentFilter = filters.FolderRatingFilter;
@@ -168,9 +169,11 @@ namespace ImagePerfect.ViewModels
                 currentFilter = filters.FolderDescriptionFilter;
                 await RefreshFolders();
             });
-            LoadCurrentDirectoryCommand = ReactiveCommand.Create(async () =>
-            {
+            LoadCurrentDirectoryCommand = ReactiveCommand.Create(async () => {
                 await LoadCurrentDirectory();
+            });
+            PickImageWidthCommand = ReactiveCommand.Create(async (string size) => {
+                await PickImageWidth(size);
             });
             //CreateNewFolderCommand = ReactiveCommand.Create(() => { CreateNewFolder(); });
             Initialize();
@@ -252,6 +255,12 @@ namespace ImagePerfect.ViewModels
             set => this.RaiseAndSetIfChanged(ref _currentDirectory, value);
         }
 
+        public int MaxImageWidth
+        {
+            get => _maxImageWidth;
+            set => this.RaiseAndSetIfChanged(ref _maxImageWidth, value);
+        }
+
         public string RootFolderLocation
         {
             get => _rootFolderLocation;
@@ -323,8 +332,33 @@ namespace ImagePerfect.ViewModels
 
         public ReactiveCommand<Unit, Task> LoadCurrentDirectoryCommand { get; }
 
+        public ReactiveCommand<string, Task> PickImageWidthCommand { get; }
+
         //public ReactiveCommand<Unit, Unit> CreateNewFolderCommand { get; }
 
+        public async Task PickImageWidth(string size)
+        {
+            Debug.WriteLine(size);
+            switch (size)
+            {
+                case "Small":
+                    MaxImageWidth = 300;
+                    break;
+                case "Medium":
+                    MaxImageWidth = 400;
+                    break;
+                case "Large":
+                    MaxImageWidth = 500;
+                    break;
+                case "XLarge":
+                    MaxImageWidth = 550;
+                    break;
+                case "XXLarge":
+                    MaxImageWidth = 600;
+                    break;
+            }
+            //update database
+        }
         private async Task LoadCurrentDirectory()
         {
             currentFilter = filters.None;
