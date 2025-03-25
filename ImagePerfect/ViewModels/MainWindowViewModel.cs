@@ -25,6 +25,7 @@ namespace ImagePerfect.ViewModels
         private readonly FolderMethods _folderMethods;
         private readonly ImageCsvMethods _imageCsvMethods;
         private readonly ImageMethods _imageMethods;
+        private readonly SettingsMethods _settingsMethods;
         private bool _showLoading;
         private bool _showFilters = false;
         private bool _showSettings = false;
@@ -76,6 +77,7 @@ namespace ImagePerfect.ViewModels
             _folderMethods = new FolderMethods(_unitOfWork);
             _imageCsvMethods = new ImageCsvMethods(_unitOfWork);   
             _imageMethods = new ImageMethods(_unitOfWork);
+            _settingsMethods = new SettingsMethods(_unitOfWork);
             _showLoading = false;
 
             NextFolderCommand = ReactiveCommand.Create((FolderViewModel currentFolder) => {
@@ -347,8 +349,7 @@ namespace ImagePerfect.ViewModels
         //public ReactiveCommand<Unit, Unit> CreateNewFolderCommand { get; }
 
         public async Task PickImageWidth(string size)
-        {
-            Debug.WriteLine(size);
+        {           
             switch (size)
             {
                 case "Small":
@@ -368,6 +369,13 @@ namespace ImagePerfect.ViewModels
                     break;
             }
             //update database
+            Settings settings = new() { 
+                SettingsId = 1,
+                MaxImageWidth = MaxImageWidth,
+                FolderPageSize = folderPageSize,
+                ImagePageSize = imagePageSize,
+            };
+            await _settingsMethods.UpdateSettings(settings);
         }
         private async Task LoadCurrentDirectory()
         {
@@ -679,6 +687,13 @@ namespace ImagePerfect.ViewModels
         {
             await GetRootFolder();
             await GetTagsList();
+            await GetSettings();
+        }
+
+        private async Task GetSettings()
+        {
+            Settings settings = await _settingsMethods.GetSettings();
+            MaxImageWidth = settings.MaxImageWidth;
         }
         private async Task GetRootFolder()
         {

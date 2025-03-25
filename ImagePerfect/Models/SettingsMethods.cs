@@ -15,5 +15,15 @@ namespace ImagePerfect.Models
         { 
             _unitOfWork = unitOfWork; 
         }
+
+        public async Task<bool> UpdateSettings(Settings updatedSetting)
+        {
+            return await _unitOfWork.Settings.Update(updatedSetting);
+        }
+
+        public async Task<Settings> GetSettings()
+        {
+            return await _unitOfWork.Settings.GetById(1);
+        }
     }
 }
