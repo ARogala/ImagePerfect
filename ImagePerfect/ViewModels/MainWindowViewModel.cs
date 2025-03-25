@@ -1092,6 +1092,8 @@ namespace ImagePerfect.ViewModels
             //show data scanned success
             if (success)
             {
+                //Update TagsList to show in UI AutoCompleteBox
+                await GetTagsList();
                 //refresh UI
                 await RefreshFolderProps(CurrentDirectory);
             }
