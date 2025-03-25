@@ -12,11 +12,13 @@ namespace ImagePerfect.Repository
 
         public IFolderRepository Folder { get; private set; }
         public IImageRepository Image { get; private set; }
+        public ISettingsRepository Settings { get; private set; }
         public UnitOfWork(MySqlConnection db)
         {
             _connection = db;
             Folder = new FolderRepository(_connection);
             Image = new ImageRepository(_connection);
+            Settings = new SettingsRepository(_connection);
         }
     }
 }
