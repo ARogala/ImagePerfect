@@ -52,7 +52,7 @@ namespace ImagePerfect.Models
 
         public async Task<bool> DeleteAllFolders()
         {
-            return await _unitOfWork.Folder.DeleteAll();
+            return await _unitOfWork.Folder.DeleteLibrary();
         }
 
         public async Task<bool> UpdateFolder(Folder folder)
