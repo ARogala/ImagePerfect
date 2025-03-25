@@ -80,6 +80,21 @@ CREATE TABLE `image_tags_join`(
 
 );
 
+/*
+https://stackoverflow.com/questions/4715183/how-can-i-ensure-that-there-is-one-and-only-one-row-in-db-table
+enum to ensure a single row settings table.
+*/
+CREATE TABLE `settings` (
+	`SettingsId` enum('1') NOT NULL,
+	`MaxImageWidth` int unsigned NOT NULL,
+	`FolderPageSize` int unsigned NOT NULL,
+	`ImagePageSize` int unsigned NOT NULL,
+	PRIMARY KEY (`SettingsId`)
+);
+
+INSERT INTO settings (MaxImageWidth, FolderPageSize, ImagePageSize) VALUES (500, 20, 60); 
+UPDATE settings SET MaxImageWidth = 550 WHERE SettingsId = 1;
+
 /*get all tags for image*/
 SELECT * FROM images 
 JOIN image_tags_join ON image_tags_join.ImageId = images.ImageId
