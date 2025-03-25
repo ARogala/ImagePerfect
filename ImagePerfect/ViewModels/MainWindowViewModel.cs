@@ -27,6 +27,7 @@ namespace ImagePerfect.ViewModels
         private readonly ImageMethods _imageMethods;
         private bool _showLoading;
         private bool _showFilters = false;
+        private bool _showSettings = false;
         private string _currentDirectory;
         private string _rootFolderLocation;
         private string _newFolderName;
@@ -136,6 +137,9 @@ namespace ImagePerfect.ViewModels
 
                 GoToPage(Decimal.ToInt32(pageNumber));
             });
+            ToggleSettingsCommand = ReactiveCommand.Create(() => { 
+                ToggleSettings();
+            });
             ToggleFiltersCommand = ReactiveCommand.Create(() => { 
                 ToggleFilters();
             });
@@ -179,6 +183,11 @@ namespace ImagePerfect.ViewModels
             Initialize();
         }
 
+        public bool ShowSettings
+        {
+            get => _showSettings;
+            set => this.RaiseAndSetIfChanged(ref _showSettings, value);  
+        }
         public bool ShowFilters
         {
             get => _showFilters;
@@ -318,6 +327,7 @@ namespace ImagePerfect.ViewModels
 
         public ReactiveCommand<decimal, Unit> GoToPageCommand { get; }
 
+        public ReactiveCommand<Unit, Unit> ToggleSettingsCommand { get; }
         public ReactiveCommand<Unit, Unit> ToggleFiltersCommand { get; }
 
         public ReactiveCommand<decimal, Task> FilterImagesOnRatingCommand { get; }
@@ -364,6 +374,18 @@ namespace ImagePerfect.ViewModels
             currentFilter = filters.None;
             await RefreshFolders(CurrentDirectory);
             await RefreshImages(CurrentDirectory);
+        }
+
+        private void ToggleSettings()
+        {
+            if (ShowSettings)
+            {
+                ShowSettings = false;
+            }
+            else
+            {
+                ShowSettings = true;
+            }
         }
         private void ToggleFilters()
         {
