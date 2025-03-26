@@ -117,11 +117,22 @@
 				</StackPanel>
 				<StackPanel Grid.Row="0" Grid.Column="2" Width="200">
 					<TextBlock Margin="0 10 0 5">Pick Image Pagination Size</TextBlock>
-					<RadioButton GroupName="PickImagePaginationSize" x:Name="ImagePagination20" Content="20"/>
-					<RadioButton GroupName="PickImagePaginationSize" x:Name="ImagePagination40" Content="40"/>
-					<RadioButton GroupName="PickImagePaginationSize" x:Name="ImagePagination60" Content="60"/>
-					<RadioButton GroupName="PickImagePaginationSize" x:Name="ImagePagination80" Content="80"/>
-					<RadioButton GroupName="PickImagePaginationSize" x:Name="ImagePagination100" Content="100"/>
+					<TextBlock Margin="0 10 0 5" Text="{Binding ImagePageSize}"/>
+					<RadioButton GroupName="PickImagePaginationSize" x:Name="ImagePagination20" Content="20"
+								 Command="{Binding PickImagePageSizeCommand}"
+								 CommandParameter="{Binding #ImagePagination20.Content}"/>
+					<RadioButton GroupName="PickImagePaginationSize" x:Name="ImagePagination40" Content="40"
+								 Command="{Binding PickImagePageSizeCommand}"
+								 CommandParameter="{Binding #ImagePagination40.Content}"/>
+					<RadioButton GroupName="PickImagePaginationSize" x:Name="ImagePagination60" Content="60"
+								 Command="{Binding PickImagePageSizeCommand}"
+								 CommandParameter="{Binding #ImagePagination60.Content}"/>
+					<RadioButton GroupName="PickImagePaginationSize" x:Name="ImagePagination80" Content="80"
+								 Command="{Binding PickImagePageSizeCommand}"
+								 CommandParameter="{Binding #ImagePagination80.Content}"/>
+					<RadioButton GroupName="PickImagePaginationSize" x:Name="ImagePagination100" Content="100"
+								 Command="{Binding PickImagePageSizeCommand}"
+								 CommandParameter="{Binding #ImagePagination100.Content}"/>
 				</StackPanel>
 			</Grid>
 		</StackPanel>
