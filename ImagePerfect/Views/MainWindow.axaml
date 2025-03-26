@@ -98,11 +98,22 @@
 				</StackPanel>
 				<StackPanel Grid.Row="0" Grid.Column="1" Width="200">
 					<TextBlock Margin="0 10 0 5">Pick Folder Pagination Size</TextBlock>
-					<RadioButton GroupName="PickFolderPaginationSize" x:Name="FolderPagination20" Content="20"/>
-					<RadioButton GroupName="PickFolderPaginationSize" x:Name="FolderPagination40" Content="40"/>
-					<RadioButton GroupName="PickFolderPaginationSize" x:Name="FolderPagination60" Content="60"/>
-					<RadioButton GroupName="PickFolderPaginationSize" x:Name="FolderPagination80" Content="80"/>
-					<RadioButton GroupName="PickFolderPaginationSize" x:Name="FolderPagination100" Content="100"/>
+					<TextBlock Margin="0 10 0 5" Text="{Binding FolderPageSize}"/>
+					<RadioButton GroupName="PickFolderPaginationSize" x:Name="FolderPagination20" Content="20"
+								 Command="{Binding PickFolderPageSizeCommand}"
+								 CommandParameter="{Binding #FolderPagination20.Content}"/>
+					<RadioButton GroupName="PickFolderPaginationSize" x:Name="FolderPagination40" Content="40"
+								 Command="{Binding PickFolderPageSizeCommand}"
+								 CommandParameter="{Binding #FolderPagination40.Content}"/>
+					<RadioButton GroupName="PickFolderPaginationSize" x:Name="FolderPagination60" Content="60"
+								 Command="{Binding PickFolderPageSizeCommand}"
+								 CommandParameter="{Binding #FolderPagination60.Content}"/>
+					<RadioButton GroupName="PickFolderPaginationSize" x:Name="FolderPagination80" Content="80"
+								 Command="{Binding PickFolderPageSizeCommand}"
+								 CommandParameter="{Binding #FolderPagination80.Content}"/>
+					<RadioButton GroupName="PickFolderPaginationSize" x:Name="FolderPagination100" Content="100"
+								 Command="{Binding PickFolderPageSizeCommand}"
+								 CommandParameter="{Binding #FolderPagination100.Content}"/>
 				</StackPanel>
 				<StackPanel Grid.Row="0" Grid.Column="2" Width="200">
 					<TextBlock Margin="0 10 0 5">Pick Image Pagination Size</TextBlock>
