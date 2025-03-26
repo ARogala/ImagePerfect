@@ -44,7 +44,7 @@ namespace ImagePerfect.ViewModels
         private int _totalFolderPages = 1;
         private int _currentFolderPage = 1;
 
-        private int imagePageSize = 20;
+        private int _imagePageSize = 20;
         private int _totalImagePages = 1;
         private int _currentImagePage = 1;
         //max value between TotalFolderPages or TotalImagePages
@@ -184,6 +184,9 @@ namespace ImagePerfect.ViewModels
             PickFolderPageSizeCommand = ReactiveCommand.Create(async (string size) => { 
                 await PickFolderPageSize(size);
             });
+            PickImagePageSizeCommand = ReactiveCommand.Create(async (string size) => { 
+                await PickImagePageSize(size);
+            });
             //CreateNewFolderCommand = ReactiveCommand.Create(() => { CreateNewFolder(); });
             Initialize();
         }
@@ -218,6 +221,12 @@ namespace ImagePerfect.ViewModels
         {
             get => _currentImagePage;
             set => this.RaiseAndSetIfChanged(ref _currentImagePage, value);
+        }
+
+        public int ImagePageSize
+        {
+            get => _imagePageSize;
+            set => this.RaiseAndSetIfChanged(ref _imagePageSize, value);
         }
 
         public int FolderPageSize
@@ -357,6 +366,8 @@ namespace ImagePerfect.ViewModels
 
         public ReactiveCommand<string, Task> PickFolderPageSizeCommand { get; }
 
+        public ReactiveCommand<string, Task> PickImagePageSizeCommand { get; }
+
         //public ReactiveCommand<Unit, Unit> CreateNewFolderCommand { get; }
 
         private async Task UpdateSettings()
@@ -367,9 +378,35 @@ namespace ImagePerfect.ViewModels
                 SettingsId = 1,
                 MaxImageWidth = MaxImageWidth,
                 FolderPageSize = FolderPageSize,
-                ImagePageSize = imagePageSize,
+                ImagePageSize = ImagePageSize,
             };
             await _settingsMethods.UpdateSettings(settings);
+        }
+
+        private async Task PickImagePageSize(string size)
+        {
+            switch (size)
+            {
+                case "20":
+                    ImagePageSize = 20;
+                    break;
+                case "40":
+                    ImagePageSize = 40;
+                    break;
+                case "60":
+                    ImagePageSize = 60;
+                    break;
+                case "80":
+                    ImagePageSize = 80;
+                    break;
+                case "100":
+                    ImagePageSize = 100;
+                    break;
+            }
+            await UpdateSettings();
+            ResetPagination();
+            await RefreshFolders();
+            await RefreshImages(CurrentDirectory);
         }
         private async Task PickFolderPageSize(string size)
         {
@@ -394,6 +431,7 @@ namespace ImagePerfect.ViewModels
             await UpdateSettings();
             ResetPagination();
             await RefreshFolders();
+            await RefreshImages(CurrentDirectory);
         }
         private async Task PickImageWidth(string size)
         {           
@@ -449,19 +487,19 @@ namespace ImagePerfect.ViewModels
         private List<Image> ImagePagination()
         {
             //same as FolderPagination
-            int offset = imagePageSize * (CurrentImagePage -1);
+            int offset = ImagePageSize * (CurrentImagePage -1);
             int totalImageCount = displayImages.Count;
-            if(totalImageCount == 0 || totalImageCount <= imagePageSize)
+            if(totalImageCount == 0 || totalImageCount <= ImagePageSize)
                 return displayImages;
-            TotalImagePages = (int)Math.Ceiling(totalImageCount / (double)imagePageSize);
+            TotalImagePages = (int)Math.Ceiling(totalImageCount / (double)ImagePageSize);
             List<Image> displayImagesTemp;
             if(CurrentImagePage == TotalImagePages)
             {
-                displayImagesTemp = displayImages.GetRange(offset, (totalImageCount - (TotalImagePages - 1)*imagePageSize));
+                displayImagesTemp = displayImages.GetRange(offset, (totalImageCount - (TotalImagePages - 1)*ImagePageSize));
             }
             else
             {
-                displayImagesTemp = displayImages.GetRange(offset, imagePageSize);
+                displayImagesTemp = displayImages.GetRange(offset, ImagePageSize);
             }
             MaxPage = Math.Max(TotalImagePages, TotalFolderPages);
             MaxCurrentPage = Math.Max(CurrentImagePage, CurrentFolderPage);
@@ -735,6 +773,7 @@ namespace ImagePerfect.ViewModels
             Settings settings = await _settingsMethods.GetSettings();
             MaxImageWidth = settings.MaxImageWidth;
             FolderPageSize = settings.FolderPageSize;
+            ImagePageSize = settings.ImagePageSize;
         }
         private async Task GetRootFolder()
         {
