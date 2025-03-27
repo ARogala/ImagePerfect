@@ -1,3 +1,7 @@
+/*
+ubuntu mysql user is imageperfect with the same pw thats in settings for windows
+*/
+
 CREATE DATABASE imageperfect;
 /*
 PARENT table

@@ -13,22 +13,46 @@ namespace ImagePerfect.Helpers
     //this whole class will need platform specific code to handle file paths. Linux vs Windows paths will be different
     public static class PathHelper
     {
+        private static string pathSlash = string.Empty;
+
+        private static string getPathSlash()
+        {
+            #if WINDOWS
+            pathSlash = @"\";
+            #else
+            pathSlash = @"/";
+            #endif
+            return pathSlash;
+        }
+        
         //regular expression string used in sql with REGEXP_LIKE to get all folders in directory (NOT Their sub folders)
         //Only gets the folders in the path -- the folder itself or any sub directories within each folder are not returned
         public static string GetRegExpStringAllFoldersInDirectory(string path)
         {
+            #if WINDOWS
             return path.Replace(@"\", @"\\\\") + @"\\\\[^\\\\]+\\\\?$";
+            #else
+            return path + @"/[^/]+/?$";
+            #endif
         }
         //regexp string to get folder and all subfolders
         //gets the folder itself as well as all folders and subfolders within. 
         //the entire directory tree of the path
         public static string GetRegExpStringDirectoryTree(string path)
         {
+            #if WINDOWS
             return path.Replace(@"\",@"\\\\");
+            #else
+            return path;
+            #endif
         }
         public static string AddNewFolderNameToPathForDirectoryMoveFolder(string newFolderPath, string newFolderName)
         {
+            #if WINDOWS
             return newFolderPath + @"\" + newFolderName;
+            #else
+            return newFolderPath + @"/" + newFolderName;
+            #endif
         }
         /*
             say for example you want to move C:\Users\arogala\Documents\CSharp\SamplePictures\space 
@@ -43,15 +67,15 @@ namespace ImagePerfect.Helpers
          */
         public static List<Folder> ModifyFolderPathsForFolderMove(List<Folder> folders, string currentFolderName, string moveToFolderPath)
         {
-            for(int i = 0; i < folders.Count; i++) 
-            { 
+            for(int i = 0; i < folders.Count; i++)
+            {
                 string newPath = string.Empty;
                 string newCoverImagePath = string.Empty;
-                newPath = moveToFolderPath + @"\" + ReturnPartialPath(folders[i].FolderPath, currentFolderName);
+                newPath = moveToFolderPath + getPathSlash() + ReturnPartialPath(folders[i].FolderPath, currentFolderName);
                 folders[i].FolderPath = newPath;
                 if (folders[i].CoverImagePath != "")
                 {
-                    newCoverImagePath = moveToFolderPath + @"\" + ReturnPartialPath(folders[i].CoverImagePath, currentFolderName);
+                    newCoverImagePath = moveToFolderPath + getPathSlash() + ReturnPartialPath(folders[i].CoverImagePath, currentFolderName);
                     folders[i].CoverImagePath = newCoverImagePath;
                 }
                 
@@ -65,8 +89,8 @@ namespace ImagePerfect.Helpers
             {
                 string newPath = string.Empty;
                 string newImageFolderPath = string.Empty;
-                newPath = moveToFolderPath + @"\" + ReturnPartialPath(images[i].ImagePath, currentFolderName);
-                newImageFolderPath = moveToFolderPath + @"\" + ReturnPartialPath(images[i].ImageFolderPath, currentFolderName);
+                newPath = moveToFolderPath + getPathSlash() + ReturnPartialPath(images[i].ImagePath, currentFolderName);
+                newImageFolderPath = moveToFolderPath + getPathSlash() + ReturnPartialPath(images[i].ImageFolderPath, currentFolderName);
                 images[i].ImagePath = newPath;
                 images[i].ImageFolderPath = newImageFolderPath;
             }
@@ -84,13 +108,13 @@ namespace ImagePerfect.Helpers
 
         public static string RemoveOneFolderFromPath(string path)
         {
-            string[] strArray = path.Split(@"\");
+            string[] strArray = path.Split(getPathSlash());
             string newPath = string.Empty;
             for (int i = 0; i < strArray.Length - 1; i++)
             {
                 if (i < strArray.Length - 2)
                 {
-                    newPath = newPath + strArray[i] + @"\";
+                    newPath = newPath + strArray[i] + getPathSlash();
                 }
                 else
                 {
@@ -102,13 +126,13 @@ namespace ImagePerfect.Helpers
 
         public static string RemoveTwoFoldersFromPath(string path)
         {
-            string[] strArray = path.Split(@"\");
+            string[] strArray = path.Split(getPathSlash());
             string newPath = string.Empty;
             for (int i = 0; i < strArray.Length - 2; i++)
             {
                 if (i < strArray.Length - 3)
                 {
-                    newPath = newPath + strArray[i] + @"\";
+                    newPath = newPath + strArray[i] + getPathSlash();
                 }
                 else
                 {
@@ -120,21 +144,33 @@ namespace ImagePerfect.Helpers
 
         public static string FormatPathForDbStorage(string path)
         {
+            #if WINDOWS
             return path.Replace(@"\", @"\\");
+            #else
+            return path;
+            #endif
         }
 
         public static string FormatPathFromFolderPicker(string path)
         {
             path = path.Replace(@"file:///", "");
             path = path.Remove(path.Length - 1);
+            #if WINDOWS
             path = path.Replace(@"/", @"\");
+            #else
+            path = getPathSlash() + path;
+            #endif
             return path;
         }
 
         public static string FormatPathFromFilePicker(string path)
         {
             path = path.Replace(@"file:///", "");
+            #if WINDOWS
             path = path.Replace(@"/", @"\");
+            #else
+            path = getPathSlash() + path;
+            #endif
             return path;
         }
 
@@ -154,25 +190,25 @@ namespace ImagePerfect.Helpers
 
         public static string GetTrashFolderPath(string rootFolderPath)
         {
-            return rootFolderPath + @"\" + "ImagePerfectTRASH";
+            return rootFolderPath + getPathSlash() + "ImagePerfectTRASH";
         }
         public static string GetImageFileTrashPath(ImageViewModel imageVm, string trashFolderPath)
         {
             //add a guid to guarantee no image in trash has the same name
             Guid g = Guid.NewGuid();
-            return trashFolderPath + @"\" + g + imageVm.FileName;
+            return trashFolderPath + getPathSlash() + g + imageVm.FileName;
         }
 
         public static string GetFolderTrashPath(FolderViewModel folderVm, string trashFolderPath)
         {
             //add a guid to guarantee no folder in trash has the same name
             Guid g = Guid.NewGuid();
-            return trashFolderPath + @"\" + g + folderVm.FolderName;
+            return trashFolderPath + getPathSlash() + g + folderVm.FolderName;
         }
 
         public static string GetNewFolderPath(string currentDirectory, string newFolderName)
         {
-            return currentDirectory + @"\" + newFolderName;
+            return currentDirectory + getPathSlash() + newFolderName;
         }
     }
 }
