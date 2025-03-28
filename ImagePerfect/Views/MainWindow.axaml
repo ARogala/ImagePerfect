@@ -151,8 +151,15 @@
 			</Grid>
 		</StackPanel>
 		<StackPanel Grid.Row="3">
-			<Grid RowDefinitions="Auto" ColumnDefinitions="*" Margin="0 10 0 15">
-				<TextBlock Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" Text="{Binding CurrentDirectory}"/>
+			<Grid RowDefinitions="Auto" ColumnDefinitions="*" Margin="0 10 0 15" HorizontalAlignment="Center">
+				<StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0">
+					<TextBlock Margin="5">Current Directory:</TextBlock>
+					<TextBlock Margin="5" Text="{Binding CurrentDirectory}"/>
+					<Button Margin="10 0 10 0" Command="{Binding OpenCurrentDirectoryWithExplorerCommand}">
+						Open Current Directory
+					</Button>
+				</StackPanel>
+				
 			</Grid>
 		</StackPanel>
 		<!--

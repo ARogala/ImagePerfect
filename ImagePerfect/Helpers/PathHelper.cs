@@ -193,6 +193,16 @@ namespace ImagePerfect.Helpers
             #endif
         }
 
+        //this needs obvious improvement -- maybe have user select path and store in db. 
+        public static string GetExternalFileExplorerExePath()
+        {
+            #if WINDOWS
+            return @"C:\Windows\explorer.exe";
+            #else
+            return @"/usr/bin/nautilus";
+            #endif
+        }
+
         public static string FormatImageFilePathForProcessStart(string imagePath)
         {
             //https://stackoverflow.com/questions/1857325/c-sharp-easiest-way-to-parse-filename-with-spaces-eg-c-test-file-with-space
