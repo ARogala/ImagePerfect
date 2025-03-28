@@ -59,6 +59,7 @@ namespace ImagePerfect.Helpers
                     //set stream to begining after writing
                     ms.Seek(0, SeekOrigin.Begin);
                     Bitmap img = new Bitmap(ms);
+                    ms.Close();
                     return img;
                 }
             }
