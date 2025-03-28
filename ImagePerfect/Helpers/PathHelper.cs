@@ -177,7 +177,11 @@ namespace ImagePerfect.Helpers
         //this needs obvious improvement -- maybe have user select path and store in db. 
         public static string GetExternalImageViewerExePath()
         {
+            #if WINDOWS 
             return @"C:\Program Files\nomacs\bin\nomacs.exe";
+            #else
+            return @"/usr/bin/eog";
+            #endif
         }
 
         public static string FormatImageFilePathForProcessStart(string imagePath)
