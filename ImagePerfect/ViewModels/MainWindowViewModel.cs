@@ -402,6 +402,18 @@ namespace ImagePerfect.ViewModels
                 case "100":
                     ImagePageSize = 100;
                     break;
+                case "125":
+                    ImagePageSize = 125;
+                    break;
+                case "150":
+                    ImagePageSize = 150;
+                    break;
+                case "175":
+                    ImagePageSize = 175;
+                    break;
+                case "200":
+                    ImagePageSize = 200;
+                    break;
             }
             await UpdateSettings();
             ResetPagination();

@@ -133,6 +133,18 @@
 					<RadioButton GroupName="PickImagePaginationSize" x:Name="ImagePagination100" Content="100"
 								 Command="{Binding PickImagePageSizeCommand}"
 								 CommandParameter="{Binding #ImagePagination100.Content}"/>
+					<RadioButton GroupName="PickImagePaginationSize" x:Name="ImagePagination125" Content="125"
+								 Command="{Binding PickImagePageSizeCommand}"
+								 CommandParameter="{Binding #ImagePagination125.Content}"/>
+					<RadioButton GroupName="PickImagePaginationSize" x:Name="ImagePagination150" Content="150"
+								 Command="{Binding PickImagePageSizeCommand}"
+								 CommandParameter="{Binding #ImagePagination150.Content}"/>
+					<RadioButton GroupName="PickImagePaginationSize" x:Name="ImagePagination175" Content="175"
+								 Command="{Binding PickImagePageSizeCommand}"
+								 CommandParameter="{Binding #ImagePagination175.Content}"/>
+					<RadioButton GroupName="PickImagePaginationSize" x:Name="ImagePagination200" Content="200"
+								 Command="{Binding PickImagePageSizeCommand}"
+								 CommandParameter="{Binding #ImagePagination200.Content}"/>
 				</StackPanel>
 			</Grid>
 		</StackPanel>
