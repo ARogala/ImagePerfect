@@ -121,6 +121,9 @@ namespace ImagePerfect.ViewModels
             OpenImageInExternalViewerCommand = ReactiveCommand.Create((ImageViewModel imageVm) => { 
                 OpenImageInExternalViewer(imageVm);
             });
+            OpenCurrentDirectoryWithExplorerCommand = ReactiveCommand.Create(() => { 
+                OpenCurrentDirectoryWithExplorer();
+            });
             MoveImageToTrashCommand = ReactiveCommand.Create((ImageViewModel imageVm) => { 
                 MoveImageToTrash(imageVm);
             });
@@ -341,6 +344,8 @@ namespace ImagePerfect.ViewModels
         public ReactiveCommand<Unit, Unit> DeleteLibraryCommand { get; }
 
         public ReactiveCommand<ImageViewModel, Unit> OpenImageInExternalViewerCommand { get; }
+
+        public ReactiveCommand<Unit, Unit> OpenCurrentDirectoryWithExplorerCommand { get; }
 
         public ReactiveCommand<ImageViewModel, Unit> MoveImageToTrashCommand { get; }
 
@@ -1121,6 +1126,22 @@ namespace ImagePerfect.ViewModels
             else
             {
                 var box = MessageBoxManager.GetMessageBoxStandard("Open Image", "You need to install nomacs.", ButtonEnum.Ok);
+                await box.ShowAsync();
+                return;
+            }
+        }
+
+        private async void OpenCurrentDirectoryWithExplorer()
+        {
+            string externalFileExplorerExePath = PathHelper.GetExternalFileExplorerExePath();
+            string folderPathForProcessStart = PathHelper.FormatImageFilePathForProcessStart(CurrentDirectory); //not an image path but all this did was wrap it in quotes
+            if (File.Exists(externalFileExplorerExePath) && Directory.Exists(CurrentDirectory))
+            {
+                Process.Start(externalFileExplorerExePath, folderPathForProcessStart);
+            }
+            else
+            {
+                var box = MessageBoxManager.GetMessageBoxStandard("Open Folder", "Sorry something went wrong.", ButtonEnum.Ok);
                 await box.ShowAsync();
                 return;
             }
