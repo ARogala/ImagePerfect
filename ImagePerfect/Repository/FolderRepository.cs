@@ -72,50 +72,91 @@ namespace ImagePerfect.Repository
             return (folders,tags);
         }
 
-        public async Task<(List<Folder> folders, List<FolderTag> tags)> GetAllFoldersAtRating(int rating)
+        public async Task<(List<Folder> folders, List<FolderTag> tags)> GetAllFoldersAtRating(int rating, bool filterInCurrentDirectory, string currentDirectory)
         {
             await _connection.OpenAsync();
             MySqlTransaction txn = await _connection.BeginTransactionAsync();
-
-            string sql1 = @"SELECT * FROM folders WHERE FolderRating = @rating ORDER BY FolderName";
-            List<Folder> allFoldersAtRating = (List<Folder>)await _connection.QueryAsync<Folder>(sql1, new { rating }, transaction: txn);
-            string sql2 = @"SELECT tags.TagId, tags.TagName, folders.FolderId FROM folders 
+            string path = PathHelper.FormatPathForLikeOperator(currentDirectory);
+            string sql1 = string.Empty;
+            string sql2 = string.Empty;
+            if (filterInCurrentDirectory)
+            {
+                sql1 = @"SELECT * FROM folders WHERE FolderRating = @rating AND FolderPath LIKE '" + path + "' ORDER BY FolderName";
+                sql2 = @"SELECT tags.TagId, tags.TagName, folders.FolderId FROM folders 
+                            JOIN folder_tags_join ON folder_tags_join.FolderId = folders.FolderId 
+                            JOIN tags ON folder_tags_join.TagId = tags.TagId WHERE folders.FolderRating = @rating AND FolderPath LIKE '" + path + "' ORDER BY folders.FolderName;";
+            }
+            else
+            {
+                sql1 = @"SELECT * FROM folders WHERE FolderRating = @rating ORDER BY FolderName";
+                sql2 = @"SELECT tags.TagId, tags.TagName, folders.FolderId FROM folders 
                             JOIN folder_tags_join ON folder_tags_join.FolderId = folders.FolderId 
                             JOIN tags ON folder_tags_join.TagId = tags.TagId WHERE folders.FolderRating = @rating ORDER BY folders.FolderName;";
+            }
+            
+            List<Folder> allFoldersAtRating = (List<Folder>)await _connection.QueryAsync<Folder>(sql1, new { rating }, transaction: txn);
             List<FolderTag> tags = (List<FolderTag>)await _connection.QueryAsync<FolderTag>(sql2, new { rating }, transaction: txn);
             await txn.CommitAsync();
             await _connection.CloseAsync();
             return (allFoldersAtRating,tags);
         }
 
-        public async Task<(List<Folder> folders, List<FolderTag> tags)> GetAllFoldersWithTag(string tag)
+        public async Task<(List<Folder> folders, List<FolderTag> tags)> GetAllFoldersWithTag(string tag, bool filterInCurrentDirectory, string currentDirectory)
         {
             await _connection.OpenAsync();
             MySqlTransaction txn = await _connection.BeginTransactionAsync();
-
-            string sql1 = @"SELECT * FROM folders
+            string path = PathHelper.FormatPathForLikeOperator(currentDirectory);
+            string sql1 = string.Empty;
+            string sql2 = string.Empty;
+            if (filterInCurrentDirectory) 
+            {
+                sql1 = @"SELECT * FROM folders
+                            JOIN folder_tags_join ON folder_tags_join.FolderId = folders.FolderId
+                            JOIN tags ON folder_tags_join.TagId = tags.TagId WHERE tags.TagName = @tag AND FolderPath LIKE '" + path + "' ORDER BY folders.FolderName;";
+                sql2 = @"SELECT tags.TagId, tags.TagName, folders.FolderId FROM folders
+                            JOIN folder_tags_join ON folder_tags_join.FolderId = folders.FolderId
+                            JOIN tags ON folder_tags_join.TagId = tags.TagId WHERE FolderPath LIKE '" + path + "' ORDER BY folders.FolderName;";
+            }
+            else
+            {
+                sql1 = @"SELECT * FROM folders
                             JOIN folder_tags_join ON folder_tags_join.FolderId = folders.FolderId
                             JOIN tags ON folder_tags_join.TagId = tags.TagId WHERE tags.TagName = @tag ORDER BY folders.FolderName;";
-            List<Folder> allFoldersWithTag = (List<Folder>)await _connection.QueryAsync<Folder>(sql1, new { tag }, transaction: txn);
-            string sql2 = @"SELECT tags.TagId, tags.TagName, folders.FolderId FROM folders
+                sql2 = @"SELECT tags.TagId, tags.TagName, folders.FolderId FROM folders
                             JOIN folder_tags_join ON folder_tags_join.FolderId = folders.FolderId
                             JOIN tags ON folder_tags_join.TagId = tags.TagId ORDER BY folders.FolderName;";
+            }
+            
+            List<Folder> allFoldersWithTag = (List<Folder>)await _connection.QueryAsync<Folder>(sql1, new { tag }, transaction: txn);
             List<FolderTag> tags = (List<FolderTag>)await _connection.QueryAsync<FolderTag>(sql2, new { tag }, transaction: txn);
             await txn.CommitAsync();
             await _connection.CloseAsync();
             return (allFoldersWithTag, tags);
         }
 
-        public async Task<(List<Folder> folders, List<FolderTag> tags)> GetAllFoldersWithDescriptionText(string text)
+        public async Task<(List<Folder> folders, List<FolderTag> tags)> GetAllFoldersWithDescriptionText(string text, bool filterInCurrentDirectory, string currentDirectory)
         {
             await _connection.OpenAsync();
             MySqlTransaction txn = await _connection.BeginTransactionAsync();
-
-            string sql1 = @"SELECT * FROM folders WHERE MATCH(FolderName, FolderPath, FolderDescription) AGAINST(@text) ORDER BY FolderName";
-            List<Folder> allFoldersWithDescriptionText = (List<Folder>)await _connection.QueryAsync<Folder>(sql1, new { text }, transaction: txn);
-            string sql2 = @"SELECT tags.TagId, tags.TagName, folders.FolderId FROM folders
+            string path = PathHelper.FormatPathForLikeOperator(currentDirectory);
+            string sql1 = string.Empty;
+            string sql2 = string.Empty;
+            if (filterInCurrentDirectory)
+            {
+                sql1 = @"SELECT * FROM folders WHERE MATCH(FolderName, FolderPath, FolderDescription) AGAINST(@text) AND FolderPath LIKE '" + path + "' ORDER BY FolderName";
+                sql2 = @"SELECT tags.TagId, tags.TagName, folders.FolderId FROM folders
+                            JOIN folder_tags_join ON folder_tags_join.FolderId = folders.FolderId
+                            JOIN tags ON folder_tags_join.TagId = tags.TagId WHERE FolderPath LIKE '" + path + "' ORDER BY folders.FolderName;";
+            }
+            else 
+            {
+                sql1 = @"SELECT * FROM folders WHERE MATCH(FolderName, FolderPath, FolderDescription) AGAINST(@text) ORDER BY FolderName";
+                sql2 = @"SELECT tags.TagId, tags.TagName, folders.FolderId FROM folders
                             JOIN folder_tags_join ON folder_tags_join.FolderId = folders.FolderId
                             JOIN tags ON folder_tags_join.TagId = tags.TagId ORDER BY folders.FolderName;";
+            }
+            
+            List<Folder> allFoldersWithDescriptionText = (List<Folder>)await _connection.QueryAsync<Folder>(sql1, new { text }, transaction: txn);
             List<FolderTag> tags = (List<FolderTag>)await _connection.QueryAsync<FolderTag>(sql2, transaction: txn);
             await txn.CommitAsync();
             await _connection.CloseAsync();

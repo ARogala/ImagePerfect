@@ -25,6 +25,15 @@ namespace ImagePerfect.Helpers
             return pathSlash;
         }
         
+        public static string FormatPathForLikeOperator(string path)
+        {
+            #if WINDOWS
+            return path.Replace(@"\", @"\\\\") + @"%";
+            #else
+            return path + @"%";
+            #endif
+        }
+
         //regular expression string used in sql with REGEXP_LIKE to get all folders in directory (NOT Their sub folders)
         //Only gets the folders in the path -- the folder itself or any sub directories within each folder are not returned
         public static string GetRegExpStringAllFoldersInDirectory(string path)

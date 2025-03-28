@@ -30,6 +30,7 @@ namespace ImagePerfect.ViewModels
         private bool _showFilters = false;
         private bool _showSettings = false;
         private string _currentDirectory;
+        private bool _filterInCurrentDirectory = false;
         private string _rootFolderLocation;
         private string _newFolderName;
         private bool _isNewFolderEnabled;
@@ -282,6 +283,12 @@ namespace ImagePerfect.ViewModels
         {
             get => _currentDirectory;
             set => this.RaiseAndSetIfChanged(ref _currentDirectory, value);
+        }
+
+        public bool FilterInCurrentDirectory
+        {
+            get => _filterInCurrentDirectory;
+            set => this.RaiseAndSetIfChanged(ref _filterInCurrentDirectory, value);
         }
 
         public int MaxImageWidth
@@ -592,7 +599,7 @@ namespace ImagePerfect.ViewModels
                     await MapTagsToFoldersAddToObservable();
                     break;
                 case filters.FolderRatingFilter:
-                    (List<Folder> folders, List<FolderTag> tags) folderRatingResult = await _folderMethods.GetAllFoldersAtRating(selectedRatingForFilter);
+                    (List<Folder> folders, List<FolderTag> tags) folderRatingResult = await _folderMethods.GetAllFoldersAtRating(selectedRatingForFilter, FilterInCurrentDirectory, CurrentDirectory);
                     displayFolders = folderRatingResult.folders;
                     displayFolderTags = folderRatingResult.tags;
 
@@ -602,7 +609,7 @@ namespace ImagePerfect.ViewModels
                     await MapTagsToFoldersAddToObservable();
                     break;
                 case filters.FolderTagFilter:
-                    (List<Folder> folders, List<FolderTag> tags) folderTagResult = await _folderMethods.GetAllFoldersWithTag(tagForFilter);
+                    (List<Folder> folders, List<FolderTag> tags) folderTagResult = await _folderMethods.GetAllFoldersWithTag(tagForFilter, FilterInCurrentDirectory, CurrentDirectory);
                     displayFolders = folderTagResult.folders;
                     displayFolderTags = folderTagResult.tags;
 
@@ -612,7 +619,7 @@ namespace ImagePerfect.ViewModels
                     await MapTagsToFoldersAddToObservable();
                     break;
                 case filters.FolderDescriptionFilter:
-                    (List<Folder> folders, List<FolderTag> tags) folderDescriptionResult = await _folderMethods.GetAllFoldersWithDescriptionText(textForFilter);
+                    (List<Folder> folders, List<FolderTag> tags) folderDescriptionResult = await _folderMethods.GetAllFoldersWithDescriptionText(textForFilter, FilterInCurrentDirectory, CurrentDirectory);
                     displayFolders = folderDescriptionResult.folders;
                     displayFolderTags = folderDescriptionResult.tags;
 
@@ -651,21 +658,21 @@ namespace ImagePerfect.ViewModels
                     await MapTagsToFoldersUpdateObservable();
                     break;
                 case filters.FolderRatingFilter:
-                    (List<Folder> folders, List<FolderTag> tags) folderRatingResult = await _folderMethods.GetAllFoldersAtRating(selectedRatingForFilter);
+                    (List<Folder> folders, List<FolderTag> tags) folderRatingResult = await _folderMethods.GetAllFoldersAtRating(selectedRatingForFilter, FilterInCurrentDirectory, CurrentDirectory);
                     displayFolders = folderRatingResult.folders;
                     displayFolderTags = folderRatingResult.tags;
                     displayFolders = FolderPagination();
                     await MapTagsToFoldersUpdateObservable();
                     break;
                 case filters.FolderTagFilter:
-                    (List<Folder> folders, List<FolderTag> tags) folderTagResult = await _folderMethods.GetAllFoldersWithTag(tagForFilter);
+                    (List<Folder> folders, List<FolderTag> tags) folderTagResult = await _folderMethods.GetAllFoldersWithTag(tagForFilter, FilterInCurrentDirectory, CurrentDirectory);
                     displayFolders = folderTagResult.folders;
                     displayFolderTags = folderTagResult.tags;
                     displayFolders = FolderPagination();
                     await MapTagsToFoldersUpdateObservable();
                     break;
                 case filters.FolderDescriptionFilter:
-                    (List<Folder> folders, List<FolderTag> tags) folderDescriptionResult = await _folderMethods.GetAllFoldersWithDescriptionText(textForFilter);
+                    (List<Folder> folders, List<FolderTag> tags) folderDescriptionResult = await _folderMethods.GetAllFoldersWithDescriptionText(textForFilter, FilterInCurrentDirectory, CurrentDirectory);
                     displayFolders = folderDescriptionResult.folders;
                     displayFolderTags = folderDescriptionResult.tags;
                     displayFolders = FolderPagination();
@@ -706,7 +713,7 @@ namespace ImagePerfect.ViewModels
                     await MapTagsToImagesAddToObservable();
                     break;
                 case filters.ImageRatingFilter:
-                    (List<Image> images, List<ImageTag> tags) imageRatingResult = await _imageMethods.GetAllImagesAtRating(selectedRatingForFilter);
+                    (List<Image> images, List<ImageTag> tags) imageRatingResult = await _imageMethods.GetAllImagesAtRating(selectedRatingForFilter, FilterInCurrentDirectory, CurrentDirectory);
                     displayImages = imageRatingResult.images;
                     displayImageTags = imageRatingResult.tags;
 
@@ -716,7 +723,7 @@ namespace ImagePerfect.ViewModels
                     await MapTagsToImagesAddToObservable();
                     break;
                 case filters.ImageTagFilter:
-                    (List<Image> images, List<ImageTag> tags) imageTagResult = await _imageMethods.GetAllImagesWithTag(tagForFilter);
+                    (List<Image> images, List<ImageTag> tags) imageTagResult = await _imageMethods.GetAllImagesWithTag(tagForFilter, FilterInCurrentDirectory, CurrentDirectory);
                     displayImages = imageTagResult.images;
                     displayImageTags = imageTagResult.tags;
 
@@ -758,14 +765,14 @@ namespace ImagePerfect.ViewModels
                     await MapTagsToImagesUpdateObservable();
                     break;
                 case filters.ImageRatingFilter:
-                    (List<Image> images, List<ImageTag> tags) imageRatingResult = await _imageMethods.GetAllImagesAtRating(selectedRatingForFilter);
+                    (List<Image> images, List<ImageTag> tags) imageRatingResult = await _imageMethods.GetAllImagesAtRating(selectedRatingForFilter, FilterInCurrentDirectory, CurrentDirectory);
                     displayImages = imageRatingResult.images;
                     displayImageTags = imageRatingResult.tags;
                     displayImages = ImagePagination();
                     await MapTagsToImagesUpdateObservable();
                     break;
                 case filters.ImageTagFilter:
-                    (List<Image> images, List<ImageTag> tags) imageTagResult = await _imageMethods.GetAllImagesWithTag(tagForFilter);
+                    (List<Image> images, List<ImageTag> tags) imageTagResult = await _imageMethods.GetAllImagesWithTag(tagForFilter, FilterInCurrentDirectory, CurrentDirectory);
                     displayImages = imageTagResult.images;
                     displayImageTags = imageTagResult.tags;
                     displayImages = ImagePagination();

@@ -5,6 +5,7 @@ using ImagePerfect.Repository.IRepository;
 using MySqlConnector;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -51,39 +52,65 @@ namespace ImagePerfect.Repository
             return (allImagesInFolder, tags);
         }
 
-        public async Task<(List<Image> images, List<ImageTag> tags)> GetAllImagesAtRating(int rating)
+        public async Task<(List<Image> images, List<ImageTag> tags)> GetAllImagesAtRating(int rating, bool filterInCurrentDirectory, string currentDirectory)
         {
             await _connection.OpenAsync();
             MySqlTransaction txn = await _connection.BeginTransactionAsync();
-
-            string sql1 = @"SELECT * FROM images WHERE ImageRating = @rating ORDER BY FileName";
-            List<Image> allImagesAtRating = (List<Image>)await _connection.QueryAsync<Image>(sql1, new { rating }, transaction: txn);
-            string sql2 = @"SELECT tags.TagId, tags.TagName, images.ImageId FROM images
+            string path = PathHelper.FormatPathForLikeOperator(currentDirectory);
+            string sql1 = string.Empty;
+            string sql2 = string.Empty;
+            if (filterInCurrentDirectory) 
+            {
+                sql1 = @"SELECT * FROM images WHERE ImageRating = @rating AND ImageFolderPath LIKE '" + path + "' ORDER BY FileName";
+                sql2 = @"SELECT tags.TagId, tags.TagName, images.ImageId FROM images
+                            JOIN image_tags_join ON image_tags_join.ImageId = images.ImageId
+                            JOIN tags ON image_tags_join.TagId = tags.TagId WHERE images.ImageRating = @rating AND ImageFolderPath LIKE '" + path + "' ORDER BY images.FileName;";
+            }
+            else
+            {
+                sql1 = @"SELECT * FROM images WHERE ImageRating = @rating ORDER BY FileName";
+                sql2 = @"SELECT tags.TagId, tags.TagName, images.ImageId FROM images
                             JOIN image_tags_join ON image_tags_join.ImageId = images.ImageId
                             JOIN tags ON image_tags_join.TagId = tags.TagId WHERE images.ImageRating = @rating ORDER BY images.FileName;";
+            }
+            List<Image> allImagesAtRating = (List<Image>)await _connection.QueryAsync<Image>(sql1, new { rating }, transaction: txn);           
             List<ImageTag> tags = (List<ImageTag>)await _connection.QueryAsync<ImageTag>(sql2, new { rating }, transaction: txn);
             await txn.CommitAsync();
             await _connection.CloseAsync();
             return (allImagesAtRating, tags);
         }
 
-        public async Task<(List<Image> images, List<ImageTag> tags)> GetAllImagesWithTag(string tag)
+        public async Task<(List<Image> images, List<ImageTag> tags)> GetAllImagesWithTag(string tag, bool filterInCurrentDirectory, string currentDirectory)
         {
             await _connection.OpenAsync();
             MySqlTransaction txn = await _connection.BeginTransactionAsync();
-
-            string sql1 = @"SELECT * FROM images 
+            string path = PathHelper.FormatPathForLikeOperator(currentDirectory);
+            string sql1 = string.Empty;
+            string sql2 = string.Empty;
+            if (filterInCurrentDirectory) 
+            {
+                sql1 = @"SELECT * FROM images 
+                            JOIN image_tags_join ON image_tags_join.ImageId = images.ImageId
+                            JOIN tags ON image_tags_join.TagId = tags.TagId WHERE tags.TagName = @tag AND ImageFolderPath LIKE '" + path + "' ORDER BY images.FileName;";
+                sql2 = @"SELECT tags.TagId, tags.TagName, images.ImageId FROM images 
+                            JOIN image_tags_join ON image_tags_join.ImageId = images.ImageId
+                            JOIN tags ON image_tags_join.TagId = tags.TagId WHERE ImageFolderPath LIKE '" + path + "' ORDER BY images.FileName;";
+            }
+            else
+            {
+                sql1 = @"SELECT * FROM images 
                             JOIN image_tags_join ON image_tags_join.ImageId = images.ImageId
                             JOIN tags ON image_tags_join.TagId = tags.TagId WHERE tags.TagName = @tag ORDER BY images.FileName;";
-            List<Image> allImagesWithTag = (List<Image>)await _connection.QueryAsync<Image>(sql1, new { tag }, transaction: txn);
-            string sql2 = @"SELECT tags.TagId, tags.TagName, images.ImageId FROM images 
+                sql2 = @"SELECT tags.TagId, tags.TagName, images.ImageId FROM images 
                             JOIN image_tags_join ON image_tags_join.ImageId = images.ImageId
                             JOIN tags ON image_tags_join.TagId = tags.TagId ORDER BY images.FileName;";
+            }
+
+            List<Image> allImagesWithTag = (List<Image>)await _connection.QueryAsync<Image>(sql1, new { tag }, transaction: txn);
             List<ImageTag> tags = (List<ImageTag>)await _connection.QueryAsync<ImageTag>(sql2, new { tag }, transaction: txn);
             await txn.CommitAsync();
             await _connection.CloseAsync();
             return (allImagesWithTag, tags);
-
         }
         public async Task<List<Image>> GetAllImagesInDirectoryTree(string directoryPath)
         {
