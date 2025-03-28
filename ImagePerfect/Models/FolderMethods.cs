@@ -30,19 +30,19 @@ namespace ImagePerfect.Models
             return await _unitOfWork.Folder.GetFoldersInDirectory(directoryPath);
         }
 
-        public async Task<(List<Folder> folders, List<FolderTag> tags)> GetAllFoldersAtRating(int rating)
+        public async Task<(List<Folder> folders, List<FolderTag> tags)> GetAllFoldersAtRating(int rating, bool filterInCurrentDirectory, string currentDirectory)
         {
-            return await _unitOfWork.Folder.GetAllFoldersAtRating(rating);
+            return await _unitOfWork.Folder.GetAllFoldersAtRating(rating, filterInCurrentDirectory, currentDirectory);
         }
 
-        public async Task<(List<Folder> folders, List<FolderTag> tags)> GetAllFoldersWithTag(string tag)
+        public async Task<(List<Folder> folders, List<FolderTag> tags)> GetAllFoldersWithTag(string tag, bool filterInCurrentDirectory, string currentDirectory)
         {
-            return await _unitOfWork.Folder.GetAllFoldersWithTag(tag);
+            return await _unitOfWork.Folder.GetAllFoldersWithTag(tag, filterInCurrentDirectory, currentDirectory);
         }
 
-        public async Task<(List<Folder> folders, List<FolderTag> tags)> GetAllFoldersWithDescriptionText(string text)
+        public async Task<(List<Folder> folders, List<FolderTag> tags)> GetAllFoldersWithDescriptionText(string text, bool filterInCurrentDirectory, string currentDirectory)
         {
-            return await _unitOfWork.Folder.GetAllFoldersWithDescriptionText(text);
+            return await _unitOfWork.Folder.GetAllFoldersWithDescriptionText(text, filterInCurrentDirectory, currentDirectory);
         }
 
         public async Task<List<Folder>> GetDirectoryTree(string directoryPath)

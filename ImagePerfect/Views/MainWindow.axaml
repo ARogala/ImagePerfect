@@ -71,7 +71,9 @@
 						Command="{Binding LoadCurrentDirectoryCommand}">
 					Load Current Directory
 				</Button>
-				
+				<CheckBox Grid.Row="2" Grid.Column="3" Margin="5" IsChecked="{Binding FilterInCurrentDirectory}">
+					Filter in Current Directory
+				</CheckBox>
 			</Grid>
 		</StackPanel>
 		<StackPanel Grid.Row="2" IsVisible="{Binding ShowSettings}">
