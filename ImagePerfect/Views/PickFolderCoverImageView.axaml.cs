@@ -24,11 +24,13 @@ public partial class PickFolderCoverImageView : ReactiveUserControl<PickFolderCo
     {
         // Get our parent top level control in order to get the needed service (in our sample the storage provider. Can also be the clipboard etc.)
         TopLevel? topLevel = TopLevel.GetTopLevel(this);
+        var startLocation = await topLevel!.StorageProvider.TryGetFolderFromPathAsync(context.Input);
         var storageFile = await topLevel!.StorageProvider.OpenFilePickerAsync(
             new FilePickerOpenOptions()
             {
                 AllowMultiple = false,
-                Title = context.Input
+                Title = "Select Folder Cover Image",
+                SuggestedStartLocation = startLocation,
             }
         );
 
