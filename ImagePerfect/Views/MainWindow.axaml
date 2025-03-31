@@ -160,6 +160,12 @@
 					<Button Margin="10 0 10 0" Command="{Binding OpenCurrentDirectoryWithExplorerCommand}">
 						Open Current Directory
 					</Button>
+					<Button Margin="10 0 10 0" Command="{Binding SaveDirectoryCommand}">
+						Save Directory
+					</Button>
+					<Button Margin="10 0 10 0" Command="{Binding LoadSavedDirectoryCommand}">
+						Load Saved Directory
+					</Button>
 				</StackPanel>
 				
 			</Grid>

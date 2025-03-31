@@ -30,6 +30,7 @@ namespace ImagePerfect.ViewModels
         private bool _showFilters = false;
         private bool _showSettings = false;
         private string _currentDirectory;
+        private string _savedDirectory;
         private bool _filterInCurrentDirectory = false;
         private string _rootFolderLocation;
         private string _newFolderName;
@@ -44,10 +45,14 @@ namespace ImagePerfect.ViewModels
         private int _folderPageSize = 20;
         private int _totalFolderPages = 1;
         private int _currentFolderPage = 1;
+        private int _savedTotalFolderPages = 1;
+        private int _savedFolderPage = 1;
 
         private int _imagePageSize = 20;
         private int _totalImagePages = 1;
         private int _currentImagePage = 1;
+        private int _savedTotalImagePages = 1;
+        private int _savedImagePage = 1;
         //max value between TotalFolderPages or TotalImagePages
         private int _maxPage = 1;
         //max value between CurrentFolderPage or CurrentImagePage
@@ -139,9 +144,8 @@ namespace ImagePerfect.ViewModels
             PreviousPageCommand = ReactiveCommand.Create(() => { 
                 PreviousPage();
             });
-            GoToPageCommand = ReactiveCommand.Create((decimal pageNumber) => {
-
-                GoToPage(Decimal.ToInt32(pageNumber));
+            GoToPageCommand = ReactiveCommand.Create(async (decimal pageNumber) => {
+               await GoToPage(Decimal.ToInt32(pageNumber));
             });
             ToggleSettingsCommand = ReactiveCommand.Create(() => { 
                 ToggleSettings();
@@ -191,6 +195,12 @@ namespace ImagePerfect.ViewModels
             PickImagePageSizeCommand = ReactiveCommand.Create(async (string size) => { 
                 await PickImagePageSize(size);
             });
+            SaveDirectoryCommand = ReactiveCommand.Create(() => {
+                SaveDirectory();
+            });
+            LoadSavedDirectoryCommand = ReactiveCommand.Create(async () => { 
+                await LoadSavedDirectory();
+            });
             //CreateNewFolderCommand = ReactiveCommand.Create(() => { CreateNewFolder(); });
             Initialize();
         }
@@ -226,6 +236,16 @@ namespace ImagePerfect.ViewModels
             get => _currentImagePage;
             set => this.RaiseAndSetIfChanged(ref _currentImagePage, value);
         }
+        public int SavedTotalImagePages
+        {
+            get => _savedTotalImagePages;
+            set => _savedTotalImagePages = value;
+        }
+        public int SavedImagePage
+        {
+            get => _savedImagePage;
+            set => _savedImagePage = value;
+        }
 
         public int ImagePageSize
         {
@@ -242,6 +262,16 @@ namespace ImagePerfect.ViewModels
         {
             get => _totalFolderPages;
             set => this.RaiseAndSetIfChanged(ref _totalFolderPages, value);
+        }
+        public int SavedTotalFolderPages
+        {
+            get => _savedTotalFolderPages;
+            set => _savedTotalFolderPages = value;
+        }
+        public int SavedFolderPage
+        {
+            get => _savedFolderPage;
+            set => _savedFolderPage = value;
         }
         public int CurrentFolderPage
         {
@@ -286,6 +316,12 @@ namespace ImagePerfect.ViewModels
         {
             get => _currentDirectory;
             set => this.RaiseAndSetIfChanged(ref _currentDirectory, value);
+        }
+
+        public string SavedDirectory
+        {
+            get => _savedDirectory;
+            set => _savedDirectory = value;
         }
 
         public bool FilterInCurrentDirectory
@@ -357,7 +393,7 @@ namespace ImagePerfect.ViewModels
 
         public ReactiveCommand<Unit, Unit> PreviousPageCommand { get; }
 
-        public ReactiveCommand<decimal, Unit> GoToPageCommand { get; }
+        public ReactiveCommand<decimal, Task> GoToPageCommand { get; }
 
         public ReactiveCommand<Unit, Unit> ToggleSettingsCommand { get; }
         public ReactiveCommand<Unit, Unit> ToggleFiltersCommand { get; }
@@ -380,8 +416,32 @@ namespace ImagePerfect.ViewModels
 
         public ReactiveCommand<string, Task> PickImagePageSizeCommand { get; }
 
+        public ReactiveCommand<Unit, Unit> SaveDirectoryCommand { get; }
+
+        public ReactiveCommand<Unit, Task> LoadSavedDirectoryCommand { get; }
+
         //public ReactiveCommand<Unit, Unit> CreateNewFolderCommand { get; }
 
+        private void SaveDirectory()
+        {
+            SavedDirectory = CurrentDirectory;
+            SavedFolderPage = CurrentFolderPage;
+            SavedTotalFolderPages = TotalFolderPages;
+            SavedImagePage = CurrentImagePage;
+            SavedTotalImagePages = TotalImagePages;
+        }
+
+        private async Task LoadSavedDirectory()
+        {
+            CurrentDirectory = SavedDirectory;
+            CurrentFolderPage = SavedFolderPage;
+            TotalFolderPages = SavedTotalFolderPages;
+            CurrentImagePage = SavedImagePage;
+            TotalImagePages = SavedTotalImagePages;
+            MaxPage = Math.Max(TotalImagePages, TotalFolderPages);
+            MaxCurrentPage = Math.Max(CurrentImagePage, CurrentFolderPage);
+            await LoadCurrentDirectory();
+        }
         private async Task UpdateSettings()
         {
             //update database
@@ -790,6 +850,8 @@ namespace ImagePerfect.ViewModels
             await GetRootFolder();
             await GetTagsList();
             await GetSettings();
+            //initially set SavedDirectory to CurrentDirectory so method wont fail if btn clicked before saving a directory
+            SavedDirectory = CurrentDirectory;
         }
 
         private async Task GetSettings()
@@ -929,7 +991,7 @@ namespace ImagePerfect.ViewModels
             }
         }
 
-        private async void GoToPage(int pageNumber)
+        private async Task GoToPage(int pageNumber)
         {
             if (pageNumber <= TotalFolderPages)
             {
