@@ -633,13 +633,23 @@ namespace ImagePerfect.ViewModels
 
         private async Task MapTagsToFoldersAddToObservable()
         {
-            for (int i = 0; i < displayFolders.Count; i++)
+            try
             {
-                //need to map tags to folders 
-                displayFolders[i] = FolderMapper.MapTagsToFolder(displayFolders[i], displayFolderTags);
-                FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(displayFolders[i]);
-                LibraryFolders.Add(folderViewModel);
+                for (int i = 0; i < displayFolders.Count; i++)
+                {
+                    //need to map tags to folders 
+                    displayFolders[i] = FolderMapper.MapTagsToFolder(displayFolders[i], displayFolderTags);
+                    FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(displayFolders[i]);
+                    LibraryFolders.Add(folderViewModel);
+                }
             }
+            catch (Exception ex) 
+            {
+                var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Something went wrong click ok to reload current directory. {ex}", ButtonEnum.Ok);
+                await box.ShowAsync();
+                await LoadCurrentDirectory();
+            }
+            
         }
 
         //public so we can call from other view models
@@ -698,15 +708,24 @@ namespace ImagePerfect.ViewModels
 
         private async Task MapTagsToFoldersUpdateObservable()
         {
-            for (int i = 0; i < displayFolders.Count; i++)
+            try
             {
-                //need to map tags to folders 
-                displayFolders[i] = FolderMapper.MapTagsToFolder(displayFolders[i], displayFolderTags);
-                FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(displayFolders[i]);
-                //will be in the same order unless delete/move or next back folder
-                //Any non destructive operation that does not affect the number or order of items returned from
-                //the sql query will be in the same order so just modify props for a much cleaner UI refresh
-                LibraryFolders[i] = folderViewModel;
+                for (int i = 0; i < displayFolders.Count; i++)
+                {
+                    //need to map tags to folders 
+                    displayFolders[i] = FolderMapper.MapTagsToFolder(displayFolders[i], displayFolderTags);
+                    FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(displayFolders[i]);
+                    //will be in the same order unless delete/move or next back folder
+                    //Any non destructive operation that does not affect the number or order of items returned from
+                    //the sql query will be in the same order so just modify props for a much cleaner UI refresh
+                    LibraryFolders[i] = folderViewModel;
+                }
+            }
+            catch (Exception ex) 
+            {
+                var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Something went wrong click ok to reload current directory. {ex}", ButtonEnum.Ok);
+                await box.ShowAsync();
+                await LoadCurrentDirectory();
             }
         }
         
@@ -748,12 +767,21 @@ namespace ImagePerfect.ViewModels
 
         private async Task MapTagsToImagesAddToObservable()
         {
-            for (int i = 0; i < displayImages.Count; i++)
+            try
             {
-                //need to map tags to images
-                displayImages[i] = ImageMapper.MapTagsToImage(displayImages[i], displayImageTags);
-                ImageViewModel imageViewModel = await ImageMapper.GetImageVm(displayImages[i]);
-                Images.Add(imageViewModel);
+                for (int i = 0; i < displayImages.Count; i++)
+                {
+                    //need to map tags to images
+                    displayImages[i] = ImageMapper.MapTagsToImage(displayImages[i], displayImageTags);
+                    ImageViewModel imageViewModel = await ImageMapper.GetImageVm(displayImages[i]);
+                    Images.Add(imageViewModel);
+                }
+            }
+            catch (Exception ex) 
+            {
+                var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Something went wrong click ok to reload current directory. {ex}", ButtonEnum.Ok);
+                await box.ShowAsync();
+                await LoadCurrentDirectory();
             }
         }
         private async Task RefreshImages(string path = "", int folderId = 0)
@@ -802,13 +830,23 @@ namespace ImagePerfect.ViewModels
 
         private async Task MapTagsToImagesUpdateObservable()
         {
-            for (int i = 0; i < displayImages.Count; i++)
+            try
             {
-                //need to map tags to images
-                displayImages[i] = ImageMapper.MapTagsToImage(displayImages[i], displayImageTags);
-                ImageViewModel imageViewModel = await ImageMapper.GetImageVm(displayImages[i]);
-                Images[i] = imageViewModel;
+                for (int i = 0; i < displayImages.Count; i++)
+                {
+                    //need to map tags to images
+                    displayImages[i] = ImageMapper.MapTagsToImage(displayImages[i], displayImageTags);
+                    ImageViewModel imageViewModel = await ImageMapper.GetImageVm(displayImages[i]);
+                    Images[i] = imageViewModel;
+                }
             }
+            catch (Exception ex) 
+            {
+                var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Something went wrong click ok to reload current directory. {ex}", ButtonEnum.Ok);
+                await box.ShowAsync();
+                await LoadCurrentDirectory();
+            }
+            
         }
         private async Task RefreshImageProps(string path = "", int folderId = 0)
         {
