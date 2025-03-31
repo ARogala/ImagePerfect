@@ -36,7 +36,7 @@ namespace ImagePerfect.ViewModels
 
         private async Task SelectCoverImage(FolderViewModel folderVm)
         {
-            _CoverImagePath = await _SelectCoverImageInteraction.Handle("Select Folder Cover Image");
+            _CoverImagePath = await _SelectCoverImageInteraction.Handle(folderVm.FolderPath);
             //list will be empty if Cancel is pressed exit method
             if (_CoverImagePath.Count == 0) 
             { 
