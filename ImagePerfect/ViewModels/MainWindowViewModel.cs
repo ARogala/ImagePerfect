@@ -786,6 +786,7 @@ namespace ImagePerfect.ViewModels
         }
         private async Task RefreshImages(string path = "", int folderId = 0)
         {
+            ShowLoading = true;
             switch (currentFilter)
             {
                 case filters.None:
@@ -826,6 +827,7 @@ namespace ImagePerfect.ViewModels
                     await MapTagsToImagesAddToObservable();
                     break;
             }
+            ShowLoading = false;
         }
 
         private async Task MapTagsToImagesUpdateObservable()
