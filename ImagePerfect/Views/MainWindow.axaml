@@ -28,7 +28,7 @@
 		</StackPanel>
 		<StackPanel Orientation="Vertical" Grid.Row="1" IsVisible="{Binding ShowFilters}">
 			<!--Filters-->
-			<Grid RowDefinitions="Auto, Auto, Auto" ColumnDefinitions="*, Auto, *, Auto" MaxWidth="800">
+			<Grid RowDefinitions="Auto, Auto, Auto" ColumnDefinitions="*, Auto, *, Auto" MaxWidth="800" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
 				<NumericUpDown Grid.Row="0" Grid.Column="0" Minimum="0" Value="1" Maximum="5" 
 							   Margin="5" ParsingNumberStyle="Integer" FormatString="0"
 							   x:Name="FilterImageRating"/>
@@ -78,7 +78,7 @@
 		</StackPanel>
 		<StackPanel Grid.Row="2" IsVisible="{Binding ShowSettings}">
 			<!--Settings-->
-			<Grid RowDefinitions="Auto" ColumnDefinitions="Auto,Auto,Auto" Width="600">
+			<Grid RowDefinitions="Auto" ColumnDefinitions="Auto,Auto,Auto" Width="600" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
 				<StackPanel Grid.Row="0" Grid.Column="0" Width="200">
 					<TextBlock Margin="0 10 0 5">Pick Image Width</TextBlock>
 					<TextBlock Margin="0 10 0 5" Text="{Binding MaxImageWidth}" />
@@ -151,7 +151,7 @@
 			</Grid>
 		</StackPanel>
 		<StackPanel Grid.Row="3">
-			<Grid RowDefinitions="Auto" ColumnDefinitions="*" Margin="0 10 0 15" HorizontalAlignment="Center">
+			<Grid RowDefinitions="Auto" ColumnDefinitions="*" Margin="0 10 0 15" HorizontalAlignment="Center" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
 				<StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0">
 					<!--
 					<TextBlock Margin="5">Current Directory:</TextBlock>
@@ -197,7 +197,7 @@
 							<StackPanel Margin="10">
 								<TextBlock MaxWidth="{Binding #Root.((vm:MainWindowViewModel)DataContext).MaxImageWidth}" Text="{Binding FolderName}"/>
 								<Image MaxWidth="{Binding #Root.((vm:MainWindowViewModel)DataContext).MaxImageWidth}" Source="{Binding CoverImageBitmap}" />
-								<Grid RowDefinitions="Auto" ColumnDefinitions="*,*,*,*" MaxWidth="600">
+								<Grid RowDefinitions="Auto" ColumnDefinitions="*,*,*,*" MaxWidth="600" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
 									<Button Grid.Row="0" Grid.Column="0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="2" IsEnabled="{Binding !IsRoot}"
 											Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).BackFolderCommand}"
 											CommandParameter="{Binding}">
@@ -215,7 +215,7 @@
 									</Button>
 									<v:PickFolderCoverImageView Grid.Row="0" Grid.Column="3" DataContext="{Binding #Root.((vm:MainWindowViewModel)DataContext).PickCoverImage}"/>
 								</Grid>
-								<Grid RowDefinitions="Auto" ColumnDefinitions="*,*" MaxWidth="600">
+								<Grid RowDefinitions="Auto" ColumnDefinitions="*,*" MaxWidth="600" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
 									<v:PickMoveToFolderView Grid.Row="0" Grid.Column="0" DataContext="{Binding #Root.((vm:MainWindowViewModel)DataContext).PickMoveToFolder}" />
 									<Button Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="2" IsEnabled="{Binding !IsRoot}"
 											Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).MoveFolderToTrashCommand}"
@@ -223,7 +223,7 @@
 										Move To Trash
 									</Button>
 								</Grid>
-								<Grid RowDefinitions="Auto" ColumnDefinitions="*,*" MaxWidth="600">
+								<Grid RowDefinitions="Auto" ColumnDefinitions="*,*" MaxWidth="600" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
 									<Button Grid.Row="0" Grid.Column="0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="2" IsVisible="{Binding AreImagesImported}"
 											Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).ScanFolderImagesForMetaDataCommand}"
 											CommandParameter="{Binding}">
@@ -233,7 +233,7 @@
 										Image Metadata Scanned
 									</TextBlock>
 								</Grid>
-								<Grid RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="*,Auto" MaxWidth="600">
+								<Grid RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="*,Auto" MaxWidth="600" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
 									<TextBox Grid.Row="0" Grid.Column="0" Watermark="Add Description" Height="100" AcceptsReturn="True" TextWrapping="Wrap" Margin="5" MaxLength="3000" Text="{Binding FolderDescription}" />
 									<Button Grid.Row="0" Grid.Column="1" Height="100" Padding="8,40,8,6" Width="100" HorizontalContentAlignment="Center"
 											Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).AddFolderDescriptionCommand}"
@@ -274,7 +274,7 @@
 						<DataTemplate DataType="vm:ImageViewModel">
 							<StackPanel Margin="10">
 								<Image MaxWidth="{Binding #Root.((vm:MainWindowViewModel)DataContext).MaxImageWidth}" Source="{Binding ImageBitmap}" />
-								<Grid RowDefinitions="Auto" ColumnDefinitions="*,*,*" MaxWidth="600" IsVisible="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
+								<Grid RowDefinitions="Auto" ColumnDefinitions="*,*,*" MaxWidth="600" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
 									<Button Grid.Row="0" Grid.Column="0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="2"
 									Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).BackFolderFromImageCommand}"
 									CommandParameter="{Binding}">
@@ -292,7 +292,7 @@
 									</Button>
 								</Grid>
 								
-								<Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto" IsVisible="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
+								<Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
 									<TextBox Grid.Row="0" Grid.Column="0" Margin="5" MaxLength="2000" Text="{Binding ImageTags}"/>
 									<Button Grid.Row="0" Grid.Column="1" Width="100" HorizontalContentAlignment="Center"
 											Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).EditImageTagsCommand}"
@@ -319,7 +319,7 @@
 			</StackPanel>
 		</ScrollViewer>
 		<StackPanel Grid.Row="6" Orientation="Vertical" HorizontalAlignment="Center" Margin="0 10 0 0">
-			<Grid RowDefinitions="Auto" ColumnDefinitions="Auto, Auto, Auto, Auto">
+			<Grid RowDefinitions="Auto" ColumnDefinitions="Auto, Auto, Auto, Auto" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
 				<Button Margin="5" Grid.Row="0" Grid.Column="0"
 					Command="{Binding PreviousPageCommand}">
 					Previous Page
