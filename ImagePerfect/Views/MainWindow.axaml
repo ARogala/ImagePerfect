@@ -292,7 +292,7 @@
 									</Button>
 								</Grid>
 								
-								<Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
+								<Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto" MaxWidth="600" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
 									<TextBox Grid.Row="0" Grid.Column="0" Margin="5" MaxLength="2000" Text="{Binding ImageTags}"/>
 									<Button Grid.Row="0" Grid.Column="1" Width="100" HorizontalContentAlignment="Center"
 											Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).EditImageTagsCommand}"
