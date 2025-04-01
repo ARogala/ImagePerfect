@@ -655,6 +655,7 @@ namespace ImagePerfect.ViewModels
         //public so we can call from other view models
         public async Task RefreshFolders(string path = "")
         {
+            ShowLoading = true;
             switch (currentFilter)
             {
                 case filters.None:
@@ -704,6 +705,7 @@ namespace ImagePerfect.ViewModels
                     await MapTagsToFoldersAddToObservable();
                     break;
             }
+            ShowLoading = false;
         }
 
         private async Task MapTagsToFoldersUpdateObservable()
@@ -732,6 +734,7 @@ namespace ImagePerfect.ViewModels
         //public so we can call from other view models
         public async Task RefreshFolderProps(string path)
         {
+            ShowLoading = true;
             switch (currentFilter)
             {
                 case filters.None:
@@ -763,6 +766,7 @@ namespace ImagePerfect.ViewModels
                     await MapTagsToFoldersUpdateObservable();
                     break;
             }
+            ShowLoading = false;
         }
 
         private async Task MapTagsToImagesAddToObservable()
@@ -852,6 +856,7 @@ namespace ImagePerfect.ViewModels
         }
         private async Task RefreshImageProps(string path = "", int folderId = 0)
         {
+            ShowLoading = true;
             switch (currentFilter)
             {
                 case filters.None:
@@ -884,6 +889,7 @@ namespace ImagePerfect.ViewModels
                     await MapTagsToImagesUpdateObservable();
                     break;
             }
+            ShowLoading = false;
         }
         private async void Initialize()
         {
@@ -932,12 +938,12 @@ namespace ImagePerfect.ViewModels
             if (csvIsSet) 
             {
                 await _imageCsvMethods.AddImageCsv(imageFolderId);
-                ShowLoading = false;
                 //remove one folder from path
                 newPath = PathHelper.RemoveOneFolderFromPath(imageFolderPath);
                 //refresh UI
                 await RefreshFolderProps(newPath);
             }
+            ShowLoading = false;
         }
 
         //opens the previous directory location -- from image button
