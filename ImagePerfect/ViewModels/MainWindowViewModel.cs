@@ -66,7 +66,8 @@ namespace ImagePerfect.ViewModels
             FolderRatingFilter,
             ImageTagFilter,
             FolderTagFilter,
-            FolderDescriptionFilter
+            FolderDescriptionFilter,
+            AllFavoriteFolders
         }
         private filters currentFilter = filters.None;
         private int selectedRatingForFilter = 0;
@@ -200,6 +201,18 @@ namespace ImagePerfect.ViewModels
             });
             LoadSavedDirectoryCommand = ReactiveCommand.Create(async () => { 
                 await LoadSavedDirectory();
+            });
+            SaveFolderAsFavoriteCommand = ReactiveCommand.Create(async (FolderViewModel folderVm) => {
+                await SaveFolderAsFavorite(folderVm);
+            });
+            GetAllFavoriteFoldersCommand = ReactiveCommand.Create(async () => {
+                ResetPagination();
+                currentFilter = filters.AllFavoriteFolders;
+                await RefreshFolders();
+            });
+            RemoveAllFavoriteFoldersCommand = ReactiveCommand.Create(async () =>
+            {
+                await RemoveAllFavoriteFolders();
             });
             //CreateNewFolderCommand = ReactiveCommand.Create(() => { CreateNewFolder(); });
             Initialize();
@@ -420,8 +433,23 @@ namespace ImagePerfect.ViewModels
 
         public ReactiveCommand<Unit, Task> LoadSavedDirectoryCommand { get; }
 
+        public ReactiveCommand<FolderViewModel, Task> SaveFolderAsFavoriteCommand { get; }
+
+        public ReactiveCommand<Unit, Task> GetAllFavoriteFoldersCommand {  get; } 
+
+        public ReactiveCommand<Unit, Task> RemoveAllFavoriteFoldersCommand { get; }
+
         //public ReactiveCommand<Unit, Unit> CreateNewFolderCommand { get; }
 
+        private async Task SaveFolderAsFavorite(FolderViewModel folderVm)
+        {
+            await _folderMethods.SaveFolderToFavorites(folderVm.FolderId);
+        }
+
+        private async Task RemoveAllFavoriteFolders()
+        {
+            await _folderMethods.RemoveAllFavoriteFolders();
+        }
         private void SaveDirectory()
         {
             SavedDirectory = CurrentDirectory;
@@ -704,6 +732,16 @@ namespace ImagePerfect.ViewModels
                     displayFolders = FolderPagination();
                     await MapTagsToFoldersAddToObservable();
                     break;
+                case filters.AllFavoriteFolders:
+                    (List<Folder> folders, List<FolderTag> tags) allFavoriteFoldersResult = await _folderMethods.GetAllFavoriteFolders();
+                    displayFolders = allFavoriteFoldersResult.folders;
+                    displayFolderTags = allFavoriteFoldersResult.tags;
+
+                    Images.Clear();
+                    LibraryFolders.Clear();
+                    displayFolders = FolderPagination();
+                    await MapTagsToFoldersAddToObservable();
+                    break;
             }
             ShowLoading = false;
         }
@@ -766,6 +804,13 @@ namespace ImagePerfect.ViewModels
                     (List<Folder> folders, List<FolderTag> tags) folderDescriptionResult = await _folderMethods.GetAllFoldersWithDescriptionText(textForFilter, FilterInCurrentDirectory, CurrentDirectory);
                     displayFolders = folderDescriptionResult.folders;
                     displayFolderTags = folderDescriptionResult.tags;
+                    displayFolders = FolderPagination();
+                    await MapTagsToSingleFolderUpdateObservable(folderVm);
+                    break;
+                case filters.AllFavoriteFolders:
+                    (List<Folder> folders, List<FolderTag> tags) allFavoriteFoldersResult = await _folderMethods.GetAllFavoriteFolders();
+                    displayFolders = allFavoriteFoldersResult.folders;
+                    displayFolderTags = allFavoriteFoldersResult.tags;
                     displayFolders = FolderPagination();
                     await MapTagsToSingleFolderUpdateObservable(folderVm);
                     break;

@@ -13,11 +13,14 @@ namespace ImagePerfect.Repository.IRepository
         Task<(List<Folder> folders, List<FolderTag> tags)> GetAllFoldersAtRating(int rating, bool filterInCurrentDirectory, string currentDirectory);
         Task<(List<Folder> folders, List<FolderTag> tags)> GetAllFoldersWithTag(string tag, bool filterInCurrentDirectory, string currentDirectory);
         Task<(List<Folder> folders, List<FolderTag> tags)> GetAllFoldersWithDescriptionText(string text, bool filterInCurrentDirectory, string currentDirectory);
+        Task<(List<Folder> folders, List<FolderTag> tags)> GetAllFavoriteFolders();
         Task<List<Folder>> GetDirectoryTree(string directoryPath);
         Task<bool> AddCoverImage(string coverImagePath, int folderId);
         Task<bool> MoveFolder(string folderMoveSql, string imageMoveSql);
         Task<bool> UpdateFolderTags(Folder folder, string newTag);
         Task<bool> DeleteFolderTag(FolderTag tag);
         Task<bool> DeleteLibrary();
+        Task SaveFolderToFavorites(int  folderId);
+        Task DeleteAllFavoriteFolders();
     }
 }

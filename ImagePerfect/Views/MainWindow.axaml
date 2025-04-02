@@ -19,10 +19,11 @@
 			<Menu>
 				<MenuItem Header="_File">
 					<v:PickRootFolderView DataContext="{Binding PickRootFolder}" x:Name="PickRootFolder"/>
-					<Button Margin="0" Width="150" HorizontalContentAlignment="Center" Command="{Binding DeleteLibraryCommand}">Delete Library</Button>
+					<Button Margin="0" Width="175" HorizontalContentAlignment="Center" Command="{Binding DeleteLibraryCommand}">Delete Library</Button>
 					<v:PickNewFoldersView DataContext="{Binding PickNewFolders}"/>
-					<Button Margin="0" Width="150" HorizontalContentAlignment="Center" Command="{Binding ToggleFiltersCommand}">Filters</Button>
-					<Button Margin="0" Width="150" HorizontalContentAlignment="Center" Command="{Binding ToggleSettingsCommand}">Settings</Button>
+					<Button Margin="0" Width="175" HorizontalContentAlignment="Center" Command="{Binding ToggleFiltersCommand}">Filters</Button>
+					<Button Margin="0" Width="175" HorizontalContentAlignment="Center" Command="{Binding ToggleSettingsCommand}">Settings</Button>
+					<Button Margin="0" Width="175" HorizontalContentAlignment="Center" Command="{Binding RemoveAllFavoriteFoldersCommand}">Delete Favorite Folders</Button>
 				</MenuItem>
 			</Menu>
 		</StackPanel>
@@ -215,9 +216,14 @@
 									</Button>
 									<v:PickFolderCoverImageView Grid.Row="0" Grid.Column="3" DataContext="{Binding #Root.((vm:MainWindowViewModel)DataContext).PickCoverImage}"/>
 								</Grid>
-								<Grid RowDefinitions="Auto" ColumnDefinitions="*,*" MaxWidth="600" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
+								<Grid RowDefinitions="Auto" ColumnDefinitions="*,*,*" MaxWidth="600" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
 									<v:PickMoveToFolderView Grid.Row="0" Grid.Column="0" DataContext="{Binding #Root.((vm:MainWindowViewModel)DataContext).PickMoveToFolder}" />
-									<Button Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="2" IsEnabled="{Binding !IsRoot}"
+									<Button Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="2"
+											Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).SaveFolderAsFavoriteCommand}"
+											CommandParameter="{Binding}">
+										Favorite
+									</Button>
+									<Button Grid.Row="0" Grid.Column="2" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="2" IsEnabled="{Binding !IsRoot}"
 											Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).MoveFolderToTrashCommand}"
 											CommandParameter="{Binding}">
 										Move To Trash
@@ -319,7 +325,7 @@
 			</StackPanel>
 		</ScrollViewer>
 		<StackPanel Grid.Row="6" Orientation="Vertical" HorizontalAlignment="Center" Margin="0 10 0 0">
-			<Grid RowDefinitions="Auto" ColumnDefinitions="Auto, Auto, Auto, Auto" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
+			<Grid RowDefinitions="Auto" ColumnDefinitions="Auto, Auto, Auto, Auto, Auto" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
 				<Button Margin="5" Grid.Row="0" Grid.Column="0"
 					Command="{Binding PreviousPageCommand}">
 					Previous Page
@@ -333,6 +339,9 @@
 						Command="{Binding GoToPageCommand}"
 						CommandParameter="{Binding #PageNumber.Value}">
 					Go To Page
+				</Button>
+				<Button HorizontalAlignment="Center" Margin="5" Grid.Row="0" Grid.Column="4" Command="{Binding GetAllFavoriteFoldersCommand}">
+					Load Favorite Folders
 				</Button>
 			</Grid>
 		</StackPanel>

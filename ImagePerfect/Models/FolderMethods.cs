@@ -45,6 +45,11 @@ namespace ImagePerfect.Models
             return await _unitOfWork.Folder.GetAllFoldersWithDescriptionText(text, filterInCurrentDirectory, currentDirectory);
         }
 
+        public async Task<(List<Folder> folders, List<FolderTag> tags)> GetAllFavoriteFolders()
+        {
+            return await _unitOfWork.Folder.GetAllFavoriteFolders();
+        }
+
         public async Task<List<Folder>> GetDirectoryTree(string directoryPath)
         {
             return await _unitOfWork.Folder.GetDirectoryTree(directoryPath);
@@ -88,6 +93,16 @@ namespace ImagePerfect.Models
         public async Task<bool> DeleteFolderTag(FolderTag tag)
         {
             return await _unitOfWork.Folder.DeleteFolderTag(tag);
+        }
+
+        public async Task SaveFolderToFavorites(int folderId)
+        {
+            await _unitOfWork.Folder.SaveFolderToFavorites(folderId);
+        }
+
+        public async Task RemoveAllFavoriteFolders()
+        {
+            await _unitOfWork.Folder.DeleteAllFavoriteFolders();
         }
     }
 }
