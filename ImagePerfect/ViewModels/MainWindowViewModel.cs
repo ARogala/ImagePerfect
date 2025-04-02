@@ -707,32 +707,36 @@ namespace ImagePerfect.ViewModels
             }
             ShowLoading = false;
         }
-
-        private async Task MapTagsToFoldersUpdateObservable()
+        private async Task MapTagsToSingleFolderUpdateObservable(FolderViewModel folderVm)
         {
             try
             {
                 for (int i = 0; i < displayFolders.Count; i++)
                 {
-                    //need to map tags to folders 
-                    displayFolders[i] = FolderMapper.MapTagsToFolder(displayFolders[i], displayFolderTags);
-                    FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(displayFolders[i]);
-                    //will be in the same order unless delete/move or next back folder
-                    //Any non destructive operation that does not affect the number or order of items returned from
-                    //the sql query will be in the same order so just modify props for a much cleaner UI refresh
-                    LibraryFolders[i] = folderViewModel;
+                    //only map the one that is being updated
+                    if (displayFolders[i].FolderId == folderVm.FolderId)
+                    {
+                        //need to map tags to folders 
+                        displayFolders[i] = FolderMapper.MapTagsToFolder(displayFolders[i], displayFolderTags);
+                        FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(displayFolders[i]);
+                        //will be in the same order unless delete/move or next back folder
+                        //Any non destructive operation that does not affect the number or order of items returned from
+                        //the sql query will be in the same order so just modify props for a much cleaner UI refresh
+                        LibraryFolders[i] = folderViewModel;
+                        return;
+                    }
                 }
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Something went wrong click ok to reload current directory. {ex}", ButtonEnum.Ok);
                 await box.ShowAsync();
                 await LoadCurrentDirectory();
             }
         }
-        
+
         //public so we can call from other view models
-        public async Task RefreshFolderProps(string path)
+        public async Task RefreshFolderProps(string path, FolderViewModel folderVm)
         {
             ShowLoading = true;
             switch (currentFilter)
@@ -742,28 +746,28 @@ namespace ImagePerfect.ViewModels
                     displayFolders = folderResult.folders;
                     displayFolderTags = folderResult.tags;
                     displayFolders = FolderPagination();
-                    await MapTagsToFoldersUpdateObservable();
+                    await MapTagsToSingleFolderUpdateObservable(folderVm);
                     break;
                 case filters.FolderRatingFilter:
                     (List<Folder> folders, List<FolderTag> tags) folderRatingResult = await _folderMethods.GetAllFoldersAtRating(selectedRatingForFilter, FilterInCurrentDirectory, CurrentDirectory);
                     displayFolders = folderRatingResult.folders;
                     displayFolderTags = folderRatingResult.tags;
                     displayFolders = FolderPagination();
-                    await MapTagsToFoldersUpdateObservable();
+                    await MapTagsToSingleFolderUpdateObservable(folderVm);
                     break;
                 case filters.FolderTagFilter:
                     (List<Folder> folders, List<FolderTag> tags) folderTagResult = await _folderMethods.GetAllFoldersWithTag(tagForFilter, FilterInCurrentDirectory, CurrentDirectory);
                     displayFolders = folderTagResult.folders;
                     displayFolderTags = folderTagResult.tags;
                     displayFolders = FolderPagination();
-                    await MapTagsToFoldersUpdateObservable();
+                    await MapTagsToSingleFolderUpdateObservable(folderVm);
                     break;
                 case filters.FolderDescriptionFilter:
                     (List<Folder> folders, List<FolderTag> tags) folderDescriptionResult = await _folderMethods.GetAllFoldersWithDescriptionText(textForFilter, FilterInCurrentDirectory, CurrentDirectory);
                     displayFolders = folderDescriptionResult.folders;
                     displayFolderTags = folderDescriptionResult.tags;
                     displayFolders = FolderPagination();
-                    await MapTagsToFoldersUpdateObservable();
+                    await MapTagsToSingleFolderUpdateObservable(folderVm);
                     break;
             }
             ShowLoading = false;
@@ -944,7 +948,7 @@ namespace ImagePerfect.ViewModels
                 //remove one folder from path
                 newPath = PathHelper.RemoveOneFolderFromPath(imageFolderPath);
                 //refresh UI
-                await RefreshFolderProps(newPath);
+                await RefreshFolderProps(newPath, imageFolder);
             }
             ShowLoading = false;
         }
@@ -1130,7 +1134,7 @@ namespace ImagePerfect.ViewModels
                 await GetTagsList();
                 folderVm.NewTag = "";
                 //refresh UI
-                await RefreshFolderProps(CurrentDirectory);
+                await RefreshFolderProps(CurrentDirectory, folderVm);
             }
             else
             {
@@ -1397,7 +1401,7 @@ namespace ImagePerfect.ViewModels
                 //Update TagsList to show in UI AutoCompleteBox
                 await GetTagsList();
                 //refresh UI
-                await RefreshFolderProps(CurrentDirectory);
+                await RefreshFolderProps(CurrentDirectory, folderVm);
             }
             ShowLoading = false;
         }
