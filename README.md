@@ -10,7 +10,7 @@ A few other major dependencies are
 4. Any developer can view the rest in Visual Studio.
 
 
-I wrote this application to learn some desktop application development and because I felt the current photo management applications on the market did not fit my needs. In particular many photo managers seem to have small thumbnails for the image. That makes it harder to organize and decide which ones to delete and which ones are you favorites. Shotwell on Linux is actually pretty good but importing new images gets really slow with large libraries. Primarily Image Perfect was written with several things in mind. 
+I wrote this application to learn some desktop application development and because I felt the current photo management applications on the market did not fit my needs. In particular many photo managers seem to have small thumbnails for the image. That makes it harder to organize and decide which ones to delete and which ones are your favorites. Shotwell on Linux is actually pretty good but importing new images gets really slow with large libraries. Primarily Image Perfect was written with several things in mind. 
 
 1. Big thumbnails 500px - 600px.
 	* Image width can be adjusted from 300px all the way up to 600px!!
@@ -19,7 +19,7 @@ I wrote this application to learn some desktop application development and becau
 	* Image tags and rating are written on the image file itself as well as stored in the database. 
 	* Folder tags, description, and rating are only stored in the database.
 	* A cover image for the folders can also be selected.
-	* 
+	* Tags can only be added and removed one at a time.
 3. Perform well with large libraries no waiting hours on end to import new photos.
 	* I did this by using MySqlBulkLoader to insert data from a csv file.
 	* Note that there is no library monitoring like other apps provide. This means you have to keep track of what new folders you want to add after the initial library import.
