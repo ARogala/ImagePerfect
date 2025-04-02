@@ -833,28 +833,31 @@ namespace ImagePerfect.ViewModels
             }
             ShowLoading = false;
         }
-
-        private async Task MapTagsToImagesUpdateObservable()
+        private async Task MapTagsToSingleImageUpdateObservable(ImageViewModel imageVm)
         {
             try
             {
                 for (int i = 0; i < displayImages.Count; i++)
                 {
-                    //need to map tags to images
-                    displayImages[i] = ImageMapper.MapTagsToImage(displayImages[i], displayImageTags);
-                    ImageViewModel imageViewModel = await ImageMapper.GetImageVm(displayImages[i]);
-                    Images[i] = imageViewModel;
+                    //only map the one that is being updated
+                    if (displayImages[i].ImageId == imageVm.ImageId)
+                    {
+                        //need to map tags to image
+                        displayImages[i] = ImageMapper.MapTagsToImage(displayImages[i], displayImageTags);
+                        ImageViewModel imageViewModel = await ImageMapper.GetImageVm(displayImages[i]);
+                        Images[i] = imageViewModel;
+                        return;
+                    }
                 }
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Something went wrong click ok to reload current directory. {ex}", ButtonEnum.Ok);
                 await box.ShowAsync();
                 await LoadCurrentDirectory();
             }
-            
         }
-        private async Task RefreshImageProps(string path = "", int folderId = 0)
+        private async Task RefreshImageProps(ImageViewModel imageVm, string path = "", int folderId = 0)
         {
             ShowLoading = true;
             switch (currentFilter)
@@ -872,21 +875,21 @@ namespace ImagePerfect.ViewModels
                     displayImages = imageResult.images;
                     displayImageTags = imageResult.tags;
                     displayImages = ImagePagination();
-                    await MapTagsToImagesUpdateObservable();
+                    await MapTagsToSingleImageUpdateObservable(imageVm);
                     break;
                 case filters.ImageRatingFilter:
                     (List<Image> images, List<ImageTag> tags) imageRatingResult = await _imageMethods.GetAllImagesAtRating(selectedRatingForFilter, FilterInCurrentDirectory, CurrentDirectory);
                     displayImages = imageRatingResult.images;
                     displayImageTags = imageRatingResult.tags;
                     displayImages = ImagePagination();
-                    await MapTagsToImagesUpdateObservable();
+                    await MapTagsToSingleImageUpdateObservable(imageVm);
                     break;
                 case filters.ImageTagFilter:
                     (List<Image> images, List<ImageTag> tags) imageTagResult = await _imageMethods.GetAllImagesWithTag(tagForFilter, FilterInCurrentDirectory, CurrentDirectory);
                     displayImages = imageTagResult.images;
                     displayImageTags = imageTagResult.tags;
                     displayImages = ImagePagination();
-                    await MapTagsToImagesUpdateObservable();
+                    await MapTagsToSingleImageUpdateObservable(imageVm);
                     break;
             }
             ShowLoading = false;
@@ -1214,7 +1217,7 @@ namespace ImagePerfect.ViewModels
                 //Update TagsList to show in UI AutoCompleteBox clear NewTag in box as well
                 await GetTagsList();
                 imageVm.NewTag = "";
-                await RefreshImageProps(CurrentDirectory);   
+                await RefreshImageProps(imageVm, CurrentDirectory);   
             }
             //clear NewTag in box if try to input duplicate tag
             else
