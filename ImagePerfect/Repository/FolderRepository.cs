@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Dapper;
 using System.Collections.Generic;
 using ImagePerfect.Helpers;
-using HarfBuzzSharp;
 
 namespace ImagePerfect.Repository
 {
@@ -163,6 +162,21 @@ namespace ImagePerfect.Repository
             return (allFoldersWithDescriptionText, tags);
         }
 
+        public async Task<(List<Folder> folders, List<FolderTag> tags)> GetAllFavoriteFolders()
+        {
+            await _connection.OpenAsync();
+            MySqlTransaction txn = await _connection.BeginTransactionAsync();
+            string sql1 = @"SELECT * FROM folders WHERE FolderId IN (SELECT FolderId FROM folder_saved_favorites) ORDER BY FolderName";
+            string sql2 = @"SELECT tags.TagId, tags.TagName, folders.FolderId FROM folders
+                                JOIN folder_tags_join ON folder_tags_join.FolderId = folders.FolderId
+                                JOIN tags ON folder_tags_join.TagId = tags.TagId WHERE folders.FolderId IN (SELECT folder_saved_favorites.FolderId FROM folder_saved_favorites) ORDER BY FolderName";
+            List<Folder> allFavoriteFolders = (List<Folder>)await _connection.QueryAsync<Folder>(sql1, transaction: txn);
+            List<FolderTag> tags = (List<FolderTag>)await _connection.QueryAsync<FolderTag>(sql2, transaction: txn);
+            await txn.CommitAsync();
+            await _connection.CloseAsync();
+            return (allFavoriteFolders, tags);
+        }
+
         //gets the folder itself as well as all folders and subfolders within. 
         //the entire directory tree of the path
         public async Task<List<Folder>> GetDirectoryTree(string directoryPath)
@@ -245,6 +259,18 @@ namespace ImagePerfect.Repository
             await txn.CommitAsync();
             await _connection.CloseAsync();
             return rowsEffected > 0 ? true : false;
+        }
+
+        public async Task SaveFolderToFavorites(int folderId)
+        {
+            string sql = @"INSERT IGNORE INTO folder_saved_favorites (FolderId) VALUES (@folderId)";
+            await _connection.ExecuteAsync(sql, new { folderId });
+        }
+
+        public async Task DeleteAllFavoriteFolders()
+        {
+            string sql = @"DELETE FROM folder_saved_favorites";
+            await _connection.ExecuteAsync(sql);
         }
     }
 }

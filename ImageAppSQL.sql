@@ -99,6 +99,13 @@ CREATE TABLE `settings` (
 INSERT INTO settings (MaxImageWidth, FolderPageSize, ImagePageSize) VALUES (500, 20, 60); 
 UPDATE settings SET MaxImageWidth = 550 WHERE SettingsId = 1;
 
+CREATE TABLE `folder_saved_favorites` (
+	`SavedId` bigint unsigned NOT NULL AUTO_INCREMENT,
+	`FolderId` bigint unsigned,
+	PRIMARY KEY (`SavedId`),
+	CONSTRAINT `folderid_uq` UNIQUE (`FolderId`)
+);
+
 /*get all tags for image*/
 SELECT * FROM images 
 JOIN image_tags_join ON image_tags_join.ImageId = images.ImageId
