@@ -23,7 +23,7 @@
 					<v:PickNewFoldersView DataContext="{Binding PickNewFolders}"/>
 					<Button Margin="0" Width="175" HorizontalContentAlignment="Center" Command="{Binding ToggleFiltersCommand}">Filters</Button>
 					<Button Margin="0" Width="175" HorizontalContentAlignment="Center" Command="{Binding ToggleSettingsCommand}">Settings</Button>
-					<Button Margin="0" Width="175" HorizontalContentAlignment="Center" Command="{Binding RemoveAllFavoriteFoldersCommand}">Delete Favorite Folders</Button>
+					<Button Margin="0" Width="175" HorizontalContentAlignment="Center" Command="{Binding RemoveAllFavoriteFoldersCommand}">Clear Favorite Folders</Button>
 				</MenuItem>
 			</Menu>
 		</StackPanel>
@@ -226,7 +226,7 @@
 									<Button Grid.Row="0" Grid.Column="2" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="2" IsEnabled="{Binding !IsRoot}"
 											Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).MoveFolderToTrashCommand}"
 											CommandParameter="{Binding}">
-										Move To Trash
+										Trash
 									</Button>
 								</Grid>
 								<Grid RowDefinitions="Auto" ColumnDefinitions="*,*" MaxWidth="600" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
@@ -294,7 +294,7 @@
 									<Button Grid.Row="0" Grid.Column="2" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="2"
 											Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).MoveImageToTrashCommand}"
 											CommandParameter="{Binding}">
-										Move To Trash
+										Trash
 									</Button>
 								</Grid>
 								
