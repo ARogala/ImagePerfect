@@ -1,4 +1,5 @@
 ﻿using ImagePerfect.Models;
+using ImagePerfect.ViewModels;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
@@ -8,6 +9,23 @@ namespace ImagePerfect.Helpers
 {
     public static class SqlStringBuilder
     {
+        public static string BuildSqlForMoveImagesToTrash(List<ImageViewModel> images)
+        {
+            StringBuilder sb = new StringBuilder("DELETE FROM images WHERE ImageId IN (");
+            for (int i = 0; i < images.Count; i++) 
+            { 
+                if(i <  images.Count - 1)
+                {
+                    sb.Append($"{images[i].ImageId},");
+                }
+                else
+                {
+                    sb.Append($"{images[i].ImageId}");
+                }
+            }
+            sb.Append(");");
+            return sb.ToString();
+        }
         public static string BuildFolderSqlForFolderMove(List<Folder> folders)
         {
             //need two sql string one that updates both folder path and coverimage path

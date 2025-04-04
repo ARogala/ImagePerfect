@@ -19,5 +19,6 @@ namespace ImagePerfect.Repository.IRepository
         Task<bool> UpdateImageRatingFromMetaData(string imageUpdateSql, int folderId);
         Task ClearImageTagsJoinForMetaData(Image image);
         Task<bool> DeleteImageTag(ImageTag tag);
+        Task<bool> DeleteSelectedImages(string sql);
     }
 }

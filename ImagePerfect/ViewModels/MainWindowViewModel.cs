@@ -16,6 +16,8 @@ using DynamicData;
 using System.IO;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
+using Avalonia.Controls;
+using Image = ImagePerfect.Models.Image;
 
 namespace ImagePerfect.ViewModels
 {
@@ -130,8 +132,8 @@ namespace ImagePerfect.ViewModels
             OpenCurrentDirectoryWithExplorerCommand = ReactiveCommand.Create(() => { 
                 OpenCurrentDirectoryWithExplorer();
             });
-            MoveImageToTrashCommand = ReactiveCommand.Create((ImageViewModel imageVm) => { 
-                MoveImageToTrash(imageVm);
+            MoveImageToTrashCommand = ReactiveCommand.Create(async (ImageViewModel imageVm) => { 
+                await MoveImageToTrash(imageVm);
             });
             MoveFolderToTrashCommand = ReactiveCommand.Create((FolderViewModel folderVm) => { 
                 MoveFolderToTrash(folderVm);
@@ -213,6 +215,10 @@ namespace ImagePerfect.ViewModels
             RemoveAllFavoriteFoldersCommand = ReactiveCommand.Create(async () =>
             {
                 await RemoveAllFavoriteFolders();
+            });
+            MoveSelectedImagesToTrashCommand = ReactiveCommand.Create(async (ItemsControl imagesItemsControl) =>
+            {
+                await MoveSelectedImagesToTrash(imagesItemsControl);
             });
             //CreateNewFolderCommand = ReactiveCommand.Create(() => { CreateNewFolder(); });
             Initialize();
@@ -396,7 +402,7 @@ namespace ImagePerfect.ViewModels
 
         public ReactiveCommand<Unit, Unit> OpenCurrentDirectoryWithExplorerCommand { get; }
 
-        public ReactiveCommand<ImageViewModel, Unit> MoveImageToTrashCommand { get; }
+        public ReactiveCommand<ImageViewModel, Task> MoveImageToTrashCommand { get; }
 
         public ReactiveCommand<FolderViewModel, Unit> MoveFolderToTrashCommand { get; }
 
@@ -438,6 +444,8 @@ namespace ImagePerfect.ViewModels
         public ReactiveCommand<Unit, Task> GetAllFavoriteFoldersCommand {  get; } 
 
         public ReactiveCommand<Unit, Task> RemoveAllFavoriteFoldersCommand { get; }
+
+        public ReactiveCommand<ItemsControl, Task> MoveSelectedImagesToTrashCommand { get; }
 
         //public ReactiveCommand<Unit, Unit> CreateNewFolderCommand { get; }
 
@@ -1307,7 +1315,63 @@ namespace ImagePerfect.ViewModels
             }
         }
 
-        private async void MoveImageToTrash(ImageViewModel imageVm)
+        private async Task MoveSelectedImagesToTrash(ItemsControl imagesItemsControl)
+        {
+            List<ImageViewModel> allImages = imagesItemsControl.Items.OfType<ImageViewModel>().ToList();
+            List<ImageViewModel> imagesToDelete = new List<ImageViewModel>();
+            foreach (ImageViewModel image in allImages)
+            {
+                if (image.IsSelected && File.Exists(image.ImagePath))
+                {
+                    imagesToDelete.Add(image);
+                }
+            }
+            if(imagesToDelete.Count == 0)
+            {
+                var box = MessageBoxManager.GetMessageBoxStandard("Delete Images", "You need to select images to delete.", ButtonEnum.Ok);
+                await box.ShowAsync();
+                return;
+            }
+            var boxYesNo = MessageBoxManager.GetMessageBoxStandard("Delete Images", "Are you sure you want to delete these images?", ButtonEnum.YesNo);
+            var boxResult = await boxYesNo.ShowAsync();
+            if (boxResult == ButtonResult.Yes) 
+            {
+                (List<Folder> folders, List<FolderTag> tags) folderResult = await _folderMethods.GetFoldersInDirectory(allImages[0].ImageFolderPath);
+                displayFolders = folderResult.folders;
+                (List<Image> images, List<ImageTag> tags) imageResult = await _imageMethods.GetAllImagesInFolder(allImages[0].FolderId);
+                displayImages = imageResult.images;
+                if (displayImages.Count == 1 && displayFolders.Count == 0)
+                {
+                    var box = MessageBoxManager.GetMessageBoxStandard("Delete Image", "This is the last image in the folder go back and delete the folder", ButtonEnum.Ok);
+                    await box.ShowAsync();
+                    return;
+                }
+                Folder? rootFolder = await _folderMethods.GetRootFolder();
+                string trashFolderPath = PathHelper.GetTrashFolderPath(rootFolder.FolderPath);
+
+                //create ImagePerfectTRASH if it doesnt exist
+                if (!Directory.Exists(trashFolderPath))
+                {
+                    Directory.CreateDirectory(trashFolderPath);
+                }
+                
+                string sql = SqlStringBuilder.BuildSqlForMoveImagesToTrash(imagesToDelete);
+                bool success = await _imageMethods.DeleteSelectedImages(sql);
+                if (success) 
+                {
+                    foreach (ImageViewModel image in imagesToDelete) 
+                    {
+                        //move file to trash folder
+                        string newImagePath = PathHelper.GetImageFileTrashPath(image, trashFolderPath);
+                        File.Move(image.ImagePath, newImagePath);
+                    }
+                    //refresh UI
+                    await RefreshImages("", allImages[0].FolderId);
+                }
+            }
+        }
+
+        private async Task MoveImageToTrash(ImageViewModel imageVm)
         {
            
             var boxYesNo = MessageBoxManager.GetMessageBoxStandard("Delete Image", "Are you sure you want to delete your image?", ButtonEnum.YesNo);

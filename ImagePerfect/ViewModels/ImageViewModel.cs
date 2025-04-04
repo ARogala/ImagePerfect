@@ -17,6 +17,7 @@ namespace ImagePerfect.ViewModels
 		private string _imageFolderPath;
 		private bool _imageMetaDataScanned;
 		private int _folderId;
+		private bool _isSelected = false;
 
         public int ImageId
 		{
@@ -69,6 +70,12 @@ namespace ImagePerfect.ViewModels
 		{
 			get => _folderId;
 			set => this.RaiseAndSetIfChanged(ref _folderId, value);
+		}
+
+		public bool IsSelected
+		{
+			get => _isSelected;
+			set => this.RaiseAndSetIfChanged(ref _isSelected, value);
 		}
 
         //for many to many relationship folder_tags_join
