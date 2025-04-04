@@ -332,7 +332,7 @@
 						Trash Selected
 					</Button>
 					<Button Margin="5" HorizontalAlignment="Center"
-						Command="{Binding MoveSelectedImagesToTrashCommand}"
+						Command="{Binding MoveSelectedImagesToNewFolderCommand}"
 						CommandParameter="{Binding #ImagesItemsControl}">
 						Move Selected
 					</Button>
