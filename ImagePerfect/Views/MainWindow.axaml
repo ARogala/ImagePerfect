@@ -336,6 +336,7 @@
 						CommandParameter="{Binding #ImagesItemsControl}">
 						Move Selected
 					</Button>
+					<v:PickImageMoveToFolderView DataContext="{Binding #Root.((vm:MainWindowViewModel)DataContext).PickImageMoveToFolder}"/>
 				</StackPanel>
 				
 			</StackPanel>

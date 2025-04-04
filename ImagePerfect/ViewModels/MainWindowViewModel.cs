@@ -34,6 +34,7 @@ namespace ImagePerfect.ViewModels
         private bool _showManageImages = false;
         private string _currentDirectory;
         private string _savedDirectory;
+        private string _selectedImagesNewDirectory = string.Empty;
         private bool _filterInCurrentDirectory = false;
         private string _rootFolderLocation;
         private string _newFolderName;
@@ -350,6 +351,11 @@ namespace ImagePerfect.ViewModels
             set => this.RaiseAndSetIfChanged(ref _currentDirectory, value);
         }
 
+        public string SelectedImagesNewDirectory
+        {
+            get => _selectedImagesNewDirectory;
+            set => this.RaiseAndSetIfChanged(ref _selectedImagesNewDirectory, value);
+        }
         public string SavedDirectory
         {
             get => _savedDirectory;
@@ -380,6 +386,8 @@ namespace ImagePerfect.ViewModels
         public PickNewFoldersViewModel PickNewFolders { get => new PickNewFoldersViewModel(_unitOfWork, this); }
 
         public PickMoveToFolderViewModel PickMoveToFolder { get => new PickMoveToFolderViewModel(_unitOfWork, this); }
+
+        public PickImageMoveToFolderViewModel PickImageMoveToFolder { get => new PickImageMoveToFolderViewModel(_unitOfWork, this); }
 
         public PickFolderCoverImageViewModel PickCoverImage { get => new PickFolderCoverImageViewModel(_unitOfWork, this); }
 
@@ -1346,6 +1354,12 @@ namespace ImagePerfect.ViewModels
 
         private async Task MoveSelectedImagesToNewFolder(ItemsControl imagesItemsControl)
         {
+            if(SelectedImagesNewDirectory == null || SelectedImagesNewDirectory == "")
+            {
+                var box = MessageBoxManager.GetMessageBoxStandard("Move Images", "You need to select the move to folder first.", ButtonEnum.Ok);
+                await box.ShowAsync();
+                return;
+            }
             List<ImageViewModel> allImages = imagesItemsControl.Items.OfType<ImageViewModel>().ToList();
             List<ImageViewModel> imagesToMove = new List<ImageViewModel>();
             foreach (ImageViewModel image in allImages) 
@@ -1361,6 +1375,15 @@ namespace ImagePerfect.ViewModels
                 var box = MessageBoxManager.GetMessageBoxStandard("Move Images", "You need to select images to move.", ButtonEnum.Ok);
                 await box.ShowAsync();
                 return;
+            }
+            var boxYesNo = MessageBoxManager.GetMessageBoxStandard("Move Images", $"Are you sure you want to move these images to {SelectedImagesNewDirectory}?", ButtonEnum.YesNo);
+            var boxResult = await boxYesNo.ShowAsync();
+            if (boxResult == ButtonResult.Yes)
+            {
+                //move the fucking things
+
+                //in db just need to modify ImagePath, ImageFolderPath and FolderId -- shit how to get the folderID??
+                //guess i need a special method just to get single folder with the SelectedImagesNewDirectory
             }
         }
         private async Task MoveSelectedImagesToTrash(ItemsControl imagesItemsControl)
