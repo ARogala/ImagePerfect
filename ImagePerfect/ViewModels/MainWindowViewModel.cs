@@ -224,6 +224,9 @@ namespace ImagePerfect.ViewModels
             {
                 await MoveSelectedImagesToTrash(imagesItemsControl);
             });
+            MoveSelectedImagesToNewFolderCommand = ReactiveCommand.Create(async (ItemsControl imagesItemsControl) => { 
+                await MoveSelectedImagesToNewFolder(imagesItemsControl);
+            });
             //CreateNewFolderCommand = ReactiveCommand.Create(() => { CreateNewFolder(); });
             Initialize();
         }
@@ -459,6 +462,8 @@ namespace ImagePerfect.ViewModels
         public ReactiveCommand<Unit, Task> RemoveAllFavoriteFoldersCommand { get; }
 
         public ReactiveCommand<ItemsControl, Task> MoveSelectedImagesToTrashCommand { get; }
+
+        public ReactiveCommand<ItemsControl, Task> MoveSelectedImagesToNewFolderCommand { get; }
 
         //public ReactiveCommand<Unit, Unit> CreateNewFolderCommand { get; }
 
@@ -1339,6 +1344,25 @@ namespace ImagePerfect.ViewModels
             }
         }
 
+        private async Task MoveSelectedImagesToNewFolder(ItemsControl imagesItemsControl)
+        {
+            List<ImageViewModel> allImages = imagesItemsControl.Items.OfType<ImageViewModel>().ToList();
+            List<ImageViewModel> imagesToMove = new List<ImageViewModel>();
+            foreach (ImageViewModel image in allImages) 
+            {
+                if (image.IsSelected && File.Exists(image.ImagePath))
+                {
+                    Debug.WriteLine(image.FileName);
+                    imagesToMove.Add(image);
+                }
+            }
+            if(imagesToMove.Count == 0)
+            {
+                var box = MessageBoxManager.GetMessageBoxStandard("Move Images", "You need to select images to move.", ButtonEnum.Ok);
+                await box.ShowAsync();
+                return;
+            }
+        }
         private async Task MoveSelectedImagesToTrash(ItemsControl imagesItemsControl)
         {
             List<ImageViewModel> allImages = imagesItemsControl.Items.OfType<ImageViewModel>().ToList();
