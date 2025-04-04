@@ -31,6 +31,7 @@ namespace ImagePerfect.ViewModels
         private bool _showLoading;
         private bool _showFilters = false;
         private bool _showSettings = false;
+        private bool _showManageImages = false;
         private string _currentDirectory;
         private string _savedDirectory;
         private bool _filterInCurrentDirectory = false;
@@ -153,6 +154,9 @@ namespace ImagePerfect.ViewModels
             ToggleSettingsCommand = ReactiveCommand.Create(() => { 
                 ToggleSettings();
             });
+            ToggleManageImagesCommand = ReactiveCommand.Create(() => { 
+                ToggleManageImages();
+            });
             ToggleFiltersCommand = ReactiveCommand.Create(() => { 
                 ToggleFilters();
             });
@@ -222,6 +226,12 @@ namespace ImagePerfect.ViewModels
             });
             //CreateNewFolderCommand = ReactiveCommand.Create(() => { CreateNewFolder(); });
             Initialize();
+        }
+
+        public bool ShowManageImages
+        {
+            get => _showManageImages;
+            set => this.RaiseAndSetIfChanged(ref _showManageImages, value);
         }
 
         public bool ShowSettings
@@ -415,7 +425,10 @@ namespace ImagePerfect.ViewModels
         public ReactiveCommand<decimal, Task> GoToPageCommand { get; }
 
         public ReactiveCommand<Unit, Unit> ToggleSettingsCommand { get; }
+
         public ReactiveCommand<Unit, Unit> ToggleFiltersCommand { get; }
+
+        public ReactiveCommand<Unit, Unit> ToggleManageImagesCommand { get; }
 
         public ReactiveCommand<decimal, Task> FilterImagesOnRatingCommand { get; }
 
@@ -582,6 +595,17 @@ namespace ImagePerfect.ViewModels
             await RefreshImages(CurrentDirectory);
         }
 
+        private void ToggleManageImages()
+        {
+            if (ShowManageImages)
+            {
+                ShowManageImages = false;
+            }
+            else
+            {
+                ShowManageImages = true;
+            }
+        }
         private void ToggleSettings()
         {
             if (ShowSettings)
@@ -1413,7 +1437,7 @@ namespace ImagePerfect.ViewModels
                 }
             }
         }
-
+        
         private async void MoveFolderToTrash(FolderViewModel folderVm)
         {
             //only allow delete if folder does not contain children/sub directories
