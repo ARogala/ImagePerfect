@@ -71,6 +71,16 @@ namespace ImagePerfect.Repository
             return (folders,tags);
         }
 
+        //get the folder at the path -- only one folder returned
+        public async Task<Folder> GetFolderAtDirectory(string directoryPath)
+        {
+            //fomats the path correctly for this case as well. Maybe new method name.
+            string path = PathHelper.GetRegExpStringDirectoryTree(directoryPath);
+            string sql = @"SELECT * FROM folders WHERE FolderPath LIKE '" + path + "'";
+            Folder folder = (Folder)await _connection.QuerySingleAsync<Folder>(sql);
+            return folder;
+        }
+
         public async Task<(List<Folder> folders, List<FolderTag> tags)> GetAllFoldersAtRating(int rating, bool filterInCurrentDirectory, string currentDirectory)
         {
             await _connection.OpenAsync();

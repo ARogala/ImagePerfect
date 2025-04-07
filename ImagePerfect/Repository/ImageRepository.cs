@@ -192,6 +192,13 @@ namespace ImagePerfect.Repository
             return rowsEffected > 0 ? true : false;
         }
 
+        public async Task<bool> MoveSelectedImageToNewFolder(string sql)
+        {
+            int rowsEffected = await _connection.ExecuteAsync(sql);
+            await _connection.CloseAsync();
+            return rowsEffected > 0 ? true : false;
+        }
+
         public async Task<List<string>> GetTagsList()
         {
             string sql = @"SELECT TagName FROM tags";

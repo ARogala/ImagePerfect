@@ -61,6 +61,11 @@ namespace ImagePerfect.Models
             return await _unitOfWork.Image.DeleteSelectedImages(sql);
         }
 
+        public async Task<bool> MoveSelectedImageToNewFolder(string sql)
+        {
+            return await _unitOfWork.Image.MoveSelectedImageToNewFolder(sql);
+        }
+
         public async Task<List<string>> GetTagsList()
         {
             return await _unitOfWork.Image.GetTagsList();

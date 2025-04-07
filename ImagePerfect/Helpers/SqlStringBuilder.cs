@@ -26,6 +26,39 @@ namespace ImagePerfect.Helpers
             sb.Append(");");
             return sb.ToString();
         }
+
+        public static string BuildSqlForMoveImagesToNewFolder(List<ImageViewModel> imagesToMove)
+        {
+            StringBuilder sb = new StringBuilder("UPDATE images SET ImagePath = CASE ");
+            foreach (ImageViewModel image in imagesToMove) 
+            {
+                sb.Append($"WHEN ImageId = {image.ImageId} THEN '{PathHelper.FormatPathForDbStorage(image.ImagePath)}' ");
+            }
+            sb.Append("ELSE ImagePath END, ImageFolderPath = CASE ");
+            foreach(ImageViewModel image in imagesToMove)
+            {
+                sb.Append($"WHEN ImageId = {image.ImageId} THEN '{PathHelper.FormatPathForDbStorage(image.ImageFolderPath)}' ");
+            }
+            sb.Append("ELSE ImageFolderPath END, FolderId = CASE ");
+            foreach(ImageViewModel image in imagesToMove)
+            {
+                sb.Append($"WHEN ImageId = {image.ImageId} THEN {image.FolderId} ");
+            }
+            sb.Append($"ELSE FolderId END WHERE ImageId IN (");
+            for(int i = 0; i < imagesToMove.Count; i++)
+            {
+                if(i < imagesToMove.Count - 1)
+                {
+                    sb.Append($"{imagesToMove[i].ImageId},");
+                }
+                else
+                {
+                    sb.Append($"{imagesToMove[i].ImageId}");
+                }
+            }
+            sb.Append(");");
+            return sb.ToString();
+        }
         public static string BuildFolderSqlForFolderMove(List<Folder> folders)
         {
             //need two sql string one that updates both folder path and coverimage path
