@@ -1360,13 +1360,21 @@ namespace ImagePerfect.ViewModels
                 await box.ShowAsync();
                 return;
             }
+            //get folder at SelectedImagesNewDirectory
+            Folder imagesNewFolder = await _folderMethods.GetFolderAtDirectory(SelectedImagesNewDirectory);
+            //prevent a double import and only allow move to folders that are already imported
+            if(imagesNewFolder.HasFiles == true && imagesNewFolder.AreImagesImported == false)
+            {
+                var box = MessageBoxManager.GetMessageBoxStandard("Move Images", "The move to folder has to have its current images imported first.", ButtonEnum.Ok);
+                await box.ShowAsync();
+                return;
+            }
             List<ImageViewModel> allImages = imagesItemsControl.Items.OfType<ImageViewModel>().ToList();
             List<ImageViewModel> imagesToMove = new List<ImageViewModel>();
             foreach (ImageViewModel image in allImages) 
             {
                 if (image.IsSelected && File.Exists(image.ImagePath))
                 {
-                    Debug.WriteLine(image.FileName);
                     imagesToMove.Add(image);
                 }
             }
@@ -1380,10 +1388,32 @@ namespace ImagePerfect.ViewModels
             var boxResult = await boxYesNo.ShowAsync();
             if (boxResult == ButtonResult.Yes)
             {
-                //move the fucking things
-
-                //in db just need to modify ImagePath, ImageFolderPath and FolderId -- shit how to get the folderID??
-                //guess i need a special method just to get single folder with the SelectedImagesNewDirectory
+                
+                //modify ImagePath, ImageFolderPath and FolderId for each image in imagesToMove 
+                List<ImageViewModel> imagesToMoveModifiedPaths = PathHelper.ModifyImagePathsForMoveImagesToNewFolder(imagesToMove, imagesNewFolder);
+                //get image move sql
+                string imageMoveSql = SqlStringBuilder.BuildSqlForMoveImagesToNewFolder(imagesToMoveModifiedPaths);
+                //move images in db
+                bool success = await _imageMethods.MoveSelectedImageToNewFolder(imageMoveSql);
+                //move images on disk
+                if (success) 
+                {
+                    for (int i = 0; i < imagesToMoveModifiedPaths.Count; i++) 
+                    {
+                        File.Move(imagesToMove[i].ImagePath, imagesToMoveModifiedPaths[i].ImagePath);
+                    }
+                }
+                //if new folder did not have images before it does now so set to true
+                if (imagesNewFolder.HasFiles == false)
+                {
+                    imagesNewFolder.HasFiles = true;
+                    imagesNewFolder.AreImagesImported = true;
+                    await _folderMethods.UpdateFolder(imagesNewFolder);
+                }
+                //reset SelectedImageNewDirectory
+                SelectedImagesNewDirectory = string.Empty;
+                //refresh UI
+                await RefreshImages("", allImages[0].FolderId);
             }
         }
         private async Task MoveSelectedImagesToTrash(ItemsControl imagesItemsControl)

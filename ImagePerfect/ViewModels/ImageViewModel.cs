@@ -19,12 +19,28 @@ namespace ImagePerfect.ViewModels
 		private int _folderId;
 		private bool _isSelected = false;
 
+		public ImageViewModel() { }
+		//copy constructor so i can make a deep copy of this object
+        public ImageViewModel(ImageViewModel imageVm)
+        {
+			ImageId = imageVm.ImageId;
+			ImageBitmap = imageVm.ImageBitmap;
+			ImagePath = imageVm.ImagePath;
+			FileName = imageVm.FileName;
+			ImageTags = imageVm.ImageTags;	
+			NewTag = imageVm.NewTag;
+			ImageRating = imageVm.ImageRating;
+			ImageFolderPath = imageVm.ImageFolderPath;
+			ImageMetaDataScanned = imageVm.ImageMetaDataScanned;
+			FolderId = imageVm.FolderId;
+			IsSelected = imageVm.IsSelected;
+			Tags = imageVm.Tags;
+        }
         public int ImageId
 		{
 			get => _imageId;
 			set => this.RaiseAndSetIfChanged(ref _imageId, value);
 		}
-
 		public Bitmap ImageBitmap
 		{
 			get => _imageBitmap;
@@ -71,13 +87,11 @@ namespace ImagePerfect.ViewModels
 			get => _folderId;
 			set => this.RaiseAndSetIfChanged(ref _folderId, value);
 		}
-
 		public bool IsSelected
 		{
 			get => _isSelected;
 			set => this.RaiseAndSetIfChanged(ref _isSelected, value);
 		}
-
         //for many to many relationship folder_tags_join
 		public List<ImageTag> Tags { get; set; } = new List<ImageTag>();
     }

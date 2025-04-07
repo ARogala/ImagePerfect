@@ -105,6 +105,22 @@ namespace ImagePerfect.Helpers
             }
             return images;
         }
+
+        public static List<ImageViewModel> ModifyImagePathsForMoveImagesToNewFolder(List<ImageViewModel> imagesToMove, Folder imagesNewFolder) 
+        {
+            List<ImageViewModel> imagesToMoveModifiedPaths = new List<ImageViewModel>();
+            foreach (ImageViewModel imgToMove in imagesToMove)
+            {
+                imagesToMoveModifiedPaths.Add(new ImageViewModel(imgToMove));
+            }
+            foreach (ImageViewModel image in imagesToMoveModifiedPaths) 
+            {
+                image.ImagePath = imagesNewFolder.FolderPath + getPathSlash() + image.FileName;
+                image.ImageFolderPath = imagesNewFolder.FolderPath;
+                image.FolderId = imagesNewFolder.FolderId;
+            }
+            return imagesToMoveModifiedPaths;
+        }
         //returns path to end starting at the provied folderName
         //path must contain folderName
         private static string ReturnPartialPath(string path, string folderName)
