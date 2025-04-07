@@ -21,11 +21,13 @@ public partial class PickNewFoldersView : ReactiveUserControl<PickNewFoldersView
     {
         // Get our parent top level control in order to get the needed service (in our sample the storage provider. Can also be the clipboard etc.)
         TopLevel? topLevel = TopLevel.GetTopLevel(this);
+        var startLocation = await topLevel!.StorageProvider.TryGetFolderFromPathAsync(context.Input);
         var storageFolders = await topLevel!.StorageProvider.OpenFolderPickerAsync(
                 new FolderPickerOpenOptions()
                 {
                     AllowMultiple = true,
-                    Title = context.Input
+                    Title = "Select New Folders",
+                    SuggestedStartLocation = startLocation
                 }
             );
         context.SetOutput(storageFolders.Select(x => x.Path.ToString()).ToList());

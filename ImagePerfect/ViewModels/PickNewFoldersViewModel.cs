@@ -46,7 +46,7 @@ namespace ImagePerfect.ViewModels
                 return;
             }
 
-            _NewFolders = await _SelectNewFoldersInteraction.Handle("Select New Folders");
+            _NewFolders = await _SelectNewFoldersInteraction.Handle(rootFolder.FolderPath);
 			//list will be empty if Cancel is pressed exit method
 			if (_NewFolders.Count == 0) 
 			{
