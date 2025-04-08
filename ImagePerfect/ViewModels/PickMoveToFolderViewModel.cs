@@ -10,6 +10,8 @@ using ReactiveUI;
 using ImagePerfect.Models;
 using ImagePerfect.Repository.IRepository;
 using System.IO;
+using System.Diagnostics;
+using System.Linq;
 
 namespace ImagePerfect.ViewModels
 {
@@ -89,6 +91,9 @@ namespace ImagePerfect.ViewModels
             //build sql string and update db
             string folderMoveSql = SqlStringBuilder.BuildFolderSqlForFolderMove(folders);
             string imageMoveSql = SqlStringBuilder.BuildImageSqlForFolderMove(images);
+           
+            Folder moveToFolder = await _folderMethods.GetFolderAtDirectory(newFolderPath);
+            Folder parentOfTheFolderToMove = await _folderMethods.GetFolderAtDirectory(PathHelper.RemoveOneFolderFromPath(folderVm.FolderPath));
             //move images and folders in db do both in a transaction
             bool success = await _folderMethods.MoveFolder(folderMoveSql, imageMoveSql);
             //move folder in filesystem if db move is successfull
@@ -100,6 +105,11 @@ namespace ImagePerfect.ViewModels
                     //update lib folders to show the folder has moved
                     string foldersDirectoryPath = PathHelper.RemoveOneFolderFromPath(folderVm.FolderPath);
                     await _mainWindowViewModel.RefreshFolders(foldersDirectoryPath);
+                    //update the moveToFolder and parentOfTheFolderToMove HasChildren propery
+                    moveToFolder.HasChildren = true;
+                    parentOfTheFolderToMove.HasChildren = Directory.GetDirectories(parentOfTheFolderToMove.FolderPath).Any();
+                    await _folderMethods.UpdateFolder(moveToFolder);
+                    await _folderMethods.UpdateFolder(parentOfTheFolderToMove);
                 }
                 catch (Exception e)
                 {
