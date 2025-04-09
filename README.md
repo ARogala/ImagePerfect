@@ -26,27 +26,62 @@ I wrote this application to learn some desktop application development and becau
 	* Also photos and metadata are not imported initially but are done on each folder by the user before before viewing the photos in that folder. The operations are fast enough this is not a issue for me. 
 4. Model the file system to make it easy and fast to move folders/images in the application while moving the folders/images in the file system at the same time as well.
 5. Provide a way to import all the tags written on the image from Shotwell (this requires you had Shotwell actually write the tags and rating to the image itself).
+6. ImagePerfect is currently designed to be a great image viewer with tagging and organization features. Its use case for me is to get a big library organized and cleaned up/trimmed down.
 
-Number 4 can still use some work. 
+Number 4 is basically complete but could maybe use some fine tuning. 
 
 The app currently can 
 
 1. Move folders
 2. Pick new folders that were added with the file system 
-	* These new folders need images in them before picking
-3. Delete folders
-4. Delete individual/single images
+	* These new folders should have images in them before picking
+	* Otherwise best just to create a new empty folder within the app and move images to it 
+3. Create new empty folders within the app
+4. Delete folders
+5. Delete individual/single images
+6. Delete multiple images
+7. Move multiple images
 
-But needs to have
+Maybe add
 
 1. Rename folders
-2. Add new folders with app function
-3. Move individual or groups of images to folders
-4. Re-scan a folder for newly images added
+2. Re-scan a folder for newly images added -- useful so you can add images to a folder from they file system then re-scan
+
+## Other Features to add
+
+1. Filter folders to get not imported ones -- useful for large libraries
+2. Filter folders to get metadata not scanned ones -- useful for large libraries
+3. Section to show total number of imported photos
+4. A way to find duplicate images -- big task
+5. Facial recognition -- big task
+6. Improve the UI
+7. Improve Tagging right now you can only add one tag at a time. Make it so you can add several tags at once if comma separated
+8. Maybe make a SQLite version so no server set up -- the reason for the MySQL server is i plan to have a mobile client so you can at least view photos via you phone
+9. look into making the mobile client 
+10. Maybe find a way to scan library root folder to find folders added to file system but not added to app
+11. A way to prevent adding the same folder twice. Right now its up to the user to be careful about adding new folders after the initial library add.
 
 ## Screen Shot
 
 ![Image](AppScreenShot4-2-25.png)
+
+## Build and Install directions
+
+to be added
+
+## Server set up and configuration directions
+
+to be added
+
+## back up and restore database directions
+
+to be added
+
+## directions to back up photos and move the app and database to a new pc.
+
+to be added
+
+
 
 
  
