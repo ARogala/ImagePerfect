@@ -59,7 +59,7 @@ namespace ImagePerfect.ViewModels
                 return;
             }
 
-            _MoveToFolderPath = await _SelectMoveToFolderInteration.Handle("Select Folder To Move To");
+            _MoveToFolderPath = await _SelectMoveToFolderInteration.Handle(_mainWindowViewModel.CurrentDirectory);
 			//list will be empty if Cancel is pressed exit method
 			if (_MoveToFolderPath.Count == 0) 
 			{ 

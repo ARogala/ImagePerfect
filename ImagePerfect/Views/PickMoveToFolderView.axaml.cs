@@ -23,12 +23,13 @@ public partial class PickMoveToFolderView : ReactiveUserControl<PickMoveToFolder
     {
         // Get our parent top level control in order to get the needed service (in our sample the storage provider. Can also be the clipboard etc.)
         TopLevel? topLevel = TopLevel.GetTopLevel(this);
-
+        var startLocation = await topLevel!.StorageProvider.TryGetFolderFromPathAsync(context.Input);
         var storageFolder = await topLevel!.StorageProvider.OpenFolderPickerAsync(
                 new FolderPickerOpenOptions() 
                 { 
                     AllowMultiple= false,
-                    Title = context.Input
+                    Title = "Select Folder To Move To",
+                    SuggestedStartLocation = startLocation,
                 }
             );
         context.SetOutput(storageFolder.Select(x => x.Path.ToString()).ToList());
