@@ -110,6 +110,35 @@ namespace ImagePerfect.Repository
             return (allFoldersAtRating,tags);
         }
 
+        public async Task<(List<Folder> folders, List<FolderTag> tags)> GetAllFoldersWithNoImportedImages(bool filterInCurrentDirectory, string currentDirectory)
+        {
+            await _connection.OpenAsync();
+            MySqlTransaction txn = await _connection.BeginTransactionAsync();
+            string path = PathHelper.FormatPathForLikeOperator(currentDirectory);
+            string sql1 = string.Empty;
+            string sql2 = string.Empty;
+            if (filterInCurrentDirectory) 
+            {
+                sql1 = @"SELECT * FROM folders WHERE AreImagesImported = false AND FolderPath LIKE '" + path + "' ORDER BY FolderName";
+                sql2 = @"SELECT tags.TagId, tags.TagName, folders.FolderId FROM folders 
+                            JOIN folder_tags_join ON folder_tags_join.FolderId = folders.FolderId 
+                            JOIN tags ON folder_tags_join.TagId = tags.TagId WHERE folders.AreImagesImported = false AND FolderPath LIKE '" + path + "' ORDER BY folders.FolderName;";
+            }
+            else
+            {
+                sql1 = @"SELECT * FROM folders WHERE AreImagesImported = false ORDER BY FolderName";
+                sql2 = @"SELECT tags.TagId, tags.TagName, folders.FolderId FROM folders 
+                            JOIN folder_tags_join ON folder_tags_join.FolderId = folders.FolderId 
+                            JOIN tags ON folder_tags_join.TagId = tags.TagId WHERE folders.AreImagesImported = false ORDER BY folders.FolderName;";
+            }
+
+            List<Folder> allFoldersWithNoImportedImages = (List<Folder>)await _connection.QueryAsync<Folder>(sql1, transaction: txn);
+            List<FolderTag> tags = (List<FolderTag>)await _connection.QueryAsync<FolderTag>(sql2, transaction: txn);
+            await txn.CommitAsync();
+            await _connection.CloseAsync();
+            return (allFoldersWithNoImportedImages, tags);
+        }
+
         public async Task<(List<Folder> folders, List<FolderTag> tags)> GetAllFoldersWithTag(string tag, bool filterInCurrentDirectory, string currentDirectory)
         {
             await _connection.OpenAsync();
