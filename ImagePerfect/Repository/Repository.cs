@@ -189,7 +189,7 @@ namespace ImagePerfect.Repository
              */
             Type type = typeof(T);
             string columns = string.Join(", ", type.GetProperties()
-                .Where(p => !excludeKey || !p.IsDefined(typeof(KeyAttribute)))
+                .Where(p => !excludeKey || !p.IsDefined(typeof(KeyAttribute))).Where(p => p.GetCustomAttribute<NotMappedAttribute>() == null)
                 .Select(p =>
                 {
                     var columnAttr = p.GetCustomAttribute<ColumnAttribute>();
@@ -202,7 +202,7 @@ namespace ImagePerfect.Repository
         private static string GetPropertyNames(bool excludeKey = false)
         {
             var properties = typeof(T).GetProperties()
-                .Where(p => !excludeKey || p.GetCustomAttribute<KeyAttribute>() == null);
+                .Where(p => !excludeKey || p.GetCustomAttribute<KeyAttribute>() == null).Where(p => p.GetCustomAttribute<NotMappedAttribute>() == null);
 
             var values = string.Join(", ", properties.Select(p =>
             {
