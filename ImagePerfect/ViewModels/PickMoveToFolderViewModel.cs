@@ -49,6 +49,15 @@ namespace ImagePerfect.ViewModels
                 await box.ShowAsync();
                 return;
             }
+            //pull current folder and sub folders from db
+            List<Folder> folders = await _folderMethods.GetDirectoryTree(folderVm.FolderPath);
+            List<Image> images = await _imageMethods.GetAllImagesInDirectoryTree(folderVm.FolderPath);
+            if (!images.Any()) 
+            {
+                var box = MessageBoxManager.GetMessageBoxStandard("Move Folder", "The folder must have images imported to move it.", ButtonEnum.Ok);
+                await box.ShowAsync();
+                return;
+            }
 
             _MoveToFolderPath = await _SelectMoveToFolderInteration.Handle("Select Folder To Move To");
 			//list will be empty if Cancel is pressed exit method
@@ -80,10 +89,7 @@ namespace ImagePerfect.ViewModels
                 return;
             }
             _mainWindowViewModel.ShowLoading = true;
-            //pull current folder and sub folders from db
-            List<Folder> folders = await _folderMethods.GetDirectoryTree(folderVm.FolderPath);
-            List<Image> images = await _imageMethods.GetAllImagesInDirectoryTree(folderVm.FolderPath);
-           
+            
             //modify folder path and folder, cover image path, and images
             folders = PathHelper.ModifyFolderPathsForFolderMove(folders, folderVm.FolderName, newFolderPath);
             images = PathHelper.ModifyImagePathsForFolderMove(images, folderVm.FolderName, newFolderPath);
