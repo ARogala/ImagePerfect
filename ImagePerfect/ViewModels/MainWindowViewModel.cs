@@ -1414,7 +1414,7 @@ namespace ImagePerfect.ViewModels
             var boxResult = await boxYesNo.ShowAsync();
             if (boxResult == ButtonResult.Yes)
             {
-                
+                ShowLoading = true;
                 //modify ImagePath, ImageFolderPath and FolderId for each image in imagesToMove 
                 List<ImageViewModel> imagesToMoveModifiedPaths = PathHelper.ModifyImagePathsForMoveImagesToNewFolder(imagesToMove, imagesNewFolder);
                 //get image move sql
@@ -1452,7 +1452,9 @@ namespace ImagePerfect.ViewModels
                     SelectedImagesNewDirectory = string.Empty;
                     //refresh UI
                     await RefreshImages("", allImages[0].FolderId);
+                    ShowLoading = false;
                 }
+                ShowLoading = false;
             }
         }
         private async Task MoveSelectedImagesToTrash(ItemsControl imagesItemsControl)
@@ -1476,6 +1478,7 @@ namespace ImagePerfect.ViewModels
             var boxResult = await boxYesNo.ShowAsync();
             if (boxResult == ButtonResult.Yes) 
             {
+                ShowLoading = true;
                 Folder imagesFolder = await _folderMethods.GetFolderAtDirectory(allImages[0].ImageFolderPath);
                 Folder? rootFolder = await _folderMethods.GetRootFolder();
                 string trashFolderPath = PathHelper.GetTrashFolderPath(rootFolder.FolderPath);
@@ -1508,7 +1511,9 @@ namespace ImagePerfect.ViewModels
                     }
                     //refresh UI
                     await RefreshImages("", allImages[0].FolderId);
+                    ShowLoading = false;
                 }
+                ShowLoading = false;
             }
         }
 
@@ -1519,6 +1524,7 @@ namespace ImagePerfect.ViewModels
             var boxResult = await boxYesNo.ShowAsync();
             if (boxResult == ButtonResult.Yes) 
             {
+                ShowLoading = true;
                 (List<Folder> folders, List<FolderTag> tags) folderResult = await _folderMethods.GetFoldersInDirectory(imageVm.ImageFolderPath);
                 displayFolders = folderResult.folders;
                 (List<Image> images, List<ImageTag> tags) imageResultA = await _imageMethods.GetAllImagesInFolder(imageVm.FolderId);
@@ -1550,8 +1556,10 @@ namespace ImagePerfect.ViewModels
 
                         //refresh UI
                         await RefreshImages("",imageVm.FolderId);
+                        ShowLoading = false;
                     }
                 }
+                ShowLoading = false;
             }
         }
         
@@ -1569,6 +1577,7 @@ namespace ImagePerfect.ViewModels
             var boxResult = await boxYesNo.ShowAsync();
             if (boxResult == ButtonResult.Yes) 
             {
+                ShowLoading = true;
                 //the folders parent
                 string pathThatContainsFolder = PathHelper.RemoveOneFolderFromPath(folderVm.FolderPath);                
                 Folder? rootFolder = await _folderMethods.GetRootFolder();
@@ -1604,6 +1613,7 @@ namespace ImagePerfect.ViewModels
                         }
                         //refresh UI
                         await RefreshFolders(pathThatContainsFolder);
+                        ShowLoading = false;
                     }
                 }
             }
