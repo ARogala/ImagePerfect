@@ -32,6 +32,7 @@ namespace ImagePerfect.ViewModels
         private bool _showFilters = false;
         private bool _showSettings = false;
         private bool _showManageImages = false;
+        private bool _showCreateNewFolder = false;
         private string _currentDirectory;
         private string _savedDirectory;
         private string _selectedImagesNewDirectory = string.Empty;
@@ -161,6 +162,9 @@ namespace ImagePerfect.ViewModels
             ToggleFiltersCommand = ReactiveCommand.Create(() => { 
                 ToggleFilters();
             });
+            ToggleCreateNewFolderCommand = ReactiveCommand.Create(() => {
+                ToggleCreateNewFolder();
+            });
             FilterImagesOnRatingCommand = ReactiveCommand.Create(async (decimal rating) => {
                 ResetPagination();
                 selectedRatingForFilter = Decimal.ToInt32(rating);
@@ -228,7 +232,7 @@ namespace ImagePerfect.ViewModels
             MoveSelectedImagesToNewFolderCommand = ReactiveCommand.Create(async (ItemsControl imagesItemsControl) => { 
                 await MoveSelectedImagesToNewFolder(imagesItemsControl);
             });
-            //CreateNewFolderCommand = ReactiveCommand.Create(() => { CreateNewFolder(); });
+            CreateNewFolderCommand = ReactiveCommand.Create(() => { CreateNewFolder(); });
             Initialize();
         }
 
@@ -322,6 +326,13 @@ namespace ImagePerfect.ViewModels
             set => this.RaiseAndSetIfChanged(ref _showLoading, value);
         }
 
+        public bool ShowCreateNewFolder 
+        { 
+            get => _showCreateNewFolder;
+            set => this.RaiseAndSetIfChanged(ref _showCreateNewFolder, value);
+        }
+
+
         public bool IsNewFolderEnabled
         {
             get => _isNewFolderEnabled;
@@ -334,7 +345,7 @@ namespace ImagePerfect.ViewModels
             set 
             {
                 this.RaiseAndSetIfChanged(ref _newFolderName, value);
-                if (value == "" || CurrentDirectory == RootFolderLocation) 
+                if (value == "" || CurrentDirectory == RootFolderLocation || currentFilter != filters.None) 
                 { 
                     IsNewFolderEnabled = false;
                 }
@@ -441,6 +452,8 @@ namespace ImagePerfect.ViewModels
 
         public ReactiveCommand<Unit, Unit> ToggleManageImagesCommand { get; }
 
+        public ReactiveCommand<Unit, Unit> ToggleCreateNewFolderCommand { get; }
+
         public ReactiveCommand<decimal, Task> FilterImagesOnRatingCommand { get; }
 
         public ReactiveCommand<decimal, Task> FilterFoldersOnRatingCommand { get; }
@@ -473,7 +486,7 @@ namespace ImagePerfect.ViewModels
 
         public ReactiveCommand<ItemsControl, Task> MoveSelectedImagesToNewFolderCommand { get; }
 
-        //public ReactiveCommand<Unit, Unit> CreateNewFolderCommand { get; }
+        public ReactiveCommand<Unit, Unit> CreateNewFolderCommand { get; }
 
         private async Task SaveFolderAsFavorite(FolderViewModel folderVm)
         {
@@ -639,6 +652,18 @@ namespace ImagePerfect.ViewModels
             else
             {
                 ShowFilters = true;
+            }
+        }
+
+        private void ToggleCreateNewFolder()
+        {
+            if (ShowCreateNewFolder)
+            {
+                ShowCreateNewFolder = false;
+            }
+            else
+            {
+                ShowCreateNewFolder = true;
             }
         }
         private List<Image> ImagePagination()
@@ -1544,17 +1569,8 @@ namespace ImagePerfect.ViewModels
             var boxResult = await boxYesNo.ShowAsync();
             if (boxResult == ButtonResult.Yes) 
             {
-                string pathThatContainsFolder = PathHelper.RemoveOneFolderFromPath(folderVm.FolderPath);
-                (List<Image> images, List<ImageTag> tags) imageResult = await _imageMethods.GetAllImagesInFolder(pathThatContainsFolder);
-                displayImages = imageResult.images;
-                (List<Folder> folders, List<FolderTag> tags) folderResultA = await _folderMethods.GetFoldersInDirectory(pathThatContainsFolder);
-                displayFolders = folderResultA.folders;
-                if (displayFolders.Count == 1 && displayImages.Count == 0)
-                {
-                    var box = MessageBoxManager.GetMessageBoxStandard("Delete Folder", "This is the last folder in the current directory go back and delete the root folder", ButtonEnum.Ok);
-                    await box.ShowAsync();
-                    return;
-                }
+                //the folders parent
+                string pathThatContainsFolder = PathHelper.RemoveOneFolderFromPath(folderVm.FolderPath);                
                 Folder? rootFolder = await _folderMethods.GetRootFolder();
                 string trashFolderPath = PathHelper.GetTrashFolderPath(rootFolder.FolderPath);
 
@@ -1566,13 +1582,26 @@ namespace ImagePerfect.ViewModels
                 if (Directory.Exists(folderVm.FolderPath))
                 {
                     //delete folder from db -- does not delete sub folders.
+                    //images table child of folders ON DELETE CASCADE is applied on sql to delete all images if a folder is deleted
                     bool success = await _folderMethods.DeleteFolder(folderVm.FolderId);
                     if (success) 
                     {
                         //move folder to trash folder
                         string newFolderPath = PathHelper.GetFolderTrashPath(folderVm, trashFolderPath);
                         Directory.Move(folderVm.FolderPath, newFolderPath);
-
+                        //update the parent folder HasChildren prop
+                        List<Folder> parentFolderDirTree = await _folderMethods.GetDirectoryTree(pathThatContainsFolder);
+                        Folder parentFolder = await _folderMethods.GetFolderAtDirectory(pathThatContainsFolder);
+                        if (parentFolderDirTree.Count > 1)
+                        {
+                            parentFolder.HasChildren = true;
+                            await _folderMethods.UpdateFolder(parentFolder);
+                        }
+                        else
+                        {
+                            parentFolder.HasChildren = false;
+                            await _folderMethods.UpdateFolder(parentFolder);
+                        }
                         //refresh UI
                         await RefreshFolders(pathThatContainsFolder);
                     }
@@ -1630,59 +1659,51 @@ namespace ImagePerfect.ViewModels
             }
             ShowLoading = false;
         }
-   
-        /*
-         A bit too much complexity at the moment. For now to add a new folder with images make that in the filesystem and use
-         the current add new folders method. At some point i want to add this along with moving images.
-         */
-        //private async void CreateNewFolder()
-        //{
-        //    //first check if directory exists
-        //    string newFolderPath = PathHelper.GetNewFolderPath(CurrentDirectory, NewFolderName);
-        //    if (Directory.Exists(newFolderPath))
-        //    {
-        //        var box = MessageBoxManager.GetMessageBoxStandard("New Folder", "A folder with this name already exists.", ButtonEnum.Ok);
-        //        await box.ShowAsync();
-        //        return;
-        //    }
-        //    //add dir to database -- also need to update parent folders HasChildren bool value
-        //    Folder newFolder = new Folder
-        //    {
-        //        FolderName = NewFolderName,
-        //        FolderPath = newFolderPath,
-        //        HasChildren = false,
-        //        CoverImagePath = "",
-        //        FolderRating = 0,
-        //        HasFiles = false,
-        //        IsRoot = false,
-        //        FolderContentMetaDataScanned = false,
-        //        AreImagesImported = false,
-        //    };
-        //    bool success = await _folderMethods.CreateNewFolder(newFolder);
 
-        //    //create on disk
-        //    if (success)
-        //    {
-        //        try
-        //        {
-        //            Directory.CreateDirectory(newFolderPath);
-        //            //refresh UI
-        //            List<Folder> folders = await _folderMethods.GetFoldersInDirectory(CurrentDirectory);
-        //            LibraryFolders.Clear();
-        //            foreach (Folder folder in folders)
-        //            {
-        //                FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(folder);
-        //                LibraryFolders.Add(folderViewModel);
-        //            }
-        //        }
-        //        catch (Exception e) 
-        //        {
-        //            var box = MessageBoxManager.GetMessageBoxStandard("New Folder", $"Error {e}.", ButtonEnum.Ok);
-        //            await box.ShowAsync();
-        //            return;
-        //        }
-        //    }   
-        //}
+        private async void CreateNewFolder()
+        {
+            //first check if directory exists
+            string newFolderPath = PathHelper.GetNewFolderPath(CurrentDirectory, NewFolderName);
+            if (Directory.Exists(newFolderPath))
+            {
+                var box = MessageBoxManager.GetMessageBoxStandard("New Folder", "A folder with this name already exists.", ButtonEnum.Ok);
+                await box.ShowAsync();
+                return;
+            }
+            //add dir to database -- also need to update parent folders HasChildren bool value
+            Folder newFolder = new Folder
+            {
+                FolderName = NewFolderName,
+                FolderPath = newFolderPath,
+                HasChildren = false,
+                CoverImagePath = "",
+                FolderDescription = "",
+                FolderRating = 0,
+                HasFiles = false,
+                IsRoot = false,
+                FolderContentMetaDataScanned = false,
+                AreImagesImported = false,
+            };
+            bool success = await _folderMethods.CreateNewFolder(newFolder);
+
+            //create on disk
+            if (success)
+            {
+                try
+                {
+                    Directory.CreateDirectory(newFolderPath);
+                    //refresh UI
+                    currentFilter = filters.None;
+                    await RefreshFolders();
+                }
+                catch (Exception e)
+                {
+                    var box = MessageBoxManager.GetMessageBoxStandard("New Folder", $"Error {e}.", ButtonEnum.Ok);
+                    await box.ShowAsync();
+                    return;
+                }
+            }
+        }
 
 
         private async void GetAllFolders()

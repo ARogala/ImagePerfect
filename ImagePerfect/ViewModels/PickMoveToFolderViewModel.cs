@@ -102,14 +102,14 @@ namespace ImagePerfect.ViewModels
                 try
                 {
                     Directory.Move(folderVm.FolderPath, PathHelper.AddNewFolderNameToPathForDirectoryMoveFolder(newFolderPath, folderVm.FolderName));
-                    //update lib folders to show the folder has moved
-                    string foldersDirectoryPath = PathHelper.RemoveOneFolderFromPath(folderVm.FolderPath);
-                    await _mainWindowViewModel.RefreshFolders(foldersDirectoryPath);
                     //update the moveToFolder and parentOfTheFolderToMove HasChildren propery
                     moveToFolder.HasChildren = true;
                     parentOfTheFolderToMove.HasChildren = Directory.GetDirectories(parentOfTheFolderToMove.FolderPath).Any();
                     await _folderMethods.UpdateFolder(moveToFolder);
                     await _folderMethods.UpdateFolder(parentOfTheFolderToMove);
+                    //update lib folders to show the folder has moved
+                    string foldersDirectoryPath = PathHelper.RemoveOneFolderFromPath(folderVm.FolderPath);
+                    await _mainWindowViewModel.RefreshFolders(foldersDirectoryPath);
                 }
                 catch (Exception e)
                 {

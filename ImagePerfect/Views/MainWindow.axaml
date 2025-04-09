@@ -14,7 +14,7 @@
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-	<Grid ColumnDefinitions="*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,*,Auto,Auto" x:Name="Root">
+	<Grid ColumnDefinitions="*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,*,Auto,Auto" x:Name="Root">
 		<!--File Menu-->
 		<StackPanel Grid.Row="0">
 			<Menu>
@@ -22,6 +22,7 @@
 					<v:PickRootFolderView DataContext="{Binding PickRootFolder}" x:Name="PickRootFolder"/>
 					<Button Margin="0" Width="175" HorizontalContentAlignment="Center" Command="{Binding DeleteLibraryCommand}">Delete Library</Button>
 					<v:PickNewFoldersView DataContext="{Binding PickNewFolders}"/>
+					<Button Margin="0" Width="175" HorizontalContentAlignment="Center" Command="{Binding ToggleCreateNewFolderCommand}">Create New Folder</Button>
 					<Button Margin="0" Width="175" HorizontalContentAlignment="Center" Command="{Binding ToggleFiltersCommand}">Filters</Button>
 					<Button Margin="0" Width="175" HorizontalContentAlignment="Center" Command="{Binding ToggleSettingsCommand}">Settings</Button>
 					<Button Margin="0" Width="175" HorizontalContentAlignment="Center" Command="{Binding RemoveAllFavoriteFoldersCommand}">Clear Favorite Folders</Button>
@@ -173,8 +174,8 @@
 				</StackPanel>
 			</Grid>
 		</StackPanel>
-		<!--
-		<StackPanel Grid.Row="2" MaxWidth="400">
+		
+		<StackPanel Grid.Row="4" MaxWidth="400" IsVisible="{Binding ShowCreateNewFolder}">
 			<TextBlock Margin="0 5" >Create A New Folder:</TextBlock>
 			<TextBox  Watermark="Enter folder name" Text="{Binding NewFolderName}" />
 			<Button
@@ -184,10 +185,10 @@
 				Create Folder
 			</Button>
 		</StackPanel>
-		-->
-		<ProgressBar Grid.Row="4" Margin="10" IsIndeterminate="True" IsVisible="{Binding ShowLoading}"/>		
+		
+		<ProgressBar Grid.Row="5" Margin="10" IsIndeterminate="True" IsVisible="{Binding ShowLoading}"/>		
 		<!--Folders and Images-->
-		<ScrollViewer Grid.Row="5">
+		<ScrollViewer Grid.Row="6">
 			<StackPanel>
 				<ItemsControl ItemsSource="{Binding LibraryFolders}">
 					<ItemsControl.ItemsPanel>
@@ -342,7 +343,7 @@
 			</StackPanel>
 		</ScrollViewer>
 		<!--Pagination-->
-		<StackPanel Grid.Row="6" Orientation="Vertical" HorizontalAlignment="Center" Margin="0 10 0 0">
+		<StackPanel Grid.Row="7" Orientation="Vertical" HorizontalAlignment="Center" Margin="0 10 0 0">
 			<Grid RowDefinitions="Auto" ColumnDefinitions="Auto, Auto, Auto, Auto, Auto" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
 				<Button Margin="5" Grid.Row="0" Grid.Column="0"
 					Command="{Binding PreviousPageCommand}">
@@ -363,7 +364,7 @@
 				</Button>
 			</Grid>
 		</StackPanel>
-		<StackPanel Grid.Row="7" Orientation="Vertical" HorizontalAlignment="Center" Margin="0 0 0 10">
+		<StackPanel Grid.Row="8" Orientation="Vertical" HorizontalAlignment="Center" Margin="0 0 0 10">
 			<StackPanel Orientation="Horizontal">
 				<Label>Total Pages:</Label>
 				<TextBlock Text="{Binding MaxPage}" VerticalAlignment="Center"></TextBlock>
