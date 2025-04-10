@@ -82,6 +82,10 @@
 						Command="{Binding GetAllFoldersWithNoImportedImagesCommand}">
 					Get Folders With Images Not Imported
 				</Button>
+				<Button Grid.Row="3" Grid.Column="2" Margin="5" Width="300" HorizontalContentAlignment="Center"
+						Command="{Binding GetAllFoldersWithMetadataNotScannedCommand}">
+					Get Folders With Metadata Not Scanned
+				</Button>
 			</Grid>
 		</StackPanel>
 		<!--Settings-->
