@@ -45,6 +45,11 @@ namespace ImagePerfect.Models
             return await _unitOfWork.Folder.GetAllFoldersWithNoImportedImages(filterInCurrentDirectory, currentDirectory);
         }
 
+        public async Task<(List<Folder> folders, List<FolderTag> tags)> GetAllFoldersWithMetadataNotScanned(bool filterInCurrentDirectory, string currentDirectory)
+        {
+            return await _unitOfWork.Folder.GetAllFoldersWithMetadataNotScanned(filterInCurrentDirectory, currentDirectory);
+        }
+
         public async Task<(List<Folder> folders, List<FolderTag> tags)> GetAllFoldersWithTag(string tag, bool filterInCurrentDirectory, string currentDirectory)
         {
             return await _unitOfWork.Folder.GetAllFoldersWithTag(tag, filterInCurrentDirectory, currentDirectory);

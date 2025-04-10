@@ -73,7 +73,8 @@ namespace ImagePerfect.ViewModels
             FolderTagFilter,
             FolderDescriptionFilter,
             AllFavoriteFolders,
-            AllFoldersWithNoImportedImages
+            AllFoldersWithNoImportedImages,
+            AllFoldersWithMetadataNotScanned
         }
         private filters currentFilter = filters.None;
         private int selectedRatingForFilter = 0;
@@ -199,6 +200,11 @@ namespace ImagePerfect.ViewModels
             GetAllFoldersWithNoImportedImagesCommand = ReactiveCommand.Create(async () => {
                 ResetPagination();
                 currentFilter = filters.AllFoldersWithNoImportedImages;
+                await RefreshFolders();
+            });
+            GetAllFoldersWithMetadataNotScannedCommand = ReactiveCommand.Create(async () => {
+                ResetPagination();
+                currentFilter = filters.AllFoldersWithMetadataNotScanned;
                 await RefreshFolders();
             });
             LoadCurrentDirectoryCommand = ReactiveCommand.Create(async () => {
@@ -472,6 +478,7 @@ namespace ImagePerfect.ViewModels
 
         public ReactiveCommand<Unit, Task> GetAllFoldersWithNoImportedImagesCommand { get; }
 
+        public ReactiveCommand<Unit, Task> GetAllFoldersWithMetadataNotScannedCommand { get; }
         public ReactiveCommand<Unit, Task> LoadCurrentDirectoryCommand { get; }
 
         public ReactiveCommand<string, Task> PickImageWidthCommand { get; }
@@ -830,6 +837,16 @@ namespace ImagePerfect.ViewModels
                     displayFolders = FolderPagination();
                     await MapTagsToFoldersAddToObservable();
                     break;
+                case filters.AllFoldersWithMetadataNotScanned:
+                    (List<Folder> folders, List<FolderTag> tags) allFoldersWithMetadataNotScannedResult = await _folderMethods.GetAllFoldersWithMetadataNotScanned(FilterInCurrentDirectory, CurrentDirectory);
+                    displayFolders = allFoldersWithMetadataNotScannedResult.folders;
+                    displayFolderTags = allFoldersWithMetadataNotScannedResult.tags;
+
+                    Images.Clear();
+                    LibraryFolders.Clear();
+                    displayFolders = FolderPagination();
+                    await MapTagsToFoldersAddToObservable();
+                    break;
             }
             ShowLoading = false;
         }
@@ -906,6 +923,13 @@ namespace ImagePerfect.ViewModels
                     (List<Folder> folders, List<FolderTag> tags) allFoldersWithNoImportedImagesResult = await _folderMethods.GetAllFoldersWithNoImportedImages(FilterInCurrentDirectory, CurrentDirectory);
                     displayFolders = allFoldersWithNoImportedImagesResult.folders;
                     displayFolderTags = allFoldersWithNoImportedImagesResult.tags;
+                    displayFolders = FolderPagination();
+                    await MapTagsToSingleFolderUpdateObservable(folderVm);
+                    break;
+                case filters.AllFoldersWithMetadataNotScanned:
+                    (List<Folder> folders, List<FolderTag> tags) allFoldersWithMetadataNotScannedResult = await _folderMethods.GetAllFoldersWithMetadataNotScanned(FilterInCurrentDirectory, CurrentDirectory);
+                    displayFolders = allFoldersWithMetadataNotScannedResult.folders;
+                    displayFolderTags = allFoldersWithMetadataNotScannedResult.tags;
                     displayFolders = FolderPagination();
                     await MapTagsToSingleFolderUpdateObservable(folderVm);
                     break;
@@ -1088,7 +1112,15 @@ namespace ImagePerfect.ViewModels
                 //remove one folder from path
                 newPath = PathHelper.RemoveOneFolderFromPath(imageFolderPath);
                 //refresh UI
-                await RefreshFolderProps(newPath, imageFolder);
+                if(currentFilter == filters.AllFoldersWithMetadataNotScanned || currentFilter == filters.AllFoldersWithNoImportedImages)
+                {
+                    //have to call hard refresh for these two cases as they will not be returned from the query to update props
+                    await RefreshFolders();
+                }
+                else
+                {
+                    await RefreshFolderProps(newPath, imageFolder);
+                }
             }
             ShowLoading = false;
         }
@@ -1690,7 +1722,15 @@ namespace ImagePerfect.ViewModels
                 //Update TagsList to show in UI AutoCompleteBox
                 await GetTagsList();
                 //refresh UI
-                await RefreshFolderProps(CurrentDirectory, folderVm);
+                if (currentFilter == filters.AllFoldersWithMetadataNotScanned || currentFilter == filters.AllFoldersWithNoImportedImages)
+                {
+                    //have to call hard refresh for these two cases as they will not be returned from the query to update props
+                    await RefreshFolders();
+                }
+                else
+                {
+                    await RefreshFolderProps(CurrentDirectory, folderVm);
+                }
             }
             ShowLoading = false;
         }
