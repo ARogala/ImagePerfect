@@ -49,17 +49,15 @@ Maybe add
 
 ## Other Features to add
 
-1. Filter folders to get not imported ones -- useful for large libraries
-2. Filter folders to get metadata not scanned ones -- useful for large libraries
-3. Section to show total number of imported photos
-4. A way to find duplicate images -- big task
-5. Facial recognition -- big task
-6. Improve the UI
-7. Improve Tagging right now you can only add one tag at a time. Make it so you can add several tags at once if comma separated
-8. Maybe make a SQLite version so no server set up -- the reason for the MySQL server is i plan to have a mobile client so you can at least view photos via you phone
-9. look into making the mobile client 
-10. Maybe find a way to scan library root folder to find folders added to file system but not added to app
-11. A way to prevent adding the same folder twice. Right now its up to the user to be careful about adding new folders after the initial library add.
+1. Section to show total number of imported photos
+2. A way to find duplicate images -- big task
+3. Facial recognition -- big task
+4. Improve the UI
+5. Improve Tagging right now you can only add one tag at a time. Make it so you can add several tags at once if comma separated
+6. Maybe make a SQLite version so no server set up -- the reason for the MySQL server is i plan to have a mobile client so you can at least view photos via you phone
+7. look into making the mobile client 
+8. Maybe find a way to scan library root folder to find folders added to file system but not added to app
+9. A way to prevent adding the same folder twice. Right now its up to the user to be careful about adding new folders after the initial library add.
 
 ## Screen Shot
 
