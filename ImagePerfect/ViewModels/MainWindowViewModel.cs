@@ -43,9 +43,9 @@ namespace ImagePerfect.ViewModels
         private List<string> _tagsList = new List<string>();
 
         private List<Folder> displayFolders = new List<Folder>();
-        private List<FolderTag> displayFolderTags = new List<FolderTag>();  
+        private List<FolderTag> displayFolderTags = new List<FolderTag>();
         private List<Image> displayImages = new List<Image>();
-        private List<ImageTag> displayImageTags = new List<ImageTag>(); 
+        private List<ImageTag> displayImageTags = new List<ImageTag>();
         //pagination
         private int _folderPageSize = 20;
         private int _totalFolderPages = 1;
@@ -89,7 +89,7 @@ namespace ImagePerfect.ViewModels
         {
             _unitOfWork = unitOfWork;
             _folderMethods = new FolderMethods(_unitOfWork);
-            _imageCsvMethods = new ImageCsvMethods(_unitOfWork);   
+            _imageCsvMethods = new ImageCsvMethods(_unitOfWork);
             _imageMethods = new ImageMethods(_unitOfWork);
             _settingsMethods = new SettingsMethods(_unitOfWork);
             _showLoading = false;
@@ -98,13 +98,13 @@ namespace ImagePerfect.ViewModels
                 NextFolder(currentFolder);
             });
             BackFolderCommand = ReactiveCommand.Create((FolderViewModel currentFolder) => {
-                BackFolder(currentFolder); 
+                BackFolder(currentFolder);
             });
-            BackFolderFromImageCommand = ReactiveCommand.Create((ImageViewModel imageVm) => { 
+            BackFolderFromImageCommand = ReactiveCommand.Create((ImageViewModel imageVm) => {
                 BackFolderFromImage(imageVm);
             });
             ImportImagesCommand = ReactiveCommand.Create((FolderViewModel imageFolder) => {
-           
+
                 ImportImages(imageFolder);
             });
             AddFolderDescriptionCommand = ReactiveCommand.Create((FolderViewModel folderVm) => {
@@ -119,7 +119,7 @@ namespace ImagePerfect.ViewModels
             AddFolderRatingCommand = ReactiveCommand.Create((FolderViewModel folderVm) => {
                 UpdateFolder(folderVm, "Rating");
             });
-            AddImageTagsCommand = ReactiveCommand.Create((ImageViewModel imageVm) => {           
+            AddImageTagsCommand = ReactiveCommand.Create((ImageViewModel imageVm) => {
                 AddImageTag(imageVm);
             });
             EditImageTagsCommand = ReactiveCommand.Create((ImageViewModel imageVm) => {
@@ -131,37 +131,37 @@ namespace ImagePerfect.ViewModels
             DeleteLibraryCommand = ReactiveCommand.Create(() => {
                 DeleteLibrary();
             });
-            OpenImageInExternalViewerCommand = ReactiveCommand.Create((ImageViewModel imageVm) => { 
+            OpenImageInExternalViewerCommand = ReactiveCommand.Create((ImageViewModel imageVm) => {
                 OpenImageInExternalViewer(imageVm);
             });
-            OpenCurrentDirectoryWithExplorerCommand = ReactiveCommand.Create(() => { 
+            OpenCurrentDirectoryWithExplorerCommand = ReactiveCommand.Create(() => {
                 OpenCurrentDirectoryWithExplorer();
             });
-            MoveImageToTrashCommand = ReactiveCommand.Create(async (ImageViewModel imageVm) => { 
+            MoveImageToTrashCommand = ReactiveCommand.Create(async (ImageViewModel imageVm) => {
                 await MoveImageToTrash(imageVm);
             });
-            MoveFolderToTrashCommand = ReactiveCommand.Create((FolderViewModel folderVm) => { 
+            MoveFolderToTrashCommand = ReactiveCommand.Create((FolderViewModel folderVm) => {
                 MoveFolderToTrash(folderVm);
             });
-            ScanFolderImagesForMetaDataCommand = ReactiveCommand.Create((FolderViewModel folderVm) => { 
+            ScanFolderImagesForMetaDataCommand = ReactiveCommand.Create((FolderViewModel folderVm) => {
                 ScanFolderImagesForMetaData(folderVm);
             });
-            NextPageCommand = ReactiveCommand.Create(() => { 
+            NextPageCommand = ReactiveCommand.Create(() => {
                 NextPage();
             });
-            PreviousPageCommand = ReactiveCommand.Create(() => { 
+            PreviousPageCommand = ReactiveCommand.Create(() => {
                 PreviousPage();
             });
             GoToPageCommand = ReactiveCommand.Create(async (decimal pageNumber) => {
-               await GoToPage(Decimal.ToInt32(pageNumber));
+                await GoToPage(Decimal.ToInt32(pageNumber));
             });
-            ToggleSettingsCommand = ReactiveCommand.Create(() => { 
+            ToggleSettingsCommand = ReactiveCommand.Create(() => {
                 ToggleSettings();
             });
-            ToggleManageImagesCommand = ReactiveCommand.Create(() => { 
+            ToggleManageImagesCommand = ReactiveCommand.Create(() => {
                 ToggleManageImages();
             });
-            ToggleFiltersCommand = ReactiveCommand.Create(() => { 
+            ToggleFiltersCommand = ReactiveCommand.Create(() => {
                 ToggleFilters();
             });
             ToggleCreateNewFolderCommand = ReactiveCommand.Create(() => {
@@ -213,16 +213,16 @@ namespace ImagePerfect.ViewModels
             PickImageWidthCommand = ReactiveCommand.Create(async (string size) => {
                 await PickImageWidth(size);
             });
-            PickFolderPageSizeCommand = ReactiveCommand.Create(async (string size) => { 
+            PickFolderPageSizeCommand = ReactiveCommand.Create(async (string size) => {
                 await PickFolderPageSize(size);
             });
-            PickImagePageSizeCommand = ReactiveCommand.Create(async (string size) => { 
+            PickImagePageSizeCommand = ReactiveCommand.Create(async (string size) => {
                 await PickImagePageSize(size);
             });
             SaveDirectoryCommand = ReactiveCommand.Create(() => {
                 SaveDirectory();
             });
-            LoadSavedDirectoryCommand = ReactiveCommand.Create(async () => { 
+            LoadSavedDirectoryCommand = ReactiveCommand.Create(async () => {
                 await LoadSavedDirectory();
             });
             SaveFolderAsFavoriteCommand = ReactiveCommand.Create(async (FolderViewModel folderVm) => {
@@ -240,6 +240,9 @@ namespace ImagePerfect.ViewModels
             MoveSelectedImagesToTrashCommand = ReactiveCommand.Create(async (ItemsControl imagesItemsControl) =>
             {
                 await MoveSelectedImagesToTrash(imagesItemsControl);
+            });
+            SelectAllImagesCommand = ReactiveCommand.Create((ItemsControl imagesItemsControl) => {
+                SelectAllImages(imagesItemsControl);
             });
             MoveSelectedImagesToNewFolderCommand = ReactiveCommand.Create(async (ItemsControl imagesItemsControl) => { 
                 await MoveSelectedImagesToNewFolder(imagesItemsControl);
@@ -498,6 +501,8 @@ namespace ImagePerfect.ViewModels
         public ReactiveCommand<Unit, Task> RemoveAllFavoriteFoldersCommand { get; }
 
         public ReactiveCommand<ItemsControl, Task> MoveSelectedImagesToTrashCommand { get; }
+
+        public ReactiveCommand<ItemsControl, Unit> SelectAllImagesCommand { get; }
 
         public ReactiveCommand<ItemsControl, Task> MoveSelectedImagesToNewFolderCommand { get; }
 
@@ -1512,6 +1517,21 @@ namespace ImagePerfect.ViewModels
                     ShowLoading = false;
                 }
                 ShowLoading = false;
+            }
+        }
+
+        private void SelectAllImages(ItemsControl imagesItemsControl)
+        {
+            for(int i =0; i < Images.Count; i++)
+            {
+                if (Images[i].IsSelected == true)
+                {
+                    Images[i].IsSelected = false;
+                }
+                else
+                {
+                    Images[i].IsSelected = true;
+                }
             }
         }
         private async Task MoveSelectedImagesToTrash(ItemsControl imagesItemsControl)
