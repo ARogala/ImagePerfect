@@ -109,9 +109,13 @@ This is basically the same as Windows
 	* Obvious or maybe not, but terminal should be opened in the location/folder where your backup file is located for the restore to work.
 
 
-## Directions to back up photos and move the app and database to a new pc.
+## Directions to back up photos and move the app and database to a new computer.
 
-Basically set up you new pc. Build the app, set up the server, and run the backup commands above. Just note that the images should be in the exact same location as before. The drive name should be the same as well. Can backup the database for drive C: and expect the restore to work if all your images are in drive D: after a new pc restore.
+Basically set up you new computer. Build the app, set up the server, and run the backup commands above. Just note that the images should be in the exact same location as before. The drive name should be the same as well. Can't backup the database for drive C: and expect the restore to work if all your images are in drive D: after a new computer restore.
+
+Note: ImagePerfect stores references to your image files in the database so when you back up/restore the image files should be stored in the exact same location as they were before you needed to restore. So if your images were in C:\Users\username\Pictures they must be there and in all their same folders for a restore to work.
+
+Same idea on Ubuntu systems.
 
 ## User guide
 
