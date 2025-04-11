@@ -83,11 +83,11 @@ We will use mysqldump command to do this. Note: ImagePerfect stores references t
 	* cd C:\Program Files\MySQL\MySQL Server 8.0\bin
 3. To back-up type: 
 	* mysqldump -u root -p imageperfect > C:\MySQLBackup\imageperfect_YYYY_MM_DD.sql
-	* It will as for you root server password after hitting enter.
+	* It will ask for your root server password after hitting enter.
 	* Your back up sql file will now be in C:\MySQLBackup check and ensure it is there.
 4. To restore type:
 	* mysql -u root -p imageperfect < C:\MySQLBackup\imageperfect_YYYY_MM_DD.sql
-	* It will as for you root server password after hitting enter.
+	* It will ask for your root server password after hitting enter.
 	* Your database should now be restored.
 	
 NOTE: It would be best to try this before spending too much time organizing your photos in the app. Make sure you can back up before wasting time. Its easy to spend hours adding cover images, tags, and notes about the event/day
@@ -99,19 +99,19 @@ This is basically the same as Windows
 1. Open terminal in the location/folder you want your backup file.
 2. To backup type: 
 	* sudo mysqldump imageperfect > imageperfect_YYYY_MM_DD.sql
-	* Ubuntu will ask for you root password after hitting enter.
+	* Ubuntu will ask for your root password after hitting enter.
 	* This will dump the imageperfect database in the backup location.
 	
 3. To restore type:
 	* sudo mysql imageperfect < imageperfect_YYYY_MM_DD.sql
-	* Ubuntu will ask for you root password after hitting enter.
+	* Ubuntu will ask for your root password after hitting enter.
 	* Your database should now be restored.
 	* Obvious or maybe not, but terminal should be opened in the location/folder where your backup file is located for the restore to work.
 
 
 ## Directions to back up photos and move the app and database to a new pc.
 
-to be added
+Basically set up you new pc. Build the app, set up the server, and run the backup commands above. Just note that the images should be in the exact same location as before. The drive name should be the same as well. Can backup the database for drive C: and expect the restore to work if all your images are in drive D: after a new pc restore.
 
 ## User guide
 
