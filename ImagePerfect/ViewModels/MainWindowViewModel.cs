@@ -1441,7 +1441,11 @@ namespace ImagePerfect.ViewModels
 
         private async Task MoveSelectedImagesToNewFolder(ItemsControl imagesItemsControl)
         {
-            if(SelectedImagesNewDirectory == null || SelectedImagesNewDirectory == "")
+            List<ImageViewModel> allImages = imagesItemsControl.Items.OfType<ImageViewModel>().ToList();
+            List<ImageViewModel> imagesToMove = new List<ImageViewModel>();
+            Folder imagesCurrentFolder = await _folderMethods.GetFolderAtDirectory(allImages[0].ImageFolderPath);
+
+            if (SelectedImagesNewDirectory == null || SelectedImagesNewDirectory == "")
             {
                 var box = MessageBoxManager.GetMessageBoxStandard("Move Images", "You need to select the move to folder first.", ButtonEnum.Ok);
                 await box.ShowAsync();
@@ -1449,6 +1453,12 @@ namespace ImagePerfect.ViewModels
             }
             //get folder at SelectedImagesNewDirectory
             Folder imagesNewFolder = await _folderMethods.GetFolderAtDirectory(SelectedImagesNewDirectory);
+            if(imagesNewFolder.FolderPath == imagesCurrentFolder.FolderPath)
+            {
+                var box = MessageBoxManager.GetMessageBoxStandard("Move Images", "New folder path cannot be the same as the current folder path.", ButtonEnum.Ok);
+                await box.ShowAsync();
+                return;
+            }
             //prevent a double import and only allow move to folders that are already imported
             if(imagesNewFolder.HasFiles == true && imagesNewFolder.AreImagesImported == false)
             {
@@ -1456,9 +1466,7 @@ namespace ImagePerfect.ViewModels
                 await box.ShowAsync();
                 return;
             }
-            List<ImageViewModel> allImages = imagesItemsControl.Items.OfType<ImageViewModel>().ToList();
-            List<ImageViewModel> imagesToMove = new List<ImageViewModel>();
-            Folder imagesCurrentFolder = await _folderMethods.GetFolderAtDirectory(allImages[0].ImageFolderPath);
+           
             foreach (ImageViewModel image in allImages) 
             {
                 if (image.IsSelected && File.Exists(image.ImagePath))
@@ -1479,6 +1487,18 @@ namespace ImagePerfect.ViewModels
                 ShowLoading = true;
                 //modify ImagePath, ImageFolderPath and FolderId for each image in imagesToMove 
                 List<ImageViewModel> imagesToMoveModifiedPaths = PathHelper.ModifyImagePathsForMoveImagesToNewFolder(imagesToMove, imagesNewFolder);
+                for (int i = 0; i < imagesToMoveModifiedPaths.Count; i++)
+                {
+                    if (File.Exists(imagesToMoveModifiedPaths[i].ImagePath))
+                    {
+                        var box = MessageBoxManager.GetMessageBoxStandard("Move Images", "One or more images in the destination has the same file name. Pick a different folder", ButtonEnum.Ok);
+                        await box.ShowAsync();
+                        ShowLoading = false;
+                        //reset SelectedImageNewDirectory
+                        SelectedImagesNewDirectory = string.Empty;
+                        return;
+                    }
+                }
                 //get image move sql
                 string imageMoveSql = SqlStringBuilder.BuildSqlForMoveImagesToNewFolder(imagesToMoveModifiedPaths);
                 //move images in db
