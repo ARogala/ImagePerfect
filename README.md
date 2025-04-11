@@ -45,7 +45,8 @@ The app currently can
 Maybe add
 
 1. Rename folders
-2. Re-scan a folder for newly images added -- useful so you can add images to a folder from they file system then re-scan
+2. Rename images
+3. Re-scan a folder for newly images added -- useful so you can add images to a folder from they file system then re-scan
 
 ## Other Features to add
 
@@ -53,11 +54,12 @@ Maybe add
 2. A way to find duplicate images -- big task
 3. Facial recognition -- big task
 4. Improve the UI
-5. Improve Tagging right now you can only add one tag at a time. Make it so you can add several tags at once if comma separated
+5. Improve Tagging right now you can only add one tag at a time. Make it so you can add several tags at once if comma separated. Same with remove you can only remove one at a time. 
 6. Maybe make a SQLite version so no server set up -- the reason for the MySQL server is i plan to have a mobile client so you can at least view photos via you phone
 7. look into making the mobile client 
 8. Maybe find a way to scan library root folder to find folders added to file system but not added to app
 9. A way to prevent adding the same folder twice. Right now its up to the user to be careful about adding new folders after the initial library add.
+10. Improve image move so you can move images to a new folder even if the new folder contains images with the same name. 
 
 ## Screen Shot
 
@@ -71,11 +73,47 @@ to be added
 
 to be added
 
-## back up and restore database directions
+## Back up and restore MySQL database on Windows
+
+We will use mysqldump command to do this. Note: ImagePerfect stores references to your image files in the database so when you back up/restore the image files should be stored in the exact same location as they were before you needed to restore. So if your images were in C:\Users\username\Pictures they must be there and in all their same folders for a restore to work.
+
+1. To back up/restore use Windows command prompt NOT power shell!!!
+2. First open command prompt in C:\Program Files\MySQL\MySQL Server 8.0\bin
+	* Open command prompt and type: 
+	* cd C:\Program Files\MySQL\MySQL Server 8.0\bin
+3. To back-up type: 
+	* mysqldump -u root -p imageperfect > C:\MySQLBackup\imageperfect_YYYY_MM_DD.sql
+	* It will as for you root server password after hitting enter.
+	* Your back up sql file will now be in C:\MySQLBackup check and ensure it is there.
+4. To restore type:
+	* mysql -u root -p imageperfect < C:\MySQLBackup\imageperfect_YYYY_MM_DD.sql
+	* It will as for you root server password after hitting enter.
+	* Your database should now be restored.
+	
+NOTE: It would be best to try this before spending too much time organizing your photos in the app. Make sure you can back up before wasting time. Its easy to spend hours adding cover images, tags, and notes about the event/day
+
+## Back up and restore MySQL database on Ubuntu
+
+This is basically the same as Windows
+
+1. Open terminal in the location/folder you want your backup file.
+2. To backup type: 
+	* sudo mysqldump imageperfect > imageperfect_YYYY_MM_DD.sql
+	* Ubuntu will ask for you root password after hitting enter.
+	* This will dump the imageperfect database in the backup location.
+	
+3. To restore type:
+	* sudo mysql imageperfect < imageperfect_YYYY_MM_DD.sql
+	* Ubuntu will ask for you root password after hitting enter.
+	* Your database should now be restored.
+	* Obvious or maybe not, but terminal should be opened in the location/folder where your backup file is located for the restore to work.
+
+
+## Directions to back up photos and move the app and database to a new pc.
 
 to be added
 
-## directions to back up photos and move the app and database to a new pc.
+## User guide
 
 to be added
 
