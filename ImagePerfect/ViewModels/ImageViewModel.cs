@@ -65,8 +65,16 @@ namespace ImagePerfect.ViewModels
 		public string NewTag
 		{
 			get => _newTag;
-			set => this.RaiseAndSetIfChanged(ref _newTag, value);
-		}
+            set
+            {
+                this.RaiseAndSetIfChanged(ref _newTag, value);
+                if (value.Contains(" "))
+                {
+                    _newTag = _newTag.Trim();
+                }
+
+            }
+        }
 		public int ImageRating
 		{
 			get => _imageRating;

@@ -1785,7 +1785,7 @@ namespace ImagePerfect.ViewModels
             if (boxResult == ButtonResult.Yes)
             {
                 List<FolderViewModel> allFolders = foldersItemsControl.Items.OfType<FolderViewModel>().ToList();
-                foreach (var folder in allFolders) 
+                foreach (FolderViewModel folder in allFolders) 
                 { 
                     if(folder.HasFiles == true && folder.AreImagesImported == false)
                     {
@@ -1802,7 +1802,7 @@ namespace ImagePerfect.ViewModels
             if (boxResult == ButtonResult.Yes)
             {
                 List<FolderViewModel> allFolders = foldersItemsControl.Items.OfType<FolderViewModel>().ToList();
-                foreach (var folder in allFolders)
+                foreach (FolderViewModel folder in allFolders)
                 {
                     if (folder.HasFiles == true && folder.AreImagesImported == true && folder.FolderContentMetaDataScanned == false)
                     {
