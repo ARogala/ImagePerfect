@@ -244,5 +244,11 @@ namespace ImagePerfect.Repository
             await txn.CommitAsync();
             await _connection.CloseAsync();
         }
+
+        public async Task<int> GetTotalImages()
+        {
+            string sql = @"SELECT COUNT(*) FROM images";
+            return await _connection.QuerySingleAsync<int>(sql);
+        }
     }
 }
