@@ -21,5 +21,6 @@ namespace ImagePerfect.Repository.IRepository
         Task<bool> DeleteImageTag(ImageTag tag);
         Task<bool> DeleteSelectedImages(string sql);
         Task<bool> MoveSelectedImageToNewFolder(string sql);
+        Task<int> GetTotalImages();
     }
 }

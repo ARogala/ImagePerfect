@@ -90,5 +90,10 @@ namespace ImagePerfect.Models
         {
             await _unitOfWork.Image.ClearImageTagsJoinForMetaData(image);
         }
+
+        public async Task<int> GetTotalImages()
+        {
+           return await _unitOfWork.Image.GetTotalImages();
+        }
     }
 }

@@ -33,6 +33,8 @@ namespace ImagePerfect.ViewModels
         private bool _showSettings = false;
         private bool _showManageImages = false;
         private bool _showCreateNewFolder = false;
+        private bool _showTotalImages = false;
+        private int _totalImages = 0;
         private string _currentDirectory;
         private string _savedDirectory;
         private string _selectedImagesNewDirectory = string.Empty;
@@ -167,6 +169,9 @@ namespace ImagePerfect.ViewModels
             ToggleCreateNewFolderCommand = ReactiveCommand.Create(() => {
                 ToggleCreateNewFolder();
             });
+            ToggleGetTotalImagesCommand = ReactiveCommand.Create(() => { 
+                ToggleGetTotalImages();
+            });
             FilterImagesOnRatingCommand = ReactiveCommand.Create(async (decimal rating) => {
                 ResetPagination();
                 selectedRatingForFilter = Decimal.ToInt32(rating);
@@ -249,6 +254,17 @@ namespace ImagePerfect.ViewModels
             });
             CreateNewFolderCommand = ReactiveCommand.Create(() => { CreateNewFolder(); });
             Initialize();
+        }
+
+        public int TotalImages
+        {
+            get => _totalImages;
+            set => this.RaiseAndSetIfChanged(ref _totalImages, value);  
+        }
+        public bool ShowTotalImages
+        {
+            get => _showTotalImages;
+            set => this.RaiseAndSetIfChanged(ref _showTotalImages, value);
         }
 
         public bool ShowManageImages
@@ -469,6 +485,8 @@ namespace ImagePerfect.ViewModels
 
         public ReactiveCommand<Unit, Unit> ToggleCreateNewFolderCommand { get; }
 
+        public ReactiveCommand<Unit, Unit> ToggleGetTotalImagesCommand { get; }
+
         public ReactiveCommand<decimal, Task> FilterImagesOnRatingCommand { get; }
 
         public ReactiveCommand<decimal, Task> FilterFoldersOnRatingCommand { get; }
@@ -641,6 +659,18 @@ namespace ImagePerfect.ViewModels
             await RefreshImages(CurrentDirectory);
         }
 
+        private async void ToggleGetTotalImages()
+        {
+            if (ShowTotalImages)
+            {
+                ShowTotalImages = false;
+            }
+            else
+            {
+                ShowTotalImages = true;
+                TotalImages = await _imageMethods.GetTotalImages();
+            }
+        }
         private void ToggleManageImages()
         {
             if (ShowManageImages)
