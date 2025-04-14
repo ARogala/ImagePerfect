@@ -34,6 +34,7 @@ namespace ImagePerfect.ViewModels
         private bool _showManageImages = false;
         private bool _showCreateNewFolder = false;
         private bool _showTotalImages = false;
+        private bool _showImportAndScan = false;
         private int _totalImages = 0;
         private string _currentDirectory;
         private string _savedDirectory;
@@ -105,9 +106,8 @@ namespace ImagePerfect.ViewModels
             BackFolderFromImageCommand = ReactiveCommand.Create((ImageViewModel imageVm) => {
                 BackFolderFromImage(imageVm);
             });
-            ImportImagesCommand = ReactiveCommand.Create((FolderViewModel imageFolder) => {
-
-                ImportImages(imageFolder);
+            ImportImagesCommand = ReactiveCommand.Create(async (FolderViewModel imageFolder) => {
+                await ImportImages(imageFolder);
             });
             AddFolderDescriptionCommand = ReactiveCommand.Create((FolderViewModel folderVm) => {
                 UpdateFolder(folderVm, "Description");
@@ -145,8 +145,8 @@ namespace ImagePerfect.ViewModels
             MoveFolderToTrashCommand = ReactiveCommand.Create((FolderViewModel folderVm) => {
                 MoveFolderToTrash(folderVm);
             });
-            ScanFolderImagesForMetaDataCommand = ReactiveCommand.Create((FolderViewModel folderVm) => {
-                ScanFolderImagesForMetaData(folderVm);
+            ScanFolderImagesForMetaDataCommand = ReactiveCommand.Create(async (FolderViewModel folderVm) => {
+                await ScanFolderImagesForMetaData(folderVm);
             });
             NextPageCommand = ReactiveCommand.Create(() => {
                 NextPage();
@@ -171,6 +171,9 @@ namespace ImagePerfect.ViewModels
             });
             ToggleGetTotalImagesCommand = ReactiveCommand.Create(() => { 
                 ToggleGetTotalImages();
+            });
+            ToggleImportAndScanCommand = ReactiveCommand.Create(() => {
+                ToggleImportAndScan();
             });
             FilterImagesOnRatingCommand = ReactiveCommand.Create(async (decimal rating) => {
                 ResetPagination();
@@ -252,6 +255,12 @@ namespace ImagePerfect.ViewModels
             MoveSelectedImagesToNewFolderCommand = ReactiveCommand.Create(async (ItemsControl imagesItemsControl) => { 
                 await MoveSelectedImagesToNewFolder(imagesItemsControl);
             });
+            ImportAllFoldersOnCurrentPageCommand = ReactiveCommand.Create(async (ItemsControl foldersItemsControl) => { 
+                await ImportAllFoldersOnCurrentPage(foldersItemsControl);
+            });
+            ScanAllFoldersOnCurrentPageCommand = ReactiveCommand.Create(async (ItemsControl foldersItemsControl) => {
+                await ScanAllFoldersOnCurrentPage(foldersItemsControl);
+            });
             CreateNewFolderCommand = ReactiveCommand.Create(() => { CreateNewFolder(); });
             Initialize();
         }
@@ -265,6 +274,12 @@ namespace ImagePerfect.ViewModels
         {
             get => _showTotalImages;
             set => this.RaiseAndSetIfChanged(ref _showTotalImages, value);
+        }
+
+        public bool ShowImportAndScan
+        {
+            get => _showImportAndScan;
+            set => this.RaiseAndSetIfChanged(ref _showImportAndScan, value);    
         }
 
         public bool ShowManageImages
@@ -443,7 +458,7 @@ namespace ImagePerfect.ViewModels
 
         public ReactiveCommand<ImageViewModel, Unit> BackFolderFromImageCommand { get; }
 
-        public ReactiveCommand<FolderViewModel, Unit> ImportImagesCommand { get; }
+        public ReactiveCommand<FolderViewModel, Task> ImportImagesCommand { get; }
 
         public ReactiveCommand<FolderViewModel, Unit> AddFolderDescriptionCommand { get; }
 
@@ -469,7 +484,7 @@ namespace ImagePerfect.ViewModels
 
         public ReactiveCommand<FolderViewModel, Unit> MoveFolderToTrashCommand { get; }
 
-        public ReactiveCommand<FolderViewModel, Unit> ScanFolderImagesForMetaDataCommand { get; }
+        public ReactiveCommand<FolderViewModel, Task> ScanFolderImagesForMetaDataCommand { get; }
 
         public ReactiveCommand<Unit, Unit> NextPageCommand { get; }
 
@@ -486,6 +501,8 @@ namespace ImagePerfect.ViewModels
         public ReactiveCommand<Unit, Unit> ToggleCreateNewFolderCommand { get; }
 
         public ReactiveCommand<Unit, Unit> ToggleGetTotalImagesCommand { get; }
+
+        public ReactiveCommand<Unit, Unit> ToggleImportAndScanCommand { get; }
 
         public ReactiveCommand<decimal, Task> FilterImagesOnRatingCommand { get; }
 
@@ -523,6 +540,10 @@ namespace ImagePerfect.ViewModels
         public ReactiveCommand<ItemsControl, Unit> SelectAllImagesCommand { get; }
 
         public ReactiveCommand<ItemsControl, Task> MoveSelectedImagesToNewFolderCommand { get; }
+
+        public ReactiveCommand<ItemsControl, Task> ImportAllFoldersOnCurrentPageCommand { get; }
+
+        public ReactiveCommand<ItemsControl, Task> ScanAllFoldersOnCurrentPageCommand { get; }
 
         public ReactiveCommand<Unit, Unit> CreateNewFolderCommand { get; }
 
@@ -659,6 +680,17 @@ namespace ImagePerfect.ViewModels
             await RefreshImages(CurrentDirectory);
         }
 
+        private void ToggleImportAndScan()
+        {
+            if (ShowImportAndScan) 
+            { 
+                ShowImportAndScan = false;
+            }
+            else
+            {
+                ShowImportAndScan = true;
+            }
+        }
         private async void ToggleGetTotalImages()
         {
             if (ShowTotalImages)
@@ -1131,7 +1163,7 @@ namespace ImagePerfect.ViewModels
             TagsList = await _imageMethods.GetTagsList();
         }
 
-        private async void ImportImages(FolderViewModel imageFolder)
+        private async Task ImportImages(FolderViewModel imageFolder)
         {
             string newPath = string.Empty;
             string imageFolderPath = imageFolder.FolderPath;
@@ -1744,9 +1776,41 @@ namespace ImagePerfect.ViewModels
                     }
                 }
             }
-            
         }
 
+        private async Task ImportAllFoldersOnCurrentPage(ItemsControl foldersItemsControl)
+        {
+            var boxYesNo = MessageBoxManager.GetMessageBoxStandard("Import All Folders", "CAUTION this could take a long time are you sure?", ButtonEnum.YesNo);
+            var boxResult = await boxYesNo.ShowAsync();
+            if (boxResult == ButtonResult.Yes)
+            {
+                List<FolderViewModel> allFolders = foldersItemsControl.Items.OfType<FolderViewModel>().ToList();
+                foreach (var folder in allFolders) 
+                { 
+                    if(folder.HasFiles == true && folder.AreImagesImported == false)
+                    {
+                        await ImportImages(folder);
+                    }
+                }
+            }
+        }
+
+        private async Task ScanAllFoldersOnCurrentPage(ItemsControl foldersItemsControl)
+        {
+            var boxYesNo = MessageBoxManager.GetMessageBoxStandard("Scan All Folders", "CAUTION this could take a long time are you sure? Make sure to import images first.", ButtonEnum.YesNo);
+            var boxResult = await boxYesNo.ShowAsync();
+            if (boxResult == ButtonResult.Yes)
+            {
+                List<FolderViewModel> allFolders = foldersItemsControl.Items.OfType<FolderViewModel>().ToList();
+                foreach (var folder in allFolders)
+                {
+                    if (folder.HasFiles == true && folder.AreImagesImported == true && folder.FolderContentMetaDataScanned == false)
+                    {
+                        await ScanFolderImagesForMetaData(folder);
+                    }
+                }
+            }
+        }
         /*
          * complicated because tags are in image_tags_join table also the tags on image metadata may or may not be in the tags table in database
          * goal is to take metadata from image and write to database. The two should be identical after this point. 
@@ -1764,7 +1828,7 @@ namespace ImagePerfect.ViewModels
          * Really how many images are going to be on one folder? I am assuming at most maybe a few thousand
          * 
          */
-        private async void ScanFolderImagesForMetaData(FolderViewModel folderVm)
+        private async Task ScanFolderImagesForMetaData(FolderViewModel folderVm)
         {
             ShowLoading = true;
             //get all images at folder id
