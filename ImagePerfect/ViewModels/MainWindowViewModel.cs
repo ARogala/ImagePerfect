@@ -1462,9 +1462,14 @@ namespace ImagePerfect.ViewModels
                 imageVm.NewTag = "";
                 await RefreshImageProps(imageVm, CurrentDirectory);   
             }
-            //clear NewTag in box if try to input duplicate tag
             else
             {
+                //remove the NewTag from the Tags list in the UI (New tag was duplicate and not added in this case)
+                int tagsMaxIndex = imageVm.ImageTags.Length - 1;
+                int newTagTotalCharsToRemove = imageVm.NewTag.Length; //total chars to remove
+                int removeStartAtIndex = tagsMaxIndex - newTagTotalCharsToRemove;
+                imageVm.ImageTags = imageVm.ImageTags.Remove(removeStartAtIndex);
+                //clear NewTag in box if try to input duplicate tag
                 imageVm.NewTag = "";
             }
         }
