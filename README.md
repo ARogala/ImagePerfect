@@ -57,10 +57,9 @@ Maybe add
 5. Maybe make a SQLite version so no server set up -- the reason for the MySQL server is I plan to have a mobile client so you can at least view photos via you phone
 6. Look into making the mobile client 
 7. Maybe find a way to scan library root folder to find folders added to file system but not added to app
-8. A way to prevent adding the same folder twice. Right now its up to the user to be careful about adding new folders after the initial library add.
-9. Improve image move so you can move images to a new folder even if the new folder contains images with the same name. 
-10. Improve Tagging right now you can only add one tag at a time. Make it so you can add several tags at once if comma separated. Same with remove you can only remove one at a time. 
-11. Add a gif maker
+8. Improve image move so you can move images to a new folder even if the new folder contains images with the same name. 
+9. Improve Tagging right now you can only add one tag at a time. Make it so you can add several tags at once if comma separated. Same with remove you can only remove one at a time. 
+10. Add a gif maker
 
 ## Screen Shot
 
