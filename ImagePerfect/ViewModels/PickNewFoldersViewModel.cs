@@ -9,6 +9,8 @@ using MsBox.Avalonia.Enums;
 using MsBox.Avalonia;
 using ReactiveUI;
 using ImagePerfect.Helpers;
+using System.Linq;
+using System.Diagnostics;
 
 namespace ImagePerfect.ViewModels
 {
@@ -61,6 +63,30 @@ namespace ImagePerfect.ViewModels
                 return;
             }
             _mainWindowViewModel.ShowLoading = true;
+            //check if any folders are already in db
+            List<Folder> allFoldersInDb = await _folderMethods.GetAllFolders();
+            List<string> foldersNotToAdd = new List<string>();
+            for (int i = 0; i < _NewFolders.Count; i++) 
+            {
+                foreach (Folder folder in allFoldersInDb)
+                {
+                    if (folder.FolderPath == PathHelper.FormatPathFromFolderPicker(_NewFolders[i]))
+                    {
+                        foldersNotToAdd.Add(_NewFolders[i]);
+                    }
+                }
+            }
+            foreach (string path in foldersNotToAdd)
+            {
+                _NewFolders.Remove(path);
+            }
+            if (_NewFolders.Count == 0) 
+            {
+                var box = MessageBoxManager.GetMessageBoxStandard("Add Folders", "All the folders selected are already in the library.", ButtonEnum.Ok);
+                await box.ShowAsync();
+                _mainWindowViewModel.ShowLoading = false;
+                return;
+            }
             //build csv
             bool csvIsSet = await FolderCsvMethods.AddNewFoldersCsv(_NewFolders, false);
             //write csv to database
