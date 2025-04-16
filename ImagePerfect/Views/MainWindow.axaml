@@ -190,7 +190,7 @@
 			</Grid>
 		</StackPanel>
 		<!--Create New Folder-->
-		<StackPanel Grid.Row="5" MaxWidth="400" IsVisible="{Binding ShowCreateNewFolder}">
+		<StackPanel Grid.Row="5" MaxWidth="400" IsVisible="{Binding ShowCreateNewFolder}" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
 			<TextBlock Margin="0 5" >Create A New Folder:</TextBlock>
 			<TextBox  Watermark="Enter folder name" Text="{Binding NewFolderName}" />
 			<Button
@@ -201,7 +201,7 @@
 			</Button>
 		</StackPanel>
 		<!--Manage Images-->
-		<StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Center" IsVisible="{Binding ShowManageImages}">
+		<StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Center" IsVisible="{Binding ShowManageImages}" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
 			<Button Margin="5" HorizontalAlignment="Center"
 					Command="{Binding SelectAllImagesCommand}"
 					CommandParameter="{Binding #ImagesItemsControl}">
@@ -220,7 +220,7 @@
 			<v:PickImageMoveToFolderView DataContext="{Binding #Root.((vm:MainWindowViewModel)DataContext).PickImageMoveToFolder}"/>
 		</StackPanel>
 		<!--Import and Scan Folders-->
-		<StackPanel Grid.Row="7" Orientation="Horizontal" HorizontalAlignment="Center" IsVisible="{Binding ShowImportAndScan}">
+		<StackPanel Grid.Row="7" Orientation="Horizontal" HorizontalAlignment="Center" IsVisible="{Binding ShowImportAndScan}" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
 			<Button Margin="5" HorizontalAlignment="Center"
 					Command="{Binding ImportAllFoldersOnCurrentPageCommand}"
 					CommandParameter="{Binding #FoldersItemsControl}">
