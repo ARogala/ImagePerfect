@@ -35,6 +35,7 @@ namespace ImagePerfect.ViewModels
         private bool _showCreateNewFolder = false;
         private bool _showTotalImages = false;
         private bool _showImportAndScan = false;
+        private bool _showAllTags = false;
         private int _totalImages = 0;
         private string _currentDirectory;
         private string _savedDirectory;
@@ -175,6 +176,9 @@ namespace ImagePerfect.ViewModels
             ToggleImportAndScanCommand = ReactiveCommand.Create(() => {
                 ToggleImportAndScan();
             });
+            ToggleListAllTagsCommand = ReactiveCommand.Create(() => {
+                ToggleListAllTags();
+            });
             FilterImagesOnRatingCommand = ReactiveCommand.Create(async (decimal rating) => {
                 ResetPagination();
                 selectedRatingForFilter = Decimal.ToInt32(rating);
@@ -274,6 +278,12 @@ namespace ImagePerfect.ViewModels
         {
             get => _showTotalImages;
             set => this.RaiseAndSetIfChanged(ref _showTotalImages, value);
+        }
+
+        public bool ShowAllTags
+        {
+            get => _showAllTags;
+            set => this.RaiseAndSetIfChanged(ref _showAllTags, value);
         }
 
         public bool ShowImportAndScan
@@ -504,6 +514,8 @@ namespace ImagePerfect.ViewModels
 
         public ReactiveCommand<Unit, Unit> ToggleImportAndScanCommand { get; }
 
+        public ReactiveCommand<Unit, Unit> ToggleListAllTagsCommand { get; }
+
         public ReactiveCommand<decimal, Task> FilterImagesOnRatingCommand { get; }
 
         public ReactiveCommand<decimal, Task> FilterFoldersOnRatingCommand { get; }
@@ -680,6 +692,17 @@ namespace ImagePerfect.ViewModels
             await RefreshImages(CurrentDirectory);
         }
 
+        private void ToggleListAllTags()
+        {
+            if (ShowAllTags)
+            {
+                ShowAllTags = false;
+            }
+            else
+            {
+                ShowAllTags = true;
+            }
+        }
         private void ToggleImportAndScan()
         {
             if (ShowImportAndScan) 

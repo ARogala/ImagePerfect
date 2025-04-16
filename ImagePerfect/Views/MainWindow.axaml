@@ -14,7 +14,7 @@
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-	<Grid ColumnDefinitions="*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,*,Auto,Auto" x:Name="Root">
+	<Grid ColumnDefinitions="*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,*,Auto,Auto" x:Name="Root">
 		<!--File Menu-->
 		<StackPanel Grid.Row="0">
 			<Menu>
@@ -29,16 +29,22 @@
 					<Button Margin="0" Width="175" HorizontalContentAlignment="Center" Command="{Binding ToggleManageImagesCommand}">Manage Images</Button>
 					<Button Margin="0" Width="175" HorizontalContentAlignment="Center" Command="{Binding ToggleGetTotalImagesCommand}">Total Images</Button>
 					<Button Margin="0" Width="175" HorizontalContentAlignment="Center" Command="{Binding ToggleImportAndScanCommand}">Import And Scan</Button>
+					<Button Margin="0" Width="175" HorizontalContentAlignment="Center" Command="{Binding ToggleListAllTagsCommand}">Show All Tags</Button>
 				</MenuItem>
 			</Menu>
 		</StackPanel>
+		<StackPanel Grid.Row="1" IsVisible="{Binding ShowAllTags}">
+			<ListBox Grid.Row="3" SelectionMode="Multiple" ItemsSource="{Binding TagsList}" Height="200" Width="500">
+
+			</ListBox>
+		</StackPanel>
 		<!--Show Total Images-->
-		<StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" IsVisible="{Binding ShowTotalImages}">
+		<StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" IsVisible="{Binding ShowTotalImages}">
 			<TextBlock Margin="5">Total Images: </TextBlock>
 			<TextBlock Margin="5" Text="{Binding TotalImages,StringFormat='{}{0:0,0}'}"></TextBlock>
 		</StackPanel>
 		<!--Filters-->
-		<StackPanel Grid.Row="2" Orientation="Vertical" IsVisible="{Binding ShowFilters}">
+		<StackPanel Grid.Row="3" Orientation="Vertical" IsVisible="{Binding ShowFilters}">
 			<Grid RowDefinitions="Auto, Auto, Auto, Auto" ColumnDefinitions="*, Auto, *, Auto" MaxWidth="800" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
 				<NumericUpDown Grid.Row="0" Grid.Column="0" Minimum="0" Value="1" Maximum="5" 
 							   Margin="5" ParsingNumberStyle="Integer" FormatString="0"
@@ -96,7 +102,7 @@
 			</Grid>
 		</StackPanel>
 		<!--Settings-->
-		<StackPanel Grid.Row="3" IsVisible="{Binding ShowSettings}">
+		<StackPanel Grid.Row="4" IsVisible="{Binding ShowSettings}">
 			<Grid RowDefinitions="Auto" ColumnDefinitions="Auto,Auto,Auto" Width="600" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
 				<StackPanel Grid.Row="0" Grid.Column="0" Width="200">
 					<TextBlock Margin="0 10 0 5">Pick Image Width</TextBlock>
@@ -170,7 +176,7 @@
 			</Grid>
 		</StackPanel>
 		<!--Directory Options-->
-		<StackPanel Grid.Row="4">
+		<StackPanel Grid.Row="5">
 			<Grid RowDefinitions="Auto" ColumnDefinitions="*" Margin="0 10 0 15" HorizontalAlignment="Center" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
 				<StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0">
 					<!--
@@ -190,7 +196,7 @@
 			</Grid>
 		</StackPanel>
 		<!--Create New Folder-->
-		<StackPanel Grid.Row="5" MaxWidth="400" IsVisible="{Binding ShowCreateNewFolder}" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
+		<StackPanel Grid.Row="6" MaxWidth="400" IsVisible="{Binding ShowCreateNewFolder}" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
 			<TextBlock Margin="0 5" >Create A New Folder:</TextBlock>
 			<TextBox  Watermark="Enter folder name" Text="{Binding NewFolderName}" />
 			<Button
@@ -201,7 +207,7 @@
 			</Button>
 		</StackPanel>
 		<!--Manage Images-->
-		<StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Center" IsVisible="{Binding ShowManageImages}" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
+		<StackPanel Grid.Row="7" Orientation="Horizontal" HorizontalAlignment="Center" IsVisible="{Binding ShowManageImages}" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
 			<Button Margin="5" HorizontalAlignment="Center"
 					Command="{Binding SelectAllImagesCommand}"
 					CommandParameter="{Binding #ImagesItemsControl}">
@@ -220,7 +226,7 @@
 			<v:PickImageMoveToFolderView DataContext="{Binding #Root.((vm:MainWindowViewModel)DataContext).PickImageMoveToFolder}"/>
 		</StackPanel>
 		<!--Import and Scan Folders-->
-		<StackPanel Grid.Row="7" Orientation="Horizontal" HorizontalAlignment="Center" IsVisible="{Binding ShowImportAndScan}" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
+		<StackPanel Grid.Row="8" Orientation="Horizontal" HorizontalAlignment="Center" IsVisible="{Binding ShowImportAndScan}" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
 			<Button Margin="5" HorizontalAlignment="Center"
 					Command="{Binding ImportAllFoldersOnCurrentPageCommand}"
 					CommandParameter="{Binding #FoldersItemsControl}">
@@ -233,9 +239,9 @@
 			</Button>
 		</StackPanel>
 		<!--Progress Bar-->
-		<ProgressBar Grid.Row="8" Margin="10" IsIndeterminate="True" IsVisible="{Binding ShowLoading}"/>		
+		<ProgressBar Grid.Row="9" Margin="10" IsIndeterminate="True" IsVisible="{Binding ShowLoading}"/>		
 		<!--Folders and Images-->
-		<ScrollViewer Grid.Row="9">
+		<ScrollViewer Grid.Row="10">
 			<StackPanel>
 				<ItemsControl ItemsSource="{Binding LibraryFolders}" x:Name="FoldersItemsControl">
 					<ItemsControl.ItemsPanel>
@@ -375,7 +381,7 @@
 			</StackPanel>
 		</ScrollViewer>
 		<!--Pagination-->
-		<StackPanel Grid.Row="10" Orientation="Vertical" HorizontalAlignment="Center" Margin="0 10 0 0">
+		<StackPanel Grid.Row="11" Orientation="Vertical" HorizontalAlignment="Center" Margin="0 10 0 0">
 			<Grid RowDefinitions="Auto" ColumnDefinitions="Auto, Auto, Auto, Auto, Auto" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
 				<Button Margin="5" Grid.Row="0" Grid.Column="0"
 					Command="{Binding PreviousPageCommand}">
@@ -396,7 +402,7 @@
 				</Button>
 			</Grid>
 		</StackPanel>
-		<StackPanel Grid.Row="11" Orientation="Vertical" HorizontalAlignment="Center" Margin="0 0 0 10">
+		<StackPanel Grid.Row="12" Orientation="Vertical" HorizontalAlignment="Center" Margin="0 0 0 10">
 			<StackPanel Orientation="Horizontal">
 				<Label>Total Pages:</Label>
 				<TextBlock Text="{Binding MaxPage}" VerticalAlignment="Center"></TextBlock>
