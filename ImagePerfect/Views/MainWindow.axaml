@@ -245,7 +245,7 @@
 					</ItemsControl.ItemsPanel>
 					<ItemsControl.ItemTemplate>
 						<DataTemplate DataType="vm:FolderViewModel">
-							<StackPanel Margin="10">
+							<StackPanel Margin="1">
 								<TextBlock MaxWidth="{Binding #Root.((vm:MainWindowViewModel)DataContext).MaxImageWidth}" Text="{Binding FolderName}"/>
 								<Image MaxWidth="{Binding #Root.((vm:MainWindowViewModel)DataContext).MaxImageWidth}" Source="{Binding CoverImageBitmap}" />
 								<Grid RowDefinitions="Auto" ColumnDefinitions="*,*,*,*" MaxWidth="600" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
@@ -327,7 +327,7 @@
 					</ItemsControl.ItemsPanel>
 					<ItemsControl.ItemTemplate>
 						<DataTemplate DataType="vm:ImageViewModel">
-							<StackPanel Margin="10">
+							<StackPanel Margin="1">
 								<Image MaxWidth="{Binding #Root.((vm:MainWindowViewModel)DataContext).MaxImageWidth}" Source="{Binding ImageBitmap}" />
 								<Grid RowDefinitions="Auto" ColumnDefinitions="*,*,*,Auto" MaxWidth="600" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
 									<Button Grid.Row="0" Grid.Column="0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="2"
