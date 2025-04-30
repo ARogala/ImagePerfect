@@ -111,6 +111,7 @@ namespace ImagePerfect.Helpers
             List<ImageViewModel> imagesToMoveModifiedPaths = new List<ImageViewModel>();
             foreach (ImageViewModel imgToMove in imagesToMove)
             {
+                //deep copy
                 imagesToMoveModifiedPaths.Add(new ImageViewModel(imgToMove));
             }
             foreach (ImageViewModel image in imagesToMoveModifiedPaths) 

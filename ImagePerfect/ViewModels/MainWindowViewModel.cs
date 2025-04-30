@@ -44,7 +44,7 @@ namespace ImagePerfect.ViewModels
         private string _rootFolderLocation;
         private string _newFolderName;
         private bool _isNewFolderEnabled;
-        private List<string> _tagsList = new List<string>();
+        private List<Tag> _tagsList = new List<Tag>();
 
         private List<Folder> displayFolders = new List<Folder>();
         private List<FolderTag> displayFolderTags = new List<FolderTag>();
@@ -124,6 +124,9 @@ namespace ImagePerfect.ViewModels
             });
             AddImageTagsCommand = ReactiveCommand.Create((ImageViewModel imageVm) => {
                 AddImageTag(imageVm);
+            });
+            AddMultipleImageTagsCommand = ReactiveCommand.Create((ListBox selectedTagsListBox) => {
+                AddMultipleImageTags(selectedTagsListBox);
             });
             EditImageTagsCommand = ReactiveCommand.Create((ImageViewModel imageVm) => {
                 EditImageTag(imageVm);
@@ -262,6 +265,9 @@ namespace ImagePerfect.ViewModels
             ImportAllFoldersOnCurrentPageCommand = ReactiveCommand.Create(async (ItemsControl foldersItemsControl) => { 
                 await ImportAllFoldersOnCurrentPage(foldersItemsControl);
             });
+            AddCoverImageOnCurrentPageCommand = ReactiveCommand.Create(async (ItemsControl folderItemsControl) => { 
+                await AddCoverImageOnCurrentPage(folderItemsControl);
+            });
             ScanAllFoldersOnCurrentPageCommand = ReactiveCommand.Create(async (ItemsControl foldersItemsControl) => {
                 await ScanAllFoldersOnCurrentPage(foldersItemsControl);
             });
@@ -371,7 +377,7 @@ namespace ImagePerfect.ViewModels
             get => _currentFolderPage;
             set => this.RaiseAndSetIfChanged(ref _currentFolderPage, value);
         }
-        public List<string> TagsList
+        public List<Tag> TagsList
         {
             get => _tagsList;
             set => this.RaiseAndSetIfChanged(ref _tagsList, value); 
@@ -480,6 +486,8 @@ namespace ImagePerfect.ViewModels
 
         public ReactiveCommand<ImageViewModel, Unit> AddImageTagsCommand { get; }
 
+        public ReactiveCommand<ListBox, Unit> AddMultipleImageTagsCommand { get; }
+
         public ReactiveCommand<ImageViewModel, Unit> EditImageTagsCommand { get; }
 
         public ReactiveCommand<ImageViewModel, Unit> AddImageRatingCommand { get; }
@@ -554,6 +562,8 @@ namespace ImagePerfect.ViewModels
         public ReactiveCommand<ItemsControl, Task> MoveSelectedImagesToNewFolderCommand { get; }
 
         public ReactiveCommand<ItemsControl, Task> ImportAllFoldersOnCurrentPageCommand { get; }
+
+        public ReactiveCommand<ItemsControl, Task> AddCoverImageOnCurrentPageCommand { get; }
 
         public ReactiveCommand<ItemsControl, Task> ScanAllFoldersOnCurrentPageCommand { get; }
 
@@ -1496,7 +1506,68 @@ namespace ImagePerfect.ViewModels
                 imageVm.NewTag = "";
             }
         }
-       
+        
+        //boiler plate set up -- need to add to DB and write new tags to image file
+        //this method does nothing for now
+        private async void AddMultipleImageTags(ListBox selectedTagsListBox)
+        {
+            if (selectedTagsListBox.DataContext != null && selectedTagsListBox.SelectedItems != null)
+            {
+                ImageViewModel imageVm = (ImageViewModel)selectedTagsListBox.DataContext;
+                List<Tag> tagsToAdd = new List<Tag>();
+                //nothing selected just return
+                if (selectedTagsListBox.SelectedItems.Count == 0)
+                {
+                    return;
+                }
+                //if no current tags just add all to list
+                if (imageVm.ImageTags == "" || imageVm.ImageTags == null)
+                {
+                    foreach (Tag selectedTag in selectedTagsListBox.SelectedItems)
+                    {
+                        tagsToAdd.Add(selectedTag);
+                    }
+                }
+                //else only add non duplicates
+                else
+                {
+                    foreach (Tag selectedTag in selectedTagsListBox.SelectedItems)
+                    {
+                        if (!imageVm.ImageTags.Contains(selectedTag.TagName))
+                        {
+                            tagsToAdd.Add(selectedTag);
+                        }
+                    }
+                }
+                //add new tags to ImageTags -- KEEP!! THIS IS NEEDED TO WRITE METADATA
+                foreach (Tag selectedTag in tagsToAdd)
+                {
+                    if (string.IsNullOrEmpty(imageVm.ImageTags))
+                    {
+                        imageVm.ImageTags = selectedTag.TagName;
+                    }
+                    else
+                    {
+                        imageVm.ImageTags = imageVm.ImageTags + "," + selectedTag.TagName;
+                    }
+                }
+                //build sql for bulk insert
+
+                //update sql db
+
+                //write new tags to image file
+
+                //Debug.WriteLine(imageVm.ImageTags);
+                //foreach (Tag selectedTag in tagsToAdd)
+                //{
+                    
+                //    Debug.WriteLine(selectedTag.TagName);
+                //    Debug.WriteLine(selectedTag.TagId);
+                //}
+                
+                //Debug.WriteLine(imageVm.FileName);
+            }
+        }
         private async void OpenImageInExternalViewer(ImageViewModel imageVm)
         {
             string externalImageViewerExePath = PathHelper.GetExternalImageViewerExePath();
@@ -1806,6 +1877,46 @@ namespace ImagePerfect.ViewModels
             }
         }
 
+        private async Task AddCoverImageOnCurrentPage(ItemsControl foldersItemsControl)
+        {
+            List<FolderViewModel> allFolders = foldersItemsControl.Items.OfType<FolderViewModel>().ToList();
+            Random random = new Random();
+            foreach (FolderViewModel folder in allFolders)
+            {
+                if (folder.HasFiles == true && folder.AreImagesImported == true)
+                {
+                    (List<Image> images, List<ImageTag> tags) imageResult = await _imageMethods.GetAllImagesInFolder(folder.FolderId);
+                    List<Image> images = imageResult.images;
+                    int randomIndex = random.Next(0, images.Count - 1);
+                    //set random fall back cover
+                    string cover = images[randomIndex].ImagePath;
+                    //get cover clean
+                    foreach (Image image in images) 
+                    { 
+                        if (image.ImagePath.ToLower().Contains("cover") && image.ImagePath.ToLower().Contains("clean"))
+                        {
+                            cover = image.ImagePath;    
+                            break;
+                        }
+                    }
+                    //if no cover clean get cover
+                    if (!(cover.ToLower().Contains("cover") && cover.ToLower().Contains("clean")))
+                    {
+                        foreach (Image image in images)
+                        {
+                            if (image.ImagePath.ToLower().Contains("cover"))
+                            {
+                                cover = image.ImagePath;
+                                break;
+                            }
+                        }
+                    }
+                    folder.CoverImagePath = cover;
+                    await _folderMethods.UpdateFolder(FolderMapper.GetFolderFromVm(folder));
+                }
+            }
+            await RefreshFolders();
+        }
         private async Task ImportAllFoldersOnCurrentPage(ItemsControl foldersItemsControl)
         {
             var boxYesNo = MessageBoxManager.GetMessageBoxStandard("Import All Folders", "CAUTION this could take a long time are you sure?", ButtonEnum.YesNo);

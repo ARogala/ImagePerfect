@@ -18,8 +18,9 @@ namespace ImagePerfect.ViewModels
 		private bool _imageMetaDataScanned;
 		private int _folderId;
 		private bool _isSelected = false;
+        private bool _showAddMultipleImageTags = false;
 
-		public ImageViewModel() { }
+        public ImageViewModel() { }
 		//copy constructor so i can make a deep copy of this object
         public ImageViewModel(ImageViewModel imageVm)
         {
@@ -34,6 +35,7 @@ namespace ImagePerfect.ViewModels
 			ImageMetaDataScanned = imageVm.ImageMetaDataScanned;
 			FolderId = imageVm.FolderId;
 			IsSelected = imageVm.IsSelected;
+			ShowAddMultipleImageTags = imageVm.ShowAddMultipleImageTags;
 			Tags = imageVm.Tags;
         }
         public int ImageId
@@ -62,7 +64,7 @@ namespace ImagePerfect.ViewModels
 			get => _imageTags;
 			set => this.RaiseAndSetIfChanged(ref _imageTags, value);
 		}
-		public string NewTag
+        public string NewTag
 		{
 			get => _newTag;
             set
@@ -100,7 +102,12 @@ namespace ImagePerfect.ViewModels
 			get => _isSelected;
 			set => this.RaiseAndSetIfChanged(ref _isSelected, value);
 		}
+        public bool ShowAddMultipleImageTags
+        {
+            get => _showAddMultipleImageTags;
+            set => this.RaiseAndSetIfChanged(ref _showAddMultipleImageTags, value);
+        }
         //for many to many relationship folder_tags_join
-		public List<ImageTag> Tags { get; set; } = new List<ImageTag>();
+        public List<ImageTag> Tags { get; set; } = new List<ImageTag>();
     }
 }

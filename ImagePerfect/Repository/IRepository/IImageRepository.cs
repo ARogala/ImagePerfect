@@ -14,7 +14,7 @@ namespace ImagePerfect.Repository.IRepository
         Task<List<Image>> GetAllImagesInDirectoryTree(string directoryPath);
         Task<bool> AddImageCsv(string filePath, int folderId);
         Task<bool> UpdateImageTags(Image image, string newTag);
-        Task<List<string>> GetTagsList();
+        Task<List<Tag>> GetTagsList();
         Task UpdateImageTagFromMetaData(ImageTag tag);
         Task<bool> UpdateImageRatingFromMetaData(string imageUpdateSql, int folderId);
         Task ClearImageTagsJoinForMetaData(Image image);
