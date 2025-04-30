@@ -199,10 +199,10 @@ namespace ImagePerfect.Repository
             return rowsEffected > 0 ? true : false;
         }
 
-        public async Task<List<string>> GetTagsList()
+        public async Task<List<Tag>> GetTagsList()
         {
-            string sql = @"SELECT TagName FROM tags";
-            List<string> tags = (List<string>)await _connection.QueryAsync<string>(sql);
+            string sql = @"SELECT * FROM tags";
+            List<Tag> tags = (List<Tag>)await _connection.QueryAsync<Tag>(sql);
             await _connection.CloseAsync();
             return tags;
         }
