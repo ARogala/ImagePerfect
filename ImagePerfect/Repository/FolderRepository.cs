@@ -168,6 +168,34 @@ namespace ImagePerfect.Repository
             return (allFoldersWithMetadataNotScanned, tags);
         }
 
+        public async Task<(List<Folder> folders, List<FolderTag> tags)> GetAllFoldersWithoutCovers(bool filterInCurrentDirectory, string currentDirectory)
+        {
+            await _connection.OpenAsync();
+            MySqlTransaction txn = await _connection.BeginTransactionAsync();
+            string path = PathHelper.FormatPathForLikeOperator(currentDirectory);
+            string sql1 = string.Empty;
+            string sql2 = string.Empty;
+            if (filterInCurrentDirectory)
+            {
+                sql1 = @"SELECT * FROM folders WHERE AreImagesImported = true AND HasFiles = true AND CoverImagePath = '' AND FolderPath LIKE '" + path + "' ORDER BY FolderName";
+                sql2 = @"SELECT tags.TagId, tags.TagName, folders.FolderId FROM folders 
+                            JOIN folder_tags_join ON folder_tags_join.FolderId = folders.FolderId 
+                            JOIN tags ON folder_tags_join.TagId = tags.TagId WHERE folders.AreImagesImported = true AND folders.CoverImagePath = '' AND FolderPath LIKE '" + path + "' ORDER BY folders.FolderName;";
+            }
+            else
+            {
+                sql1 = @"SELECT * FROM folders WHERE AreImagesImported = true AND HasFiles = true AND CoverImagePath = '' ORDER BY FolderName";
+                sql2 = @"SELECT tags.TagId, tags.TagName, folders.FolderId FROM folders 
+                            JOIN folder_tags_join ON folder_tags_join.FolderId = folders.FolderId 
+                            JOIN tags ON folder_tags_join.TagId = tags.TagId WHERE folders.AreImagesImported = true AND folders.CoverImagePath = '' ORDER BY folders.FolderName;";
+            }
+
+            List<Folder> allFoldersWithoutCovers = (List<Folder>)await _connection.QueryAsync<Folder>(sql1, transaction: txn);
+            List<FolderTag> tags = (List<FolderTag>)await _connection.QueryAsync<FolderTag>(sql2, transaction: txn);
+            await txn.CommitAsync();
+            await _connection.CloseAsync();
+            return (allFoldersWithoutCovers, tags);
+        }
         public async Task<(List<Folder> folders, List<FolderTag> tags)> GetAllFoldersWithTag(string tag, bool filterInCurrentDirectory, string currentDirectory)
         {
             await _connection.OpenAsync();
