@@ -12,7 +12,7 @@ namespace ImagePerfect.ViewModels
 		private string _imagePath;
 		private string _fileName;
 		private string? _imageTags;
-		private string _newTag;
+		private string? _newTag;
 		private int _imageRating;
 		private string _imageFolderPath;
 		private bool _imageMetaDataScanned;
@@ -64,17 +64,19 @@ namespace ImagePerfect.ViewModels
 			get => _imageTags;
 			set => this.RaiseAndSetIfChanged(ref _imageTags, value);
 		}
-        public string NewTag
+        public string? NewTag
 		{
 			get => _newTag;
             set
             {
                 this.RaiseAndSetIfChanged(ref _newTag, value);
-                if (value.Contains(" "))
+                if (value != null)
                 {
-                    _newTag = _newTag.Trim();
+					if(value.Contains(" "))
+					{
+                        _newTag = _newTag.Trim();
+                    }
                 }
-
             }
         }
 		public int ImageRating
