@@ -78,7 +78,8 @@ namespace ImagePerfect.ViewModels
             FolderDescriptionFilter,
             AllFavoriteFolders,
             AllFoldersWithNoImportedImages,
-            AllFoldersWithMetadataNotScanned
+            AllFoldersWithMetadataNotScanned,
+            AllFoldersWithoutCovers
         }
         private filters currentFilter = filters.None;
         private int selectedRatingForFilter = 0;
@@ -220,6 +221,11 @@ namespace ImagePerfect.ViewModels
             GetAllFoldersWithMetadataNotScannedCommand = ReactiveCommand.Create(async () => {
                 ResetPagination();
                 currentFilter = filters.AllFoldersWithMetadataNotScanned;
+                await RefreshFolders();
+            });
+            GetAllFoldersWithoutCoversCommand = ReactiveCommand.Create(async () => {
+                ResetPagination();
+                currentFilter = filters.AllFoldersWithoutCovers;
                 await RefreshFolders();
             });
             LoadCurrentDirectoryCommand = ReactiveCommand.Create(async () => {
@@ -537,6 +543,9 @@ namespace ImagePerfect.ViewModels
         public ReactiveCommand<Unit, Task> GetAllFoldersWithNoImportedImagesCommand { get; }
 
         public ReactiveCommand<Unit, Task> GetAllFoldersWithMetadataNotScannedCommand { get; }
+
+        public ReactiveCommand<Unit, Task> GetAllFoldersWithoutCoversCommand { get; }
+
         public ReactiveCommand<Unit, Task> LoadCurrentDirectoryCommand { get; }
 
         public ReactiveCommand<string, Task> PickImageWidthCommand { get; }
@@ -947,6 +956,16 @@ namespace ImagePerfect.ViewModels
                     displayFolders = FolderPagination();
                     await MapTagsToFoldersAddToObservable();
                     break;
+                case filters.AllFoldersWithoutCovers:
+                    (List<Folder> folders, List<FolderTag> tags) allFoldersWithoutCoversResult = await _folderMethods.GetAllFoldersWithoutCovers(FilterInCurrentDirectory, CurrentDirectory);
+                    displayFolders = allFoldersWithoutCoversResult.folders;
+                    displayFolderTags = allFoldersWithoutCoversResult.tags;
+
+                    Images.Clear();
+                    LibraryFolders.Clear();
+                    displayFolders = FolderPagination();
+                    await MapTagsToFoldersAddToObservable();
+                    break;
             }
             ShowLoading = false;
         }
@@ -1030,6 +1049,13 @@ namespace ImagePerfect.ViewModels
                     (List<Folder> folders, List<FolderTag> tags) allFoldersWithMetadataNotScannedResult = await _folderMethods.GetAllFoldersWithMetadataNotScanned(FilterInCurrentDirectory, CurrentDirectory);
                     displayFolders = allFoldersWithMetadataNotScannedResult.folders;
                     displayFolderTags = allFoldersWithMetadataNotScannedResult.tags;
+                    displayFolders = FolderPagination();
+                    await MapTagsToSingleFolderUpdateObservable(folderVm);
+                    break;
+                case filters.AllFoldersWithoutCovers:
+                    (List<Folder> folders, List<FolderTag> tags) allFoldersWithoutCoversResult = await _folderMethods.GetAllFoldersWithoutCovers(FilterInCurrentDirectory, CurrentDirectory);
+                    displayFolders = allFoldersWithoutCoversResult.folders;
+                    displayFolderTags = allFoldersWithoutCoversResult.tags;
                     displayFolders = FolderPagination();
                     await MapTagsToSingleFolderUpdateObservable(folderVm);
                     break;
