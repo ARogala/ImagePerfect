@@ -48,6 +48,11 @@ namespace ImagePerfect.Helpers
         {
             if (File.Exists(path))
             {
+                //any file that starts with a . will cause an ImageSharp error -- need filename here not path
+                if (PathHelper.GetFileNameFromImagePath(path).StartsWith("."))
+                {
+                    return LoadFromResource(new Uri("avares://ImagePerfect/Assets/missing_image.png"));
+                }
                 using (MemoryStream ms = new MemoryStream())
                 using (var image = await Image.LoadAsync(path))
                 {
