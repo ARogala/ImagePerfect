@@ -132,6 +132,11 @@ namespace ImagePerfect.Helpers
             return partialPath;
         }
 
+        public static string GetFileNameFromImagePath(string path)
+        {
+            string[] strArray = path.Split(getPathSlash());
+            return strArray[strArray.Length - 1];
+        }
         public static string RemoveOneFolderFromPath(string path)
         {
             string[] strArray = path.Split(getPathSlash());
