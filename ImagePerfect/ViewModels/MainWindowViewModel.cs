@@ -1925,8 +1925,20 @@ namespace ImagePerfect.ViewModels
                             break;
                         }
                     }
-                    //if no cover clean get cover
+                    //if no cover clean get poster
                     if (!(cover.ToLower().Contains("cover") && cover.ToLower().Contains("clean")))
+                    {
+                        foreach (Image image in images)
+                        {
+                            if (image.ImagePath.ToLower().Contains("poster"))
+                            {
+                                cover = image.ImagePath;
+                                break;
+                            }
+                        }
+                    }
+                    //if no poster get cover
+                    if (!cover.ToLower().Contains("poster"))
                     {
                         foreach (Image image in images)
                         {
