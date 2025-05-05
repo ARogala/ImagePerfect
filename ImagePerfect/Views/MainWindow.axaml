@@ -287,6 +287,13 @@
 									</Button>
 									<v:PickFolderCoverImageView Grid.Row="0" Grid.Column="3" DataContext="{Binding #Root.((vm:MainWindowViewModel)DataContext).PickCoverImage}"/>
 								</Grid>
+								<Grid RowDefinitions="Auto" ColumnDefinitions="*" MaxWidth="600" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
+									<Button Grid.Row="0" Grid.Column="0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="2"
+											Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).CopyCoverImageToContainingFolderCommand}"
+											CommandParameter="{Binding}">
+										Copy Cover Image To Containing Folder
+									</Button>
+								</Grid>
 								<Grid RowDefinitions="Auto" ColumnDefinitions="*,*,*" MaxWidth="600" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
 									<v:PickMoveToFolderView Grid.Row="0" Grid.Column="0" DataContext="{Binding #Root.((vm:MainWindowViewModel)DataContext).PickMoveToFolder}" />
 									<Button Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="2"
