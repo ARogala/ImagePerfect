@@ -277,6 +277,9 @@ namespace ImagePerfect.ViewModels
             ScanAllFoldersOnCurrentPageCommand = ReactiveCommand.Create(async (ItemsControl foldersItemsControl) => {
                 await ScanAllFoldersOnCurrentPage(foldersItemsControl);
             });
+            CopyCoverImageToContainingFolderCommand = ReactiveCommand.Create(async (FolderViewModel folderVm) => { 
+                await CopyCoverImageToContainingFolder(folderVm);
+            });
             CreateNewFolderCommand = ReactiveCommand.Create(() => { CreateNewFolder(); });
             Initialize();
         }
@@ -573,6 +576,8 @@ namespace ImagePerfect.ViewModels
         public ReactiveCommand<ItemsControl, Task> ImportAllFoldersOnCurrentPageCommand { get; }
 
         public ReactiveCommand<ItemsControl, Task> AddCoverImageOnCurrentPageCommand { get; }
+
+        public ReactiveCommand<FolderViewModel, Task> CopyCoverImageToContainingFolderCommand { get; }
 
         public ReactiveCommand<ItemsControl, Task> ScanAllFoldersOnCurrentPageCommand { get; }
 
@@ -1903,6 +1908,48 @@ namespace ImagePerfect.ViewModels
             }
         }
 
+        private async Task CopyCoverImageToContainingFolder(FolderViewModel folderVm)
+        {
+            if (PathHelper.RemoveOneFolderFromPath(folderVm.FolderPath) == RootFolderLocation) 
+            {
+                var box = MessageBoxManager.GetMessageBoxStandard("Copy Cover", "Cannot copy from root folder.", ButtonEnum.Ok);
+                await box.ShowAsync();
+                return;
+            }
+            if(folderVm.CoverImagePath == "" || folderVm.CoverImagePath == null)
+            {
+                var box = MessageBoxManager.GetMessageBoxStandard("Copy Cover", "The folder must have a cover selected to copy.", ButtonEnum.Ok);
+                await box.ShowAsync();
+                return;
+            }
+            
+            
+            string coverImageCurrentPath = folderVm.CoverImagePath;
+            string coverImageNewPath = PathHelper.GetCoverImagePathForCopyCoverImageToContainingFolder(folderVm);
+            Folder containingFolder = await _folderMethods.GetFolderAtDirectory(PathHelper.RemoveOneFolderFromPath(folderVm.FolderPath));
+            if (containingFolder.CoverImagePath != "" || containingFolder.CoverImagePath != null)
+            {
+                var boxYesNo = MessageBoxManager.GetMessageBoxStandard("Copy Cover", "Containing folder already has a cover. Do you want to copy another?", ButtonEnum.YesNo);
+                var boxResult = await boxYesNo.ShowAsync();
+                if (boxResult == ButtonResult.No)
+                {
+                    return;
+                }
+            }
+            if (File.Exists(coverImageNewPath)) 
+            {
+                var box = MessageBoxManager.GetMessageBoxStandard("Copy Cover", "A cover image in the destination has the same file name. Pick a different cover", ButtonEnum.Ok);
+                await box.ShowAsync();
+                return;
+            }
+            //add cover image path to containing folder
+            bool success = await _folderMethods.UpdateCoverImage(coverImageNewPath, containingFolder.FolderId);
+            //copy file in file system
+            if (success) 
+            {
+                File.Copy(coverImageCurrentPath, coverImageNewPath);
+            }
+        }
         private async Task AddCoverImageOnCurrentPage(ItemsControl foldersItemsControl)
         {
             List<FolderViewModel> allFolders = foldersItemsControl.Items.OfType<FolderViewModel>().ToList();

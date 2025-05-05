@@ -106,6 +106,11 @@ namespace ImagePerfect.Helpers
             return images;
         }
 
+        public static string GetCoverImagePathForCopyCoverImageToContainingFolder(FolderViewModel folderVm)
+        {
+            return RemoveOneFolderFromPath(folderVm.FolderPath) + getPathSlash() + GetFileNameFromImagePath(folderVm.CoverImagePath);
+        }
+
         public static List<ImageViewModel> ModifyImagePathsForMoveImagesToNewFolder(List<ImageViewModel> imagesToMove, Folder imagesNewFolder) 
         {
             List<ImageViewModel> imagesToMoveModifiedPaths = new List<ImageViewModel>();
