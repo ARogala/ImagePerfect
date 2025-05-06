@@ -1927,7 +1927,7 @@ namespace ImagePerfect.ViewModels
             string coverImageCurrentPath = folderVm.CoverImagePath;
             string coverImageNewPath = PathHelper.GetCoverImagePathForCopyCoverImageToContainingFolder(folderVm);
             Folder containingFolder = await _folderMethods.GetFolderAtDirectory(PathHelper.RemoveOneFolderFromPath(folderVm.FolderPath));
-            if (containingFolder.CoverImagePath != "" || containingFolder.CoverImagePath != null)
+            if (containingFolder.CoverImagePath != "")
             {
                 var boxYesNo = MessageBoxManager.GetMessageBoxStandard("Copy Cover", "Containing folder already has a cover. Do you want to copy another?", ButtonEnum.YesNo);
                 var boxResult = await boxYesNo.ShowAsync();
@@ -1984,8 +1984,8 @@ namespace ImagePerfect.ViewModels
                             }
                         }
                     }
-                    //if no poster get cover
-                    if (!cover.ToLower().Contains("poster"))
+                    //if no poster or no cover clean get cover
+                    if (!(cover.ToLower().Contains("poster") || (cover.ToLower().Contains("cover") && cover.ToLower().Contains("clean"))))
                     {
                         foreach (Image image in images)
                         {
