@@ -1321,6 +1321,7 @@ namespace ImagePerfect.ViewModels
             {
                 var box = MessageBoxManager.GetMessageBoxStandard("Empty Folder", "There are no Images in this folder.", ButtonEnum.Ok);
                 await box.ShowAsync();
+                CurrentDirectory = PathHelper.RemoveOneFolderFromPath(currentFolder.FolderPath);
                 return;
             }
             else
@@ -1726,6 +1727,7 @@ namespace ImagePerfect.ViewModels
                     SelectedImagesNewDirectory = string.Empty;
                     //refresh UI
                     await RefreshImages("", allImages[0].FolderId);
+                    await RefreshFolders(imagesCurrentFolder.FolderPath);
                     ShowLoading = false;
                 }
                 ShowLoading = false;
