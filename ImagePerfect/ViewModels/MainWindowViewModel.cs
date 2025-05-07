@@ -108,6 +108,9 @@ namespace ImagePerfect.ViewModels
             BackFolderFromImageCommand = ReactiveCommand.Create((ImageViewModel imageVm) => {
                 BackFolderFromImage(imageVm);
             });
+            BackFolderFromDirectoryOptionsPanelCommand = ReactiveCommand.Create(() => {
+                BackFolderFromDirectoryOptionsPanel();
+            });
             ImportImagesCommand = ReactiveCommand.Create(async (FolderViewModel imageFolder) => {
                 await ImportImages(imageFolder);
             });
@@ -482,6 +485,8 @@ namespace ImagePerfect.ViewModels
         public ReactiveCommand<FolderViewModel,Unit> BackFolderCommand { get; }
 
         public ReactiveCommand<ImageViewModel, Unit> BackFolderFromImageCommand { get; }
+
+        public ReactiveCommand<Unit, Unit> BackFolderFromDirectoryOptionsPanelCommand { get; }
 
         public ReactiveCommand<FolderViewModel, Task> ImportImagesCommand { get; }
 
@@ -1256,6 +1261,25 @@ namespace ImagePerfect.ViewModels
             ShowLoading = false;
         }
 
+
+        //think all three BackFolder methods can just be reduced to this one
+        private async void BackFolderFromDirectoryOptionsPanel()
+        {
+            if(CurrentDirectory == RootFolderLocation)
+            {
+                return;
+            }
+            //not ideal but keeps pagination to the folder your in. When you go back or next start from page 1
+            ResetPagination();
+            
+            string newPath = PathHelper.RemoveOneFolderFromPath(CurrentDirectory);
+            //set the current directory -- used to add new folder to location
+            CurrentDirectory = newPath;
+            //refresh UI
+            currentFilter = filters.None;
+            await RefreshFolders();
+            await RefreshImages(newPath);
+        }
         //opens the previous directory location -- from image button
         private async void BackFolderFromImage(ImageViewModel imageVm)
         {
