@@ -1563,8 +1563,6 @@ namespace ImagePerfect.ViewModels
             }
         }
         
-        //boiler plate set up -- need to add to DB and write new tags to image file
-        //this method does nothing for now
         private async void AddMultipleImageTags(ListBox selectedTagsListBox)
         {
             if (selectedTagsListBox.DataContext != null && selectedTagsListBox.SelectedItems != null)
