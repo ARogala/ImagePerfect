@@ -2043,6 +2043,7 @@ namespace ImagePerfect.ViewModels
                     }
                 }
             }
+            ResetPagination();
         }
 
         private async Task ScanAllFoldersOnCurrentPage(ItemsControl foldersItemsControl)
@@ -2059,6 +2060,7 @@ namespace ImagePerfect.ViewModels
                         await ScanFolderImagesForMetaData(folder);
                     }
                 }
+                ResetPagination();
             }
         }
         /*
