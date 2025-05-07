@@ -51,6 +51,11 @@ namespace ImagePerfect.Models
             return await _unitOfWork.Image.UpdateImageTags(image, newTag);
         }
 
+        public async Task<bool> AddMultipleImageTags(string sql)
+        {
+            return await _unitOfWork.Image.AddMultipleImageTags(sql);
+        }
+
         public async Task<bool> DeleteImageTag(ImageTag tag)
         {
             return await _unitOfWork.Image.DeleteImageTag(tag);

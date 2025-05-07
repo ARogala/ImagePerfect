@@ -176,6 +176,13 @@ namespace ImagePerfect.Repository
 
         }
 
+        public async Task<bool> AddMultipleImageTags(string sql)
+        {
+            int rowsEffected = await _connection.ExecuteAsync(sql);
+            await _connection.CloseAsync();
+            return rowsEffected > 0 ? true : false;
+        }
+
         public async Task<bool> DeleteImageTag(ImageTag tag)
         {
             int rowsEffected = 0;

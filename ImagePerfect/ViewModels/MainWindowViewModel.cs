@@ -1608,20 +1608,36 @@ namespace ImagePerfect.ViewModels
                     }
                 }
                 //build sql for bulk insert
-
+                string sql = SqlStringBuilder.BuildSqlForAddMultipleImageTags(tagsToAdd, imageVm);
                 //update sql db
-
+                bool success = await _imageMethods.AddMultipleImageTags(sql);
                 //write new tags to image file
-
-                //Debug.WriteLine(imageVm.ImageTags);
-                //foreach (Tag selectedTag in tagsToAdd)
-                //{
-                    
-                //    Debug.WriteLine(selectedTag.TagName);
-                //    Debug.WriteLine(selectedTag.TagId);
-                //}
-                
-                //Debug.WriteLine(imageVm.FileName);
+                if (success)
+                {
+                    //write new tags to image metadata
+                    await ImageMetaDataHelper.WriteTagToImage(imageVm);
+                }
+                else
+                {
+                    List<string> imageTags = imageVm.ImageTags.Split(",").ToList();
+                    //if fail remove the tags from the Tags list in the UI
+                    foreach (Tag tag in tagsToAdd)
+                    {
+                       imageTags.Remove(tag.TagName);
+                    }
+                    for (int i = 0; i < imageTags.Count; i++) 
+                    {
+                        if (i == 0)
+                        {
+                            imageVm.ImageTags = imageTags[i];
+                        }
+                        else
+                        {
+                            imageVm.ImageTags = imageVm.ImageTags + "," + imageTags[i];
+                            
+                        }
+                    }
+                }
             }
         }
         private async void OpenImageInExternalViewer(ImageViewModel imageVm)

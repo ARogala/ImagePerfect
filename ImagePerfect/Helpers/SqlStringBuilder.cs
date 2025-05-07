@@ -176,5 +176,23 @@ namespace ImagePerfect.Helpers
             sb.Append(");");
             return sb.ToString();
         }
+
+        public static string BuildSqlForAddMultipleImageTags(List<Tag> tagsToAdd, ImageViewModel imageVm)
+        {
+            StringBuilder sb = new StringBuilder("INSERT INTO image_tags_join (ImageId, TagId) VALUES ");
+            for(int i = 0; i < tagsToAdd.Count; i++)
+            {
+                if(i < tagsToAdd.Count - 1)
+                {
+                    sb.Append($"({imageVm.ImageId}, {tagsToAdd[i].TagId}),");
+                }
+                else
+                {
+                    sb.Append($"({imageVm.ImageId}, {tagsToAdd[i].TagId});");
+                }
+            }
+            
+            return sb.ToString();
+        }
     }
 }
