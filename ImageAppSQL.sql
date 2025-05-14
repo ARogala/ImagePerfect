@@ -150,6 +150,67 @@ DELETE FROM folders;
 ALTER TABLE folders AUTO_INCREMENT = 1;
 /*https://stackoverflow.com/questions/32155447/mysql-regexp-matching-only-subdirectories-of-given-directory  
 	No clue how the hell that works but it produces the needed result (gets all folders in SamplePictures but no sub directories)
+
+SELECT * FROM folders WHERE REGEXP_LIKE(FolderPath, 'C:\\\\Users\\\\arogala\\\\Documents\\\\CSharp\\\\SamplePictures\\\\[^\\\\]+\\\\?$');
+
+This query selects all rows from the folders table where the FolderPath matches a specific folder path pattern using a regular expression.
+
+Regex Pattern:
+C:\\Users\\arogala\\Documents\\CSharp\\SamplePictures\\[^\\]+\\?$
+Because it's inside a SQL string, the backslashes are escaped twice:
+
+\\ becomes \ in regex
+
+\\\\ in SQL = \\ in regex
+
+So the actual regex the engine sees is:
+C:\Users\arogala\Documents\CSharp\SamplePictures\[^\\]+\\?$
+
+	| Segment                                             | Meaning                                                                                   |
+| --------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `C:\Users\arogala\Documents\CSharp\SamplePictures\` | Matches the **exact full folder path** up to `SamplePictures\`                            |
+| `[^\\]+`                                            | Match **one or more characters that are NOT backslashes** (i.e., a single subfolder name) |
+| `\\?`                                               | An **optional backslash** (0 or 1 occurrence)                                             |
+| `$`                                                 | Anchors the match to the **end of the string**                                            |
+
+The $ ensures the match stops after one subfolder, and nothing comes after.
+
+the $ in a regular expression is a special character called an anchor, and it means: “Match only if this is the end of the string.”
+
+
+
+In plain English
+Match folder paths that:
+
+Start with
+C:\Users\arogala\Documents\CSharp\SamplePictures\
+
+Are followed by one folder name (no slashes in it)
+
+May or may not end in a trailing backslash
+
+No further subfolders after that
+
+Example Matches
+✅ Will Match:
+
+C:\Users\arogala\Documents\CSharp\SamplePictures\Cats
+
+C:\Users\arogala\Documents\CSharp\SamplePictures\Cats\
+
+❌ Won't Match:
+
+C:\Users\arogala\Documents\CSharp\SamplePictures\Cats\SubFolder
+
+C:\Users\arogala\Documents\CSharp\SamplePictures\ (because no folder after it)
+
+Why Use \\? at the End?
+It allows the regex to match both forms of the path:
+
+With trailing backslash (\)
+
+Without it
+
 */
 SELECT * FROM folders WHERE REGEXP_LIKE(FolderPath, 'C:\\\\Users\\\\arogala\\\\Documents\\\\CSharp\\\\SamplePictures\\\\[^\\\\]+\\\\?$');
 
