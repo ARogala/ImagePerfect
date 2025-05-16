@@ -1,6 +1,8 @@
 ## Image Perfect
 
 ## About
+A high-performance cross-platform image viewer designed for **massive libraries** — built to handle **hundreds of thousands to millions of images** with ease.
+
 Image Perfect is a cross platform Linux (Ubuntu tested) and Windows photo manager application. It is written with C#, MySQL, and Avalonia UI framework. The MVVM pattern is used. The Materialized Path Technique was used to model hierarchical data of the folder structure in the file system.
 
 A few other major dependencies are 
