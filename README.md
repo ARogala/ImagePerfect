@@ -51,7 +51,7 @@ I created Image Perfect both as a way to learn desktop application development a
 - Move, rename, and manage folders/images inside the app — changes reflected in the file system.
 	+ #### Current File System Capabilities
 		- Move, create, and delete folders
-		- Select newly added folders (images must be present)
+		- Import newly added folders (images must be present)
 		- Delete individual or multiple images
 		- Move individual or multiple images
 	+ #### File System Capabilities To Add
