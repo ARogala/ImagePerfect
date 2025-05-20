@@ -82,13 +82,25 @@ I created Image Perfect both as a way to learn desktop application development a
 
 ![Image](AppScreenShot4-2-25.png)
 
-## Build and Install Directions
-
-- Instructions for building and running the app will be added soon.
-
 ## MySQL Server Setup
 
 - Setup instructions will be added soon.
+
+## Build and Install Directions
+
+- First set up MySQL Server
+- Clone this repository
+```
+git clone https://github.com/ARogala/ImagePerfect.git
+```
+
+- Open solution file in Visual Studio
+- Right click on project file and click publish
+- Set up your publish profile
+	- Select local folder publish
+	- Target framework net8.0
+	- Deployment mode use self contained
+	- Target runtime win-x64
 
 ## Backing Up & Restoring the MySQL Database On Windows
 
