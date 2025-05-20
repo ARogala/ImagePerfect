@@ -1,133 +1,167 @@
-## Image Perfect
+# Image Perfect
 
 ## About
-A high-performance cross-platform image viewer designed for **massive libraries** — built to handle **hundreds of thousands to millions of images** with ease.
 
-Image Perfect is a cross platform Linux (Ubuntu tested) and Windows photo manager application. It is written with C#, MySQL, and Avalonia UI framework. The MVVM pattern is used. The Materialized Path Technique was used to model hierarchical data of the folder structure in the file system.
+**Image Perfect** is a high-performance, cross-platform (Windows + Ubuntu) image viewer and photo management system designed for **massive libraries** — capable of handling **hundreds of thousands to millions of images** with ease.
 
-A few other major dependencies are 
-1. Dapper -- SQL ORM
-2. CsvHelper
-3. SixLabors Image Sharp
-4. Any developer can view the rest in Visual Studio.
+Written in **C#**, using **Avalonia UI**, **MySQL**, and the **MVVM** pattern, Image Perfect was created to address gaps in existing photo management tools — particularly around performance, usability with large collections, effective file organization, and offering large thumbnails for optimal viewing.
+
+Instead of small, hard-to-see thumbnails and long import times, Image Perfect offers:
+
+- Large adjustable thumbnails (up to 600px wide)
+- Fast performance on for large libraries
+- Rich tagging and folder organization
+- Direct image viewing (no thumbnails written to disk)
+
+## Why I Built It
+
+I created Image Perfect both as a way to learn desktop application development and to solve personal pain points I experienced with existing photo organizers. Many tools struggled with large libraries, relied on tiny thumbnails, consumed excessive amounts of RAM, and were not great at folder organization. Shotwell on Linux came close to meeting my needs, but importing became painfully slow and memory-intensive at scale. This project is my solution to those challenges.
+
+## Tech Stack & Notable Dependencies
+
+- **UI Framework**: [Avalonia UI](https://github.com/AvaloniaUI/Avalonia)
+- **Database**: MySQL using Materialized Path for folder hierarchies
+- **ORM**: [Dapper](https://github.com/DapperLib/Dapper)
+- **CSV Parsing**: [CsvHelper](https://github.com/JoshClose/CsvHelper)
+- **Image Processing**: [SixLabors ImageSharp](https://github.com/SixLabors/ImageSharp)
 
 
-I wrote this application to learn some desktop application development and because I felt the current photo management applications on the market did not fit my needs. In particular many photo managers seem to have small thumbnails for the image. That makes it harder to organize and decide which ones to delete and which ones are your favorites. Shotwell on Linux is actually pretty good but importing new images gets really slow with large libraries. Primarily Image Perfect was written with several things in mind. 
+## Core Features
 
-1. Big thumbnails 500px - 600px.
-	* Image width can be adjusted from 300px all the way up to 600px!!
-	* Images are displayed on the fly and no thumbnails are written to disk.
-2. Good tagging system for both the photos themselves and the folders they are in.
-	* Image tags and rating are written on the image file itself as well as stored in the database. 
-	* Folder tags, description, and rating are only stored in the database.
-	* A cover image for the folders can also be selected.
-	* Tags can only be added and removed one at a time.
-3. Perform well with large libraries no waiting hours on end to import new photos.
-	* I did this by using MySqlBulkLoader to insert data from a csv file.
-	* Note that there is no library monitoring like other apps provide. This means you have to keep track of what new folders you want to add after the initial library import.
-	* Also photos and metadata are not imported initially but are done on each folder by the user before before viewing the photos in that folder. The operations are fast enough this is not a issue for me. 
-4. Model the file system to make it easy and fast to move folders/images in the application while moving the folders/images in the file system at the same time as well.
-5. Provide a way to import all the tags written on the image from Shotwell (this requires you had Shotwell actually write the tags and rating to the image itself).
-6. ImagePerfect is currently designed to be a great image viewer with tagging and organization features. Its use case for me is to get a big library organized and cleaned up/trimmed down.
+### Big Thumbnails
+- Adjustable image widths from **300px to 600px**
+- Images are displayed directly (no caching or writing thumbnails to disk)
 
-Number 4 is basically complete but could maybe use some fine tuning. 
+### Tagging & Rating
+- Tag and rate **images and folders**
+- Image tags/ratings saved in both the **file** and the **database**
+- Folder tags/ratings, and description stored in the **database only**
+- Select **cover images** for folders
+- Add image tags individually or in bulk (folder bulk tagging planned)
+- Folder and image Tags can only be removed one at a time. (bulk remove planned)
 
-The app currently can 
+### Speed with Large Libraries
+- **No long import times** thanks to MySqlBulkLoader (insert data from a csv file)
+- New folders must be manually added (no auto-monitoring)
+	+ To avoid double imports the app will check if you selected folders that are already in the library.
+- Metadata scanning is user-initiated
+	+ Bulk photo import and metadata scanning per folder or filtered set
 
-1. Move folders
-2. Pick new folders that were added with the file system 
-	* These new folders should have images in them before picking
-	* Otherwise best just to create a new empty folder within the app and move images to it 
-3. Create new empty folders within the app
-4. Delete folders
-5. Delete individual/single images
-6. Delete multiple images
-7. Move multiple images
+### File System Mirroring
+- Move, rename, and manage folders/images inside the app — changes reflected in the file system.
+	+ #### Current File System Capabilities
+		- Move, create, and delete folders
+		- Select newly added folders (images must be present)
+		- Delete individual or multiple images
+		- Move individual or multiple images
+	+ #### File System Capabilities To Add
+		- Rename folders and images
+		- Re-import images in a folder (so you can add images to a folder from the file system then re-scan)
+		
+	+ #### File System Issue/Bug
+		- Known issue: folders imported containing only ZIP files cannot be opened
 
-Maybe add
 
-1. Rename folders
-2. Rename images
-3. Re-scan a folder for newly images added -- useful so you can add images to a folder from they file system then re-scan
+### Shotwell Import
+- Import existing tags and ratings from Shotwell (if written to images)
 
-## Other Features to add
+## Planned Improvements
 
-1. A way to find duplicate images
+1. Find duplicate images
 2. Facial recognition
-3. Image Enhance -- great for grainy old cell phone pics
-4. Improve the UI
-5. Maybe make a SQLite version so no server set up -- the reason for the MySQL server is I plan to have a mobile client so you can at least view photos via you phone
-6. Look into making the mobile client 
-7. Maybe find a way to scan library root folder to find folders added to file system but not added to app
-8. Improve image move so you can move images to a new folder even if the new folder contains images with the same name. 
-9. Improve Tagging right now you can only add one tag at a time. Make it so you can add several tags at once if comma separated. Same with remove you can only remove one at a time. 
-10. Add a gif maker
+3. Image enhancement tools
+4. Improved UI design
+5. SQLite option (to remove server setup)
+6. Mobile client (view-only)
+7. Scan for new folders in file system
+8. Smarter image move operations (handle duplicate filenames)
+9. Tagging improvements (bulk remove/edit)
+10. GIF creation support
 
 ## Screen Shot
 
 ![Image](AppScreenShot4-2-25.png)
 
-## Build and Install directions
+## Build and Install Directions
 
-to be added
+- Instructions for building and running the app will be added soon.
 
-## Server set up and configuration directions
+## MySQL Server Setup
 
-to be added
+- Setup instructions will be added soon.
 
-## Back up and restore MySQL database on Windows
+## Backing Up & Restoring the MySQL Database On Windows
 
-We will use mysqldump command to do this. Note: ImagePerfect stores references to your image files in the database so when you back up/restore the image files should be stored in the exact same location as they were before you needed to restore. So if your images were in C:\Users\username\Pictures they must be there and in all their same folders for a restore to work.
+We will use mysqldump command to do this.
 
-1. To back up/restore use Windows command prompt NOT power shell!!!
-2. First open command prompt in C:\Program Files\MySQL\MySQL Server 8.0\bin
-	* Open command prompt and type: 
-	* cd C:\Program Files\MySQL\MySQL Server 8.0\bin
-3. To back-up type: 
-	* mysqldump -u root -p imageperfect > C:\MySQLBackup\imageperfect_YYYY_MM_DD.sql
-	* It will ask for your root server password after hitting enter.
-	* Your back up sql file will now be in C:\MySQLBackup check and ensure it is there.
-4. To restore type:
-	* mysql -u root -p imageperfect < C:\MySQLBackup\imageperfect_YYYY_MM_DD.sql
-	* It will ask for your root server password after hitting enter.
-	* Your database should now be restored.
+**Important:** ImagePerfect stores file paths in the database, so your image files must remain in the **same locations** (drive letter, folder paths, etc.) for a restore to work.
+
+1. Open **Command Prompt** (not PowerShell) and navigate to your MySQL bin directory:
+```
+cd C:\Program Files\MySQL\MySQL Server 8.0\bin
+```
+2. **To back up**: 
+```
+mysqldump -u root -p imageperfect > C:\MySQLBackup\imageperfect_YYYY_MM_DD.sql
+```
+
+- It will ask for your root server password after hitting enter.
+- Your back up sql file will now be in C:\MySQLBackup check and ensure it is there.
+
+
+3. **To restore**:
+```
+mysql -u root -p imageperfect < C:\MySQLBackup\imageperfect_YYYY_MM_DD.sql
+```
+
+- It will ask for your root server password after hitting enter.
+- Your database should now be restored.
 	
-NOTE: It would be best to try this before spending too much time organizing your photos in the app. Make sure you can back up before wasting time. Its easy to spend hours adding cover images, tags, and notes about the event/day
+NOTE: It would be best to try this before spending too much time organizing your photos in the app. Make sure you can back up before wasting time. Its easy to spend hours adding cover images, tags, and notes about the event/day.
 
-## Back up and restore MySQL database on Ubuntu
+## Backing Up & Restoring the MySQL Database On Ubuntu
 
 This is basically the same as Windows
 
-1. Open terminal in the location/folder you want your backup file.
-2. To backup type: 
-	* sudo mysqldump imageperfect > imageperfect_YYYY_MM_DD.sql
-	* Ubuntu will ask for your root password after hitting enter.
-	* This will dump the imageperfect database in the backup location.
+1. Open a terminal in your desired backup location.
+2. **To back up**:
+```
+sudo mysqldump imageperfect > imageperfect_YYYY_MM_DD.sql
+```
+
+- Ubuntu will ask for your root password after hitting enter.
+- This will dump the imageperfect database in the backup location.
 	
-3. To restore type:
-	* sudo mysql imageperfect < imageperfect_YYYY_MM_DD.sql
-	* Ubuntu will ask for your root password after hitting enter.
-	* Your database should now be restored.
-	* Obvious or maybe not, but terminal should be opened in the location/folder where your backup file is located for the restore to work.
+3. **To restore**:
+```
+sudo mysql imageperfect < imageperfect_YYYY_MM_DD.sql
+```
+
+- Ubuntu will ask for your root password after hitting enter.
+- Your database should now be restored.
+- Obvious or maybe not, but terminal should be opened in the location/folder where your backup file is located for the restore to work.
 
 
-## Directions to back up photos and move the app and database to a new computer.
+## Migrating To A New Computer
 
-Basically set up you new computer. Build the app, set up the server, and run the backup commands above. Just note that the images should be in the exact same location as before. The drive name should be the same as well. Can't backup the database for drive C: and expect the restore to work if all your images are in drive D: after a new computer restore.
+- Install and configure MySQL then build the app as usual
+- Restore the database as described above
+- Ensure all image files are restored to the **same location and drive letter/path** as before
 
-Note: ImagePerfect stores references to your image files in the database so when you back up/restore the image files should be stored in the exact same location as they were before you needed to restore. So if your images were in C:\Users\username\Pictures they must be there and in all their same folders for a restore to work.
 
-Same idea on Ubuntu systems.
+## User Guide
 
-## User guide
-
-to be added
+- Documentation coming soon
 
 ## License
 
-This project is licensed under the **GNU Affero General Public License v3.0 (AGPL-3.0)**.
+**Image Perfect** is licensed under the **GNU Affero General Public License v3.0 (AGPL-3.0)**.
 
 You are free to use, modify, and distribute this software under the terms of the AGPL. If you modify and publicly distribute the software — including via a hosted service — you must make your source code available under the same license.
+
+## Feedback & Contributions
+
+I'm always open to feedback, feature suggestions, or contributions. Please feel free to open issues or pull requests.
 
 
 
