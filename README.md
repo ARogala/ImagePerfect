@@ -88,7 +88,7 @@ I created Image Perfect both as a way to learn desktop application development a
 
 ## Build and Install Directions
 
-- First set up MySQL Server
+- **Important First set up MySQL Server**
 - Clone this repository
 ```
 git clone https://github.com/ARogala/ImagePerfect.git
@@ -99,10 +99,10 @@ git clone https://github.com/ARogala/ImagePerfect.git
 - Right click on project file and click publish
 - Set up your publish profile
 	- Select local folder publish
-	- Configuration set to Release | Any CPU
-	- Target framework set to net8.0
-	- Deployment mode set to Self-contained
-	- Target runtime set to win-x64
+	- Configuration: Release | Any CPU
+	- Target framework: net8.0
+	- Deployment mode: Self-contained
+	- Target runtime: win-x64
 	
 Or just download and use the publish files from [here](https://github.com/ARogala/ImagePerfectWinX64Build)
 
@@ -113,10 +113,10 @@ Then to run the application double click on ImagePerfect.exe or you could also r
 - Right click on project file and click publish
 - Set up your publish profile
 	- Select local folder publish
-	- Configuration set to Release | Any CPU
-	- Target framework set to net8.0
-	- Deployment mode set to Self-contained
-	- Target runtime set to linux-x64
+	- Configuration: Release | Any CPU
+	- Target framework: net8.0
+	- Deployment mode: Self-contained
+	- Target runtime: linux-x64
 	
 Copy the publish files from your Windows PC to your Linux one. Or just use JetBrains Rider in Linux. The steps will be almost the same.
 	
