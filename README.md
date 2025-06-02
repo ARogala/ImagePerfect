@@ -119,7 +119,94 @@ I created Image Perfect both as a way to learn desktop application development a
 
 ## MySQL Server Setup
 
-- Setup instructions will be added soon.
+Step by step directions to be added soon. But for now this should work but needs to be tested.
+
+**Image Perfect** assumes you have a MySQL Server 8.0+ running locally. You'll need a user (e.g., `root`) with permission to create a database named `imageperfect`.
+
+- **First** install MySQL server 8.0+ create your root user and password. 
+- **Second** run the commands below in order.
+
+```
+CREATE DATABASE imageperfect;
+
+CREATE TABLE `folders` (
+	`FolderId` bigint unsigned NOT NULL AUTO_INCREMENT,
+	`FolderName` Varchar(200) NOT NULL,
+  	`FolderPath` Varchar(2000) NOT NULL,
+  	`HasChildren` Bool,
+	`CoverImagePath` Varchar(2000),
+	`FolderDescription` Varchar(3000),
+	`FolderRating` tinyint unsigned,
+	`HasFiles` Bool,
+	`IsRoot` Bool,
+	`FolderContentMetaDataScanned` Bool,
+	`AreImagesImported` Bool,
+	PRIMARY KEY (`FolderId`),
+	FULLTEXT KEY `fulltext` (`FolderName`,`FolderPath`, `FolderDescription`)
+);
+
+CREATE TABLE `images` (
+	`ImageId` bigint unsigned NOT NULL AUTO_INCREMENT,
+	`ImagePath` Varchar(2000) NOT NULL,
+	`FileName` Varchar(500) NOT NULL,
+	`ImageRating` tinyint unsigned,
+	`ImageFolderPath` Varchar(2000) NOT NULL,
+	`ImageMetaDataScanned` Bool,
+	`FolderId` bigint unsigned DEFAULT NULL,
+	PRIMARY KEY (`ImageId`),
+	KEY `FolderId` (`FolderId`),
+	FULLTEXT KEY `fulltext` (`ImagePath`),
+	CONSTRAINT `images_ibfk_1` FOREIGN KEY (`FolderId`) REFERENCES `folders` (`FolderId`) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE `tags`(
+	`TagId` bigint unsigned NOT NULL AUTO_INCREMENT,
+	`TagName` Varchar(100) NOT NULL,
+	PRIMARY KEY (`TagId`),
+	CONSTRAINT `tags_uq` UNIQUE (`TagName`)
+);
+
+CREATE TABLE `folder_tags_join`(
+	`FolderId` bigint unsigned NOT NULL,
+	`TagId` bigint unsigned NOT NULL,
+	PRIMARY KEY (`FolderId`, `TagId`),
+	CONSTRAINT `folder_tags_join_idfk_1` FOREIGN KEY (`FolderId`) REFERENCES `folders` (`FolderId`) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT `folder_tags_join_idfk_2` FOREIGN KEY (`TagId`) REFERENCES `tags` (`TagId`) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE `image_tags_join`(
+	`ImageId` bigint unsigned NOT NULL,
+	`TagId` bigint unsigned NOT NULL,
+	PRIMARY KEY (`ImageId`, `TagId`),
+	CONSTRAINT `image_tags_join_ibfk_1` FOREIGN KEY (`ImageId`) REFERENCES `images` (`ImageId`) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT `image_tags_join_ibfk_2` FOREIGN KEY (`TagId`) REFERENCES `tags` (`TagId`) ON DELETE CASCADE ON UPDATE CASCADE
+
+);
+
+CREATE TABLE `settings` (
+	`SettingsId` enum('1') NOT NULL,
+	`MaxImageWidth` int unsigned NOT NULL,
+	`FolderPageSize` int unsigned NOT NULL,
+	`ImagePageSize` int unsigned NOT NULL,
+	PRIMARY KEY (`SettingsId`)
+);
+
+INSERT INTO settings (MaxImageWidth, FolderPageSize, ImagePageSize) VALUES (500, 20, 60); 
+
+CREATE TABLE `folder_saved_favorites` (
+	`SavedId` bigint unsigned NOT NULL AUTO_INCREMENT,
+	`FolderId` bigint unsigned,
+	PRIMARY KEY (`SavedId`),
+	CONSTRAINT `folderid_uq` UNIQUE (`FolderId`)
+);
+```
+
+- **Third** you will also need to adjust a MySql setting to allow loading of bulk data via a csv file. To do this run.
+
+```
+SET PERSIST local_infile = 1;
+```
+
 
 ## Build And Install Directions
 
@@ -143,6 +230,16 @@ Or just download and use the publish files from [here](https://github.com/ARogal
 
 Then to run the application double click on ImagePerfect.exe or you could also right click the exe and send to desktop as a shortcut.
 
+> 📌 **Note**: If your MySql password (pwd) and user (uid) differs from what is in the appsettings.json file in this repository. You must change it.
+
+```
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "server=127.0.0.1;uid=root;pwd=576aLMx62;database=imageperfect;AllowLoadLocalInfile=true"
+  }
+}
+```
+
 ### Ubuntu
 - Open solution file in Visual Studio
 - Right click on project file and click publish
@@ -160,6 +257,16 @@ Or just download and use the publish files from [here](https://github.com/ARogal
 Then to run just open terminal in the build folder and run this command
 ```
 ./ImagePerfect
+```
+
+> 📌 **Note**: If your MySql password (pwd) and user (uid) differs from what is in the appsettings.json file in this repository. You must change it.
+
+```
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "server=127.0.0.1;uid=root;pwd=576aLMx62;database=imageperfect;AllowLoadLocalInfile=true"
+  }
+}
 ```
 
 ## Backing Up And Restoring the MySQL Database
