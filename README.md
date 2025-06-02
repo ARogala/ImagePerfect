@@ -3,13 +3,13 @@
 # Table Of Contents
 - [About](#about)
 - [Why I Built Image Perfect](#why-i-built-image-perfect)
-- [Tech Stack & Notable Dependencies](#📚-tech-stack-&-notable-dependencies)
-- [System Requirements](#🖥️-system-requirements)
+- [Tech Stack & Notable Dependencies](#tech-stack-&-notable-dependencies)
+- [System Requirements](#system-requirements)
 - [Core Features](#core-features)
 - [Planned Improvements](#planned-improvements)
 - [Screen Shots](#screen-shots)
 - [MySQL Server Setup](#mysql-server-setup)
-- [Build and Install Directions](#build-&-install-directions)
+- [Build & Install Directions](#build-&-install-directions)
 - [Backing Up & Restoring the MySQL Database](#backing-up-&-restoring-the-mysql-database)
 - [Migrating To A New Computer](#migrating-to-a-new-computer)
 - [User Guide](#user-guide)
@@ -33,7 +33,7 @@ Instead of small, hard-to-see thumbnails and long import times, Image Perfect of
 
 I created Image Perfect both as a way to learn desktop application development and to solve personal pain points I experienced with existing photo organizers. Many tools struggled with large libraries, relied on tiny thumbnails, consumed excessive amounts of RAM, and were not great at folder organization. Shotwell on Linux came close to meeting my needs, but importing became painfully slow and memory-intensive at scale. This project is my solution to those challenges.
 
-## 📚 Tech Stack & Notable Dependencies
+## Tech Stack & Notable Dependencies
 
 - **UI Framework**: [Avalonia UI](https://github.com/AvaloniaUI/Avalonia)
 - **Database**: MySQL using Materialized Path for folder hierarchies
@@ -41,7 +41,7 @@ I created Image Perfect both as a way to learn desktop application development a
 - **CSV Parsing**: [CsvHelper](https://github.com/JoshClose/CsvHelper)
 - **Image Processing**: [SixLabors ImageSharp](https://github.com/SixLabors/ImageSharp)
 
-## 🖥️ System Requirements
+## System Requirements
 - Windows 10/11 64 bit or Ubuntu 64 bit
 - 8GB Ram (Image Perfect will use about 1GB loading high resolution images)
 - Processor -- anything that runs Windows 10/11 will do.
