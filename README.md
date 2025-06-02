@@ -45,7 +45,7 @@ I created Image Perfect both as a way to learn desktop application development a
 - **Image Processing**: [SixLabors ImageSharp](https://github.com/SixLabors/ImageSharp)
 
 <a id="item-four"></a>
-## System Requirements
+## 🖥️ System Requirements
 - Windows 10/11 64 bit or Ubuntu 64 bit
 - 8GB Ram (Image Perfect will use about 1GB loading high resolution images)
 - Processor -- anything that runs Windows 10/11 will do.
@@ -53,11 +53,11 @@ I created Image Perfect both as a way to learn desktop application development a
 <a id="item-five"></a>
 ## Core Features
 
-### Big Thumbnails
+### 🖼️ Big Thumbnails
 - Adjustable image widths from **300px to 600px**
 - Images are displayed directly (no caching or writing thumbnails to disk)
 
-### Tagging & Rating
+### 🏷️ Tagging & ⭐ Rating
 - Tag and rate **images and folders**
 - Image tags/ratings saved in both the **file** and the **database**
 - Folder tags/ratings, and description stored in the **database only**
@@ -65,14 +65,14 @@ I created Image Perfect both as a way to learn desktop application development a
 - Add image tags individually or in bulk (folder bulk tagging planned)
 - Folder and image Tags can only be removed one at a time. (bulk remove planned)
 
-### Speed with Large Libraries
+### 🗲 Speed with Large Libraries
 - **No long import times** thanks to MySqlBulkLoader (insert data from a csv file)
 - New folders must be manually added (no auto-monitoring)
 	+ To avoid double imports the app will check if you selected folders that are already in the library.
 - Metadata scanning is user-initiated
 	+ Bulk photo import and metadata scanning per folder or filtered set
 
-### File System Mirroring
+### 📂 File System Mirroring
 - Move, rename, and manage folders/images inside the app — changes reflected in the file system.
 	+ #### Current File System Capabilities
 		- Move, create, and delete folders
@@ -85,6 +85,7 @@ I created Image Perfect both as a way to learn desktop application development a
 		
 	+ #### File System Issue/Bug
 		- Known issue: folders imported containing only ZIP files cannot be opened
+		- On Ubuntu folders imported with the same name but different case will show all folders within each folder in both folders. 
 
 
 ### Shotwell Import
@@ -93,16 +94,16 @@ I created Image Perfect both as a way to learn desktop application development a
 <a id="item-six"></a>
 ## Planned Improvements
 
-1. Find duplicate images
-2. Facial recognition
-3. Image enhancement tools
-4. Improved UI design
-5. SQLite option (to remove server setup)
-6. Mobile client (view-only)
-7. Scan for new folders in file system
-8. Smarter image move operations (handle duplicate filenames)
-9. Tagging improvements (bulk remove/edit)
-10. GIF creation support
+- Find duplicate images
+- Facial recognition
+- Image enhancement tools
+- Improved UI design
+- SQLite option (to remove server setup)
+- Mobile client (view-only)
+- Scan for new folders in file system
+- Smarter image move operations (handle duplicate filenames)
+- Tagging improvements (bulk remove/edit)
+- GIF creation support
 
 <a id="item-seven"></a>
 ## Screen Shot
@@ -296,18 +297,62 @@ Optionally check **"Filter in Current Directory"**, then run the corresponding i
 
 - **File ➡️ Filters** to open the filters tool bar
 
-| Button&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Description |
-|--------------------------------------------|-------------|
+| Button | Description |
+|--------|-------------|
 | **Filter Images On Rating**| Gets all images at the selected rating. 1-5 star ⭐ | 
 | **Filter Folders On Rating** | Gets all folders at the selected rating. 1-10 star ⭐ |
-| **Filter Images On Tags** | Gets all the images with the selected tag. Only one tag can be selected. Start typing in the box and your tags will appear on a drop down to select the desired one. |
-| **Filter Folders On Tags** | Gets all the folders with the selected tag. Only one tag can be selected. Start typing in the box and your tags will appear on a drop down to select the desired one. |
+| **Filter Images On Tags** | Gets all the images with the selected tag. |
+| **Filter Folders On Tags** | Gets all the folders with the selected tag. |
 | **Search Folder Description** | Gets all folders that match the search term. This will search the Folder Name, Folder Description, and Folder Path in the database. |
-| **Load Current Directory** | Loads the current direcory. Useful if filter does not return any results. |
+| **Load Current Directory** | Loads the current directory. Useful if filter does not return any results. |
 | **Filter in Current Directory** | Check the box to apply the filter only in the current directory. Unchecked will apply the filter to the entire library. |
+| **Get Folders With Images Not Imported** | Gets all the folders where images are not yet imported. |
+| **Get Folders With Metadata Not Scanned** | Gets all the folders where images are imported but metadata is not yet scanned |
+| **Get Folders Without Covers** | Gets all the folders where images are imported but covers are not yet selected. |
 
+> 📌 **Note**: For tag filters only one tag can be selected. Start typing in the box and your tags will appear on a drop down to select the desired one.
 
+### 🗑️ Clear Favorite Folders
 
+On each folder there is a **Favorite** button. Clicking that will add that folder to a favorite list in the database. There is also a button on the bottom tool bar called **Load Favorite Folders** that button will load all your favorite folders on the screen. To clear this list
+
+- **File ➡️ Clear Favorite Folders**
+
+> 📌 **Note**: This will just remove that list from the database but the folders will remain in the file system. Also there is no pop up confirm when you click **Clear Favorite Folders** so clicking accidentally will clear them. 
+
+### 🚚 Moving and 🗑️ Deleting Images
+
+- **File ➡️ Manage Images** to open the manage images tool bar
+- Open a folder containing images
+
+#### 🚚 Moving Images
+
+- Click **Select Move To Folder** button and choose the folder you want to move images to. 
+- Select/Check the images you want moved. (each image has a check box)	
+- Click **Move Selected** to moves the selected images to the desired folder.
+
+#### 🗑️ Deleting Images
+
+There is a **Trash** button on each image. Click that to delete a single image.
+
+- Select/Check the images you want trashed. (each image has a check box)
+- Click **Trash Selected** to trash the selected images.
+
+> 📌 **Note**: Trashing images and folders just moves them to a folder called "ImagePerfectTRASH". This folder will be created by the app and placed inside your root library folder. 
+
+> 📌 **Note**: There is also a **Select All** button that will select and deselect all the images on the page.
+
+### Total 🖼️ Image Count
+
+To get the total number of images currently imported in your library.
+
+- **File ➡️ Total Images**
+
+### Show All Tags 🏷️
+
+To view a list of all the tags currently in use; either on images or folders.
+
+- **File ➡️ Show All Tags**
 
 ### ⚙️ Settings
 
