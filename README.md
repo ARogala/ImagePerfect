@@ -219,7 +219,71 @@ sudo mysql imageperfect < imageperfect_YYYY_MM_DD.sql
 <a id="item-twelve"></a>
 ## User Guide
 
-- Documentation coming soon
+The best way to get started is to run the app and explore. But here’s a guided overview of the core features.
+
+### 📂 Importing the Library Structure
+
+**To start building your library:**
+
+- Go to **File --> Pick Library Folder** 
+- Select the root folder that contains all your image folders
+- Image Perfect will scan the folder structure (but not import images yet)
+	+ If you have a large library this will take some time to import your folder structure.
+	
+> 💡 **Tip**: Image Perfect works best when your photo collection is already organized into meaningful folders. Avoid dumping thousands of images into a single folder.
+	
+
+### 🗑️ Deleting the Library
+
+- **File --> Delete Library**
+
+This removes the MySQL database but **does not delete your image files** from the file system.
+	
+### ➕ Adding New Folders 
+
+You can add additional folders to your library later.
+
+- **File --> Add New Folders**
+- Select one or more new folders from the file system 
+- The app will skip any folder that has already been imported
+
+> 📌 **Note** Known issue: folders imported containing only ZIP files cannot be opened. So ensure your new folders contain only images jpg, png, gif etc.
+	
+### 🖼️ Importing Images & Scanning Metadata
+
+**Importing images** loads file paths into the MySQL database.  
+**Scanning metadata** reads tags and ratings from image files (e.g., written by Shotwell) and stores them in the database.
+
+> 📌 **Note**: Metadata is *not* scanned and images are *not* imported during the initial library import for speed.
+
+#### Per-Folder Import/Scan
+
+- Click **Import Images** button on a specific folder to load all image paths into the database
+- Click **Scan Images for Metadata** button on a specific folder to extract tags/ratings from image files.
+
+> 📌 **Note**: You have to **Import Images** first before the scan metadata button appears.
+
+#### 📦 Bulk Import & Scan
+
+- **File → Import and Scan** to open the bulk toolbar
+- Use these buttons on the current page of folders:
+
+| Button | Description |
+|--------|-------------|
+| **Import All Folders On Current Page** | Quickly imports all images for folders on the page |
+| **Scan All Folders On Current Page**   | Scans all images for metadata (Will take longer) |
+| **Add Cover Image On Current Page**    | Picks a random image as a folder cover (must import images first) |
+
+> ⏱️ **Performance Tip**:  
+> Scanning metadata can be time-consuming on large pages. Use a folder pagination size of 40–60 for best balance.  
+> A page size of 100 folders may take 10–30 minutes depending on image resolution.
+
+#### 🔍 Filter-Based Bulk Actions
+
+- **File → Filters → Get Folders With Images Not Imported**
+- **File → Filters → Get Folders With Metadata Not Scanned**
+
+Optionally check **"Filter in Current Directory"**, then run the corresponding import/scan button from the **Import and Scan** toolbar.
 
 <a id="item-thirteen"></a>
 ## License
