@@ -3,18 +3,18 @@
 # Table Of Contents
 - [About](#about)
 - [Why I Built Image Perfect](#why-i-built-image-perfect)
-- [Tech Stack & Notable Dependencies](#tech-stack-&-notable-dependencies)
+- [Tech Stack And Notable Dependencies](#tech-stack-and-notable-dependencies)
 - [System Requirements](#system-requirements)
 - [Core Features](#core-features)
 - [Planned Improvements](#planned-improvements)
 - [Screen Shots](#screen-shots)
 - [MySQL Server Setup](#mysql-server-setup)
-- [Build & Install Directions](#build-&-install-directions)
-- [Backing Up & Restoring the MySQL Database](#backing-up-&-restoring-the-mysql-database)
+- [Build And Install Directions](#build-and-install-directions)
+- [Backing Up And Restoring the MySQL Database](#backing-up-and-restoring-the-mysql-database)
 - [Migrating To A New Computer](#migrating-to-a-new-computer)
 - [User Guide](#user-guide)
 - [License](#license)
-- [Feedback & Contributions](#feedback-&-contributions)
+- [Feedback And Contributions](#feedback-And-contributions)
 
 ## About
 
@@ -33,7 +33,7 @@ Instead of small, hard-to-see thumbnails and long import times, Image Perfect of
 
 I created Image Perfect both as a way to learn desktop application development and to solve personal pain points I experienced with existing photo organizers. Many tools struggled with large libraries, relied on tiny thumbnails, consumed excessive amounts of RAM, and were not great at folder organization. Shotwell on Linux came close to meeting my needs, but importing became painfully slow and memory-intensive at scale. This project is my solution to those challenges.
 
-## Tech Stack & Notable Dependencies
+## Tech Stack And Notable Dependencies
 
 - **UI Framework**: [Avalonia UI](https://github.com/AvaloniaUI/Avalonia)
 - **Database**: MySQL using Materialized Path for folder hierarchies
@@ -107,7 +107,7 @@ I created Image Perfect both as a way to learn desktop application development a
 
 - Setup instructions will be added soon.
 
-## Build & Install Directions
+## Build And Install Directions
 
 - **Important First set up MySQL Server**
 - Clone this repository
@@ -148,7 +148,7 @@ Then to run just open terminal in the build folder and run this command
 ./ImagePerfect
 ```
 
-## Backing Up & Restoring the MySQL Database
+## Backing Up And Restoring the MySQL Database
 
 ### Windows
 We will use mysqldump command to do this.
@@ -398,7 +398,7 @@ To view a list of all the tags currently in use; either on images or folders.
 
 You are free to use, modify, and distribute this software under the terms of the AGPL. If you modify and publicly distribute the software — including via a hosted service — you must make your source code available under the same license.
 
-## Feedback & Contributions
+## Feedback And Contributions
 
 I'm always open to feedback, feature suggestions, or contributions. Please feel free to open issues or pull requests.
 
