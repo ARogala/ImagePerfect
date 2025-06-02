@@ -101,7 +101,13 @@ I created Image Perfect both as a way to learn desktop application development a
 
 ## Screen Shots
 
-![Image](AppScreenShot4-2-25.png)
+### Screen Shot Images
+
+![Image](AppScreenShotImageView2025-06-02.png)
+
+### Screen Shot Folders
+
+![Image](AppScreenShotFolderView2025-06-02.png)
 
 ## MySQL Server Setup
 
