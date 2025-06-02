@@ -3,8 +3,8 @@
 # Table Of Contents
 - [About](#about)
 - [Why I Built Image Perfect](#why-i-built-image-perfect)
-- [Tech Stack & Notable Dependencies](#tech-stack-&-notable-dependencies)
-- [System Requirements](#system-requirements)
+- [Tech Stack & Notable Dependencies](#📚-tech-stack-&-notable-dependencies)
+- [System Requirements](#🖥️-system-requirements)
 - [Core Features](#core-features)
 - [Planned Improvements](#planned-improvements)
 - [Screen Shots](#screen-shots)
