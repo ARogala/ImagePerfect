@@ -2,7 +2,7 @@
 
 # Table Of Contents
 - [About](#item-one)
-- [Why I Built Image Perfect](#item-two)
+- [Why I Built Image Perfect](#why-i-built-image-perfect)
 - [Tech Stack & Notable Dependencies](#item-three)
 - [System Requirements](#item-four)
 - [Core Features](#item-five)
@@ -19,7 +19,7 @@
 <a id="item-one"></a>
 ## About
 
-**Image Perfect** is a high-performance, cross-platform (Windows + Ubuntu) image viewer and photo management system designed for **massive libraries** — capable of handling **hundreds of thousands to millions of images** with ease.
+**Image Perfect** is a high-performance, cross-platform (Windows + Ubuntu) image viewer and photo management tool designed for **massive image libraries**. Whether you're organizing thousands or millions of photos, Image Perfect stays responsive and efficient.
 
 Written in **C#**, using **Avalonia UI**, **MySQL**, and the **MVVM** pattern, Image Perfect was created to address gaps in existing photo management tools — particularly around performance, usability with large collections, effective file organization, and offering large thumbnails for optimal viewing.
 
@@ -30,7 +30,6 @@ Instead of small, hard-to-see thumbnails and long import times, Image Perfect of
 - Rich tagging and folder organization
 - Direct image viewing (no thumbnails written to disk)
 
-<a id="item-two"></a>
 ## Why I Built Image Perfect
 
 I created Image Perfect both as a way to learn desktop application development and to solve personal pain points I experienced with existing photo organizers. Many tools struggled with large libraries, relied on tiny thumbnails, consumed excessive amounts of RAM, and were not great at folder organization. Shotwell on Linux came close to meeting my needs, but importing became painfully slow and memory-intensive at scale. This project is my solution to those challenges.
@@ -305,7 +304,7 @@ Image Perfect was designed to mirror the file system so navigation will mostly b
 
 #### Bottom Pagination Navigation Toolbar
 
-> 📌 **Note**: This is the pagination navigation toolbar. It aids in loading the *Next* or *Previous* page of images and folders.
+> 📌 **Note**: This is the pagination navigation toolbar. It aids in loading the *Next* or *Previous* page of images and folders within the current directory.
 
 | Button | Description |
 |--------|-------------|
