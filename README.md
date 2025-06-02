@@ -36,7 +36,7 @@ Instead of small, hard-to-see thumbnails and long import times, Image Perfect of
 I created Image Perfect both as a way to learn desktop application development and to solve personal pain points I experienced with existing photo organizers. Many tools struggled with large libraries, relied on tiny thumbnails, consumed excessive amounts of RAM, and were not great at folder organization. Shotwell on Linux came close to meeting my needs, but importing became painfully slow and memory-intensive at scale. This project is my solution to those challenges.
 
 <a id="item-three"></a>
-## Tech Stack & Notable Dependencies
+## 📚 Tech Stack & Notable Dependencies
 
 - **UI Framework**: [Avalonia UI](https://github.com/AvaloniaUI/Avalonia)
 - **Database**: MySQL using Materialized Path for folder hierarchies
@@ -226,10 +226,10 @@ The best way to get started is to run the app and explore. But here’s a guided
 
 **To start building your library:**
 
-- Go to **File ➡️ Pick Library Folder** 
+- **File ➡️ Pick Library Folder** 
 - Select the root folder that contains all your image folders
 - Image Perfect will scan the folder structure (but not import images yet)
-	+ If you have a large library this will take some time to import your folder structure.
+	+ If you have a large library this will take some time to import your folder structure
 	
 > 💡 **Tip**: Image Perfect works best when your photo collection is already organized into meaningful folders. Avoid dumping thousands of images into a single folder.
 	
@@ -242,13 +242,13 @@ This removes the MySQL database but **does not delete your image files** from th
 	
 ### ➕ Adding New Folders 
 
-You can add additional folders to your library later.
+You can add additional folders to your library after initial import.
 
 - **File ➡️ Add New Folders**
 - Select one or more new folders from the file system 
 - The app will skip any folder that has already been imported
 
-> 📌 **Note** Known issue: folders imported containing only ZIP files cannot be opened. So ensure your new folders contain only images jpg, png, gif etc.
+> 📌 **Note Known issue**: folders imported containing only ZIP files cannot be opened. So ensure your new folders contain only images jpg, png, gif etc.
 	
 ### 🖼️ Importing Images & Scanning Metadata
 
@@ -277,7 +277,7 @@ You can add additional folders to your library later.
 
 > ⏱️ **Performance Tip**:  
 > Scanning metadata can be time-consuming on large pages. Use a folder pagination size of 40–60 for best balance.  
-> A page size of 100 folders may take 10–30 minutes depending on image resolution.
+> A page size of 100 folders may take 10–30 minutes depending on number of images, image resolution, and computer specs.
 
 #### 🔍 Filter-Based Bulk Actions
 
@@ -286,16 +286,56 @@ You can add additional folders to your library later.
 
 Optionally check **"Filter in Current Directory"**, then run the corresponding import/scan button from the **Import and Scan** toolbar.
 
+### 🧭 Navigation 
+
+Image Perfect was designed to mirror the file system so navigation will mostly be intuitive. However, there are a lot of buttons within the app and the pagination feature adds some complexity so getting used to navigating may take a bit. Navigation is done with a combination of on folder and on image buttons as well as two, always visible, toolbars.
+
+#### Top Directory Navigation Toolbar
+
+> 📌 **Note**: This is the directory navigation toolbar. It aids in directory navigation.
+
+> 📌 **Note**: To open a directory in app you have to click the **Open** button located on each folder.
+
+| Button | Description |
+|--------|-------------|
+| **Open Current Directory** | Opens the current directory in your file system |
+| **Save Directory** | Saves the current directory and page number for quick navigation back to this location |
+| **Load Saved Directory** | Opens the user selected saved directory |
+| **Back Directory** | Goes back one directory |
+
+#### Bottom Pagination Navigation Toolbar
+
+> 📌 **Note**: This is the pagination navigation toolbar. It aids in loading the *Next* or *Previous* page of images and folders.
+
+| Button | Description |
+|--------|-------------|
+| **Previous Page** | Loads the previous page of images or folders within the current directory |
+| **Next Page** | Loads the next page of images or folders within the current directory |
+| **Go To Page** | Loads the user selected page of images or folders within the current directory |
+| **Load Favorites** | Loads your favorite folders | 
+
+#### 📂 Folder Navigation Buttons
+
+On each folder there is an **Open** and **Back** button. **Open** opens that folder/directory. **Back** goes back one folder/directory. 
+
+#### 🖼️ Image Navigation Buttons
+
+On each image there is a **Back** button. **Back** goes back one folder/directory.
+
+> 📌 **Note**: The **Open** button on each image is to open the image with an external image viewer. On Windows PC this requires you to  install [nomacs](https://nomacs.org/). On Ubuntu PC this feature will use the default [eog](https://manpages.ubuntu.com/manpages/trusty/man1/eog.1.html) image viewer.
+
+> 📌 **Note**: You could also click **Back Directory** on the top toolbar
+
 ### 📂 Create a New Folder
 
-- **File ➡️ Create New Folder** to open the new folder tool bar
+- **File ➡️ Create New Folder** to open the new folder toolbar
 - Type the name of the desired new folder and click **Create Folder** button
 
 > 📌 **Note**: You can only create new folders once you navigate into your library. You cannot create a new folder at the root location. This feature is useful if you want to move some images from one folder to a new one within the app.
 
 ### 🔍 Filters
 
-- **File ➡️ Filters** to open the filters tool bar
+- **File ➡️ Filters** to open the filters toolbar
 
 | Button | Description |
 |--------|-------------|
@@ -306,15 +346,15 @@ Optionally check **"Filter in Current Directory"**, then run the corresponding i
 | **Search Folder Description** | Gets all folders that match the search term. This will search the Folder Name, Folder Description, and Folder Path in the database. |
 | **Load Current Directory** | Loads the current directory. Useful if filter does not return any results. |
 | **Filter in Current Directory** | Check the box to apply the filter only in the current directory. Unchecked will apply the filter to the entire library. |
-| **Get Folders With Images Not Imported** | Gets all the folders where images are not yet imported. |
-| **Get Folders With Metadata Not Scanned** | Gets all the folders where images are imported but metadata is not yet scanned |
-| **Get Folders Without Covers** | Gets all the folders where images are imported but covers are not yet selected. |
+| **Get Folders With Images Not Imported** | Gets all folders where images are not yet imported. |
+| **Get Folders With Metadata Not Scanned** | Gets all folders where images are imported but metadata is not yet scanned |
+| **Get Folders Without Covers** | Gets all folders where images are imported but covers are not yet selected. |
 
 > 📌 **Note**: For tag filters only one tag can be selected. Start typing in the box and your tags will appear on a drop down to select the desired one.
 
 ### 🗑️ Clear Favorite Folders
 
-On each folder there is a **Favorite** button. Clicking that will add that folder to a favorite list in the database. There is also a button on the bottom tool bar called **Load Favorite Folders** that button will load all your favorite folders on the screen. To clear this list
+On each folder there is a **Favorite** button. Clicking that will add that folder to a favorite list in the database. There is also a button on the bottom toolbar called **Load Favorite Folders** that button will load all your favorite folders on the screen. To clear this list
 
 - **File ➡️ Clear Favorite Folders**
 
@@ -322,14 +362,14 @@ On each folder there is a **Favorite** button. Clicking that will add that folde
 
 ### 🚚 Moving and 🗑️ Deleting Images
 
-- **File ➡️ Manage Images** to open the manage images tool bar
+- **File ➡️ Manage Images** to open the manage images toolbar
 - Open a folder containing images
 
 #### 🚚 Moving Images
 
 - Click **Select Move To Folder** button and choose the folder you want to move images to. 
 - Select/Check the images you want moved. (each image has a check box)	
-- Click **Move Selected** to moves the selected images to the desired folder.
+- Click **Move Selected** to move the selected images to the desired folder.
 
 #### 🗑️ Deleting Images
 
