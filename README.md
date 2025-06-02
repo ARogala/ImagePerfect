@@ -225,7 +225,7 @@ The best way to get started is to run the app and explore. But here’s a guided
 
 **To start building your library:**
 
-- Go to **File --> Pick Library Folder** 
+- Go to **File ➡️ Pick Library Folder** 
 - Select the root folder that contains all your image folders
 - Image Perfect will scan the folder structure (but not import images yet)
 	+ If you have a large library this will take some time to import your folder structure.
@@ -235,7 +235,7 @@ The best way to get started is to run the app and explore. But here’s a guided
 
 ### 🗑️ Deleting the Library
 
-- **File --> Delete Library**
+- **File ➡️ Delete Library**
 
 This removes the MySQL database but **does not delete your image files** from the file system.
 	
@@ -243,7 +243,7 @@ This removes the MySQL database but **does not delete your image files** from th
 
 You can add additional folders to your library later.
 
-- **File --> Add New Folders**
+- **File ➡️ Add New Folders**
 - Select one or more new folders from the file system 
 - The app will skip any folder that has already been imported
 
@@ -256,7 +256,7 @@ You can add additional folders to your library later.
 
 > 📌 **Note**: Metadata is *not* scanned and images are *not* imported during the initial library import for speed.
 
-#### Per-Folder Import/Scan
+#### 📂 Per-Folder Import/Scan
 
 - Click **Import Images** button on a specific folder to load all image paths into the database
 - Click **Scan Images for Metadata** button on a specific folder to extract tags/ratings from image files.
@@ -265,7 +265,7 @@ You can add additional folders to your library later.
 
 #### 📦 Bulk Import & Scan
 
-- **File → Import and Scan** to open the bulk toolbar
+- **File ➡️ Import and Scan** to open the bulk toolbar
 - Use these buttons on the current page of folders:
 
 | Button | Description |
@@ -280,10 +280,46 @@ You can add additional folders to your library later.
 
 #### 🔍 Filter-Based Bulk Actions
 
-- **File → Filters → Get Folders With Images Not Imported**
-- **File → Filters → Get Folders With Metadata Not Scanned**
+- **File ➡️ Filters ➡️ Get Folders With Images Not Imported**
+- **File ➡️ Filters ➡️ Get Folders With Metadata Not Scanned**
 
 Optionally check **"Filter in Current Directory"**, then run the corresponding import/scan button from the **Import and Scan** toolbar.
+
+### 📂 Create a New Folder
+
+- **File ➡️ Create New Folder** to open the new folder tool bar
+- Type the name of the desired new folder and click **Create Folder** button
+
+> 📌 **Note**: You can only create new folders once you navigate into your library. You cannot create a new folder at the root location. This feature is useful if you want to move some images from one folder to a new one within the app.
+
+### 🔍 Filters
+
+- **File ➡️ Filters** to open the filters tool bar
+
+| Button&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Description |
+|--------------------------------------------|-------------|
+| **Filter Images On Rating**| Gets all images at the selected rating. 1-5 star ⭐ | 
+| **Filter Folders On Rating** | Gets all folders at the selected rating. 1-10 star ⭐ |
+| **Filter Images On Tags** | Gets all the images with the selected tag. Only one tag can be selected. Start typing in the box and your tags will appear on a drop down to select the desired one. |
+| **Filter Folders On Tags** | Gets all the folders with the selected tag. Only one tag can be selected. Start typing in the box and your tags will appear on a drop down to select the desired one. |
+| **Search Folder Description** | Gets all folders that match the search term. This will search the Folder Name, Folder Description, and Folder Path in the database. |
+| **Load Current Directory** | Loads the current direcory. Useful if filter does not return any results. |
+| **Filter in Current Directory** | Check the box to apply the filter only in the current directory. Unchecked will apply the filter to the entire library. |
+
+
+
+
+### ⚙️ Settings
+
+- **File ➡️ Settings** to open the settings toolbar
+
+| Radio Button | Description |
+|--------|-------------|
+| **Pick Image Width**| Select the radio buttons to adjust the desired image and folder width. From 300px to 600px |
+| **Pick Folder Pagination Size** | Select the radio buttons to adjust the number of folders that appear on each page. From 20 - 100 folders |
+| **Pick Image Pagination Size** | Select the radio buttons the adjust the number of images that appear on each page. From 20 - 200 images |
+
+
 
 <a id="item-thirteen"></a>
 ## License
