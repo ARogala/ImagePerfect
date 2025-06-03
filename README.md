@@ -1,23 +1,33 @@
 # Image Perfect
 
 ## 📚 Table Of Contents
-- [About](#about)
-- [Why I Built Image Perfect](#why-i-built-image-perfect)
-- [Tech Stack And Notable Dependencies](#tech-stack-and-notable-dependencies)
-- [System Requirements](#system-requirements)
-- [Core Features](#core-features)
-- [Planned Improvements](#planned-improvements)
-- [Screen Shots](#screen-shots)
-- [Quick Start Windows](#quick-start-windows)
-- [MySQL Server Setup](#mysql-server-setup)
-- [Build And Install Directions](#build-and-install-directions)
+- 🚀 [Quick Start Windows](#quick-start-windows)
+- ℹ️ [About](#about)
+- ❓ [Why I Built Image Perfect](#why-i-built-image-perfect)
+- 📚 [Tech Stack And Notable Dependencies](#tech-stack-and-notable-dependencies)
+- 🖥️ [System Requirements](#system-requirements)
+- 👀 [Core Features](#core-features)
+- 🧰 [Planned Improvements](#planned-improvements)
+- 📷 [Screen Shots](#screen-shots)
+- 🖥️ [MySQL Server Setup](#mysql-server-setup)
+- 📋 [Build And Install Directions](#build-and-install-directions)
 - 📊 [Backing Up And Restoring The MySQL Database](#backing-up-and-restoring-the-mysql-database)
-- [Migrating To A New Computer](#migrating-to-a-new-computer)
-- [User Guide](#user-guide)
-- [License](#license)
-- [Feedback And Contributions](#feedback-And-contributions)
+- 📦 [Migrating To A New Computer](#migrating-to-a-new-computer)
+- 🔍 [User Guide](#user-guide)
+- 🪪 [License](#license)
+- 📢 [Feedback And Contributions](#feedback-And-contributions)
 
-## About
+<a id="quick-start-windows"></a>
+## 🚀 Quick Start Windows
+
+1. [Install MySQL](#mysql-server-setup) and run provided schema
+2. [Download the Windows build](https://github.com/ARogala/ImagePerfectWinX64Build)
+3. Run `ImagePerfect.exe`
+
+> See the [User Guide](#user-guide) to begin organizing your images.
+
+<a id="about"></a>
+## ℹ️ About
 
 **Image Perfect** is a high-performance, cross-platform (Windows + Ubuntu) image viewer and photo management tool designed for **massive image libraries**. Whether you're organizing thousands or millions of photos, **Image Perfect** stays responsive and efficient.
 
@@ -30,11 +40,13 @@ Instead of small, hard-to-see thumbnails and long import times, Image Perfect of
 - Rich tagging and folder organization
 - Direct image viewing (no thumbnails written to disk)
 
-## Why I Built Image Perfect
+<a id="why-i-built-image-perfect"></a>
+## ❓Why I Built Image Perfect
 
 I created Image Perfect both as a way to learn desktop application development and to solve personal pain points I experienced with existing photo organizers. Many tools struggled with large libraries, relied on tiny thumbnails, consumed excessive amounts of RAM, and were not great at folder organization. Shotwell on Linux came close to meeting my needs, but importing became painfully slow and memory-intensive at scale. This project is my solution to those challenges.
 
-## Tech Stack And Notable Dependencies
+<a id="tech-stack-and-notable-dependencies"></a>
+## 📚 Tech Stack And Notable Dependencies
 
 - **UI Framework**: [Avalonia UI](https://github.com/AvaloniaUI/Avalonia)
 - **Database**: MySQL using Materialized Path for folder hierarchies
@@ -42,12 +54,14 @@ I created Image Perfect both as a way to learn desktop application development a
 - **CSV Parsing**: [CsvHelper](https://github.com/JoshClose/CsvHelper)
 - **Image Processing**: [SixLabors ImageSharp](https://github.com/SixLabors/ImageSharp)
 
-## System Requirements
+<a id="system-requirements"></a>
+## 🖥️ System Requirements
 - Windows 10/11 64 bit or Ubuntu 64 bit
 - 8GB Ram (Image Perfect will use about 1GB loading high resolution images)
 - Processor -- anything that runs Windows 10/11 will do.
 
-## Core Features
+<a id="core-features"></a>
+## 👀 Core Features
 
 ### 🖼️ Big Thumbnails
 - Adjustable image widths from **300px to 600px**
@@ -84,10 +98,11 @@ I created Image Perfect both as a way to learn desktop application development a
 		- On Ubuntu folders imported with the same name but different case will show all folders within each folder in both folders. 
 
 
-### Shotwell Import
+### 📷 Shotwell Import
 - Import existing tags and ratings from Shotwell (if written to images)
 
-## Planned Improvements
+<a id="planned-improvements"></a>
+## 🧰 Planned Improvements
 
 - Find duplicate images
 - Facial recognition
@@ -100,7 +115,8 @@ I created Image Perfect both as a way to learn desktop application development a
 - Tagging improvements (bulk remove/edit)
 - GIF creation support
 
-## Screen Shots
+<a id="screen-shots"></a>
+## 📷 Screen Shots
 
 ### Screen Shot Images
 
@@ -118,15 +134,8 @@ I created Image Perfect both as a way to learn desktop application development a
 
 ![Image](AppScreenShotFolderCloseUp2025-06-02.png)
 
-## Quick Start Windows
-
-1. [Install MySQL](#mysql-server-setup) and run provided schema
-2. [Download the Windows build](https://github.com/ARogala/ImagePerfectWinX64Build)
-3. Run `ImagePerfect.exe`
-
-> See the [User Guide](#user-guide) to begin organizing your images.
-
-## MySQL Server Setup
+<a id="mysql-server-setup"></a>
+## 🖥️ MySQL Server Setup
 
 Step by step directions to be added soon. But for now this should work but needs to be tested.
 
@@ -216,8 +225,8 @@ CREATE TABLE `folder_saved_favorites` (
 SET PERSIST local_infile = 1;
 ```
 
-
-## Build And Install Directions
+<a id="build-and-install-directions"></a>
+## 📋 Build And Install Directions
 
 - **Important First set up MySQL Server**
 - Clone this repository
@@ -282,6 +291,7 @@ Then to run just open terminal in the build folder and run this command
 
 > 🔐 **Security Note**: Never commit your real MySQL credentials to source control.
 
+<a id="backing-up-and-restoring-the-mysql-database"></a>
 ## 📊 Backing Up And Restoring The MySQL Database
 
 ### Windows
@@ -334,13 +344,15 @@ sudo mysql imageperfect < imageperfect_YYYY_MM_DD.sql
 - Your database should now be restored.
 - Obvious or maybe not, but terminal should be opened in the location/folder where your backup file is located for the restore to work.
 
-## Migrating To A New Computer
+<a id="migrating-to-a-new-computer"></a>
+## 📦 Migrating To A New Computer
 
 - Install and configure MySQL then build the app as usual
 - Restore the database as described above
 - Ensure all image files are restored to the **same location and drive letter/path** as before
 
-## User Guide
+<a id="user-guide"></a>
+## 🔍 User Guide
 
 The best way to get started is to run the app and explore. But here’s a guided overview of the core features.
 
@@ -526,13 +538,15 @@ To view a list of all the tags currently in use; either on images or folders.
 | **Pick Folder Pagination Size** | Select the radio buttons to adjust the number of folders that appear on each page. From 20 - 100 folders |
 | **Pick Image Pagination Size** | Select the radio buttons the adjust the number of images that appear on each page. From 20 - 200 images |
 
-## License
+<a id="license"></a>
+## 🪪 License
 
 **Image Perfect** is licensed under the **GNU Affero General Public License v3.0 (AGPL-3.0)**.
 
 You are free to use, modify, and distribute this software under the terms of the AGPL. If you modify and publicly distribute the software — including via a hosted service — you must make your source code available under the same license.
 
-## Feedback And Contributions
+<a id="feedback-And-contributions"></a>
+## 📢 Feedback And Contributions
 
 I'm always open to feedback, feature suggestions, or contributions. Please feel free to open issues or pull requests.
 
