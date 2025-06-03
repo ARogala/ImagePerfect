@@ -1,6 +1,6 @@
 # Image Perfect
 
-# Table Of Contents
+## 📚 Table Of Contents
 - [About](#about)
 - [Why I Built Image Perfect](#why-i-built-image-perfect)
 - [Tech Stack And Notable Dependencies](#tech-stack-and-notable-dependencies)
@@ -8,9 +8,10 @@
 - [Core Features](#core-features)
 - [Planned Improvements](#planned-improvements)
 - [Screen Shots](#screen-shots)
+- [Quick Start Windows](#quick-start-windows)
 - [MySQL Server Setup](#mysql-server-setup)
 - [Build And Install Directions](#build-and-install-directions)
-- [Backing Up And Restoring the MySQL Database](#backing-up-and-restoring-the-mysql-database)
+- [Backing Up And Restoring The MySQL Database](#backing-up-and-restoring-the-mysql-database)
 - [Migrating To A New Computer](#migrating-to-a-new-computer)
 - [User Guide](#user-guide)
 - [License](#license)
@@ -25,7 +26,7 @@ Written in **C#**, using **Avalonia UI**, **MySQL**, and the **MVVM** pattern, I
 Instead of small, hard-to-see thumbnails and long import times, Image Perfect offers:
 
 - Large adjustable thumbnails (up to 600px wide)
-- Fast performance on for large libraries
+- Fast performance on large libraries
 - Rich tagging and folder organization
 - Direct image viewing (no thumbnails written to disk)
 
@@ -116,6 +117,14 @@ I created Image Perfect both as a way to learn desktop application development a
 ### Folder Close Up
 
 ![Image](AppScreenShotFolderCloseUp2025-06-02.png)
+
+## Quick Start Windows
+
+1. [Install MySQL](#mysql-server-setup) and run provided schema
+2. [Download the Windows build](https://github.com/ARogala/ImagePerfectWinX64Build)
+3. Run `ImagePerfect.exe`
+
+> See the [User Guide](#user-guide) to begin organizing your images.
 
 ## MySQL Server Setup
 
@@ -235,10 +244,12 @@ Then to run the application double click on ImagePerfect.exe or you could also r
 ```
 {
   "ConnectionStrings": {
-    "DefaultConnection": "server=127.0.0.1;uid=root;pwd=576aLMx62;database=imageperfect;AllowLoadLocalInfile=true"
+    "DefaultConnection": "server=127.0.0.1;uid=root;pwd=your-passowrd;database=imageperfect;AllowLoadLocalInfile=true"
   }
 }
 ```
+
+> 🔐 **Security Note**: Never commit your real MySQL credentials to source control.
 
 ### Ubuntu
 - Open solution file in Visual Studio
@@ -264,12 +275,14 @@ Then to run just open terminal in the build folder and run this command
 ```
 {
   "ConnectionStrings": {
-    "DefaultConnection": "server=127.0.0.1;uid=root;pwd=576aLMx62;database=imageperfect;AllowLoadLocalInfile=true"
+    "DefaultConnection": "server=127.0.0.1;uid=root;pwd=your-password;database=imageperfect;AllowLoadLocalInfile=true"
   }
 }
 ```
 
-## Backing Up And Restoring the MySQL Database
+> 🔐 **Security Note**: Never commit your real MySQL credentials to source control.
+
+## 📊 Backing Up And Restoring The MySQL Database
 
 ### Windows
 We will use mysqldump command to do this.
@@ -286,7 +299,7 @@ mysqldump -u root -p imageperfect > C:\MySQLBackup\imageperfect_YYYY_MM_DD.sql
 ```
 
 - It will ask for your root server password after hitting enter.
-- Your back up sql file will now be in C:\MySQLBackup check and ensure it is there.
+- Your back up SQL file will now be in C:\MySQLBackup check and ensure it is there.
 
 
 3. **To restore**:
@@ -378,10 +391,10 @@ You can add additional folders to your library after initial import.
 - **File ➡️ Import and Scan** to open the bulk toolbar
 - Use these buttons on the current page of folders:
 
-| Button | Description |
-|--------|-------------|
+| Button                                 | Description                        |
+|----------------------------------------|------------------------------------|
 | **Import All Folders On Current Page** | Quickly imports all images for folders on the page |
-| **Scan All Folders On Current Page**   | Scans all images for metadata (Will take longer) |
+| **Scan All Folders On Current Page**   | Scans all images for metadata (Takes longer) |
 | **Add Cover Image On Current Page**    | Picks a random image as a folder cover (must import images first) |
 
 > ⏱️ **Performance Tip**:  
@@ -405,22 +418,22 @@ Image Perfect was designed to mirror the file system so navigation will mostly b
 
 > 📌 **Note**: To open a directory in app you have to click the **Open** button located on each folder.
 
-| Button | Description |
-|--------|-------------|
+| Button                     | Description                                    |
+|----------------------------|------------------------------------------------|
 | **Open Current Directory** | Opens the current directory in your file system |
-| **Save Directory** | Saves the current directory and page number for quick navigation back to this location |
-| **Load Saved Directory** | Opens the user selected saved directory |
-| **Back Directory** | Goes back one directory |
+| **Save Directory**         | Saves the current directory and page number for quick navigation back to this location |
+| **Load Saved Directory**   | Opens the user selected saved directory |
+| **Back Directory**         | Goes back one directory |
 
 #### Bottom Pagination Navigation Toolbar
 
 > 📌 **Note**: This is the pagination navigation toolbar. It aids in loading the *Next* or *Previous* page of images and folders within the current directory.
 
-| Button | Description |
-|--------|-------------|
-| **Previous Page** | Loads the previous page of images or folders within the current directory |
-| **Next Page** | Loads the next page of images or folders within the current directory |
-| **Go To Page** | Loads the user selected page of images or folders within the current directory |
+| Button             | Description                                            |
+|--------------------|--------------------------------------------------------|
+| **Previous Page**  | Loads the previous page of images or folders within the current directory |
+| **Next Page**      | Loads the next page of images or folders within the current directory |
+| **Go To Page**     | Loads the user selected page of images or folders within the current directory |
 | **Load Favorites** | Loads your favorite folders | 
 
 #### 📂 Folder Navigation Buttons
@@ -459,11 +472,11 @@ On each image there is a **Back** button. **Back** goes back one folder/director
 | **Get Folders With Metadata Not Scanned** | Gets all folders where images are imported but metadata is not yet scanned |
 | **Get Folders Without Covers** | Gets all folders where images are imported but covers are not yet selected. |
 
-> 📌 **Note**: For tag filters only one tag can be selected. Start typing in the box and your tags will appear on a drop down to select the desired one.
+> 📌 **Note**: For tag filters only one tag can be selected. Start typing in the box, and a dropdown will appear with matching tags to select the desired one.
 
 ### 🗑️ Clear Favorite Folders
 
-On each folder there is a **Favorite** button. Clicking that will add that folder to a favorite list in the database. There is also a button on the bottom toolbar called **Load Favorite Folders** that button will load all your favorite folders on the screen. To clear this list
+On each folder there is a **Favorite** button. Clicking that will add that folder to a favorite list in the database. There is also a button on the bottom toolbar called **Load Favorite Folders** that button will load all your favorite folders on the screen. To clear your favorites list:
 
 - **File ➡️ Clear Favorite Folders**
 
@@ -477,14 +490,14 @@ On each folder there is a **Favorite** button. Clicking that will add that folde
 #### 🚚 Moving Images
 
 - Click **Select Move To Folder** button and choose the folder you want to move images to. 
-- Select/Check the images you want moved. (each image has a check box)	
+- Select/Check the images you want moved. (each image has a checkbox)	
 - Click **Move Selected** to move the selected images to the desired folder.
 
 #### 🗑️ Deleting Images
 
 There is a **Trash** button on each image. Click that to delete a single image.
 
-- Select/Check the images you want trashed. (each image has a check box)
+- Select/Check the images you want trashed. (each image has a checkbox)
 - Click **Trash Selected** to trash the selected images.
 
 > 📌 **Note**: Trashing images and folders just moves them to a folder called "ImagePerfectTRASH". This folder will be created by the app and placed inside your root library folder. 
