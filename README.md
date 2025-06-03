@@ -118,7 +118,7 @@ I created Image Perfect both as a way to learn desktop application development a
 <a id="screen-shots"></a>
 ## 📷 Screen Shots
 
-### Screen Shot Images
+### Images Page
 
 ![Image](AppScreenShotImageView2025-06-02.png)
 
@@ -126,7 +126,7 @@ I created Image Perfect both as a way to learn desktop application development a
 
 ![Image](AppScreenShotImageCloseUp2025-06-02.png)
 
-### Screen Shot Folders
+### Folders Page
 
 ![Image](AppScreenShotFolderView2025-06-02.png)
 
