@@ -137,52 +137,69 @@ I created Image Perfect both as a way to learn desktop application development a
 <a id="mysql-server-setup"></a>
 ## 🖥️ MySQL Server Setup
 
-Step by step directions to be added soon. But for now this should work but needs to be tested.
+### Windows
 
-**Image Perfect** assumes you have a MySQL Server 8.0+ running locally. You'll need a user (e.g., `root`) with permission to create a database named `imageperfect`.
+- Download the latest 8.0+ version of MySQL MSI Installer [here](https://dev.mysql.com/downloads/installer/)
+- Run the **mysql-installer-community-8.0.42.0.msi** installer
+- Click Full 
+- Click Next
+- Click Execute 
+- After Execute keep clicking next and keep default settings
+	+ Type and Networking ![Image](WindowsServerSetup/TypeNetworking.png)
+	+ Authentication Method ![Image](WindowsServerSetup/AuthenticationMethod.png)
+	+ Accounts and Roles ![Image](WindowsServerSetup/AccountsRoles.png) (KEEP YOUR PW SAFE)
+	+ Windows Service ![Image](WindowsServerSetup/WindowsService.png)
+	+ Server File Permissions ![Image](WindowsServerSetup/ServerFilePermissions.png)
+	+ Apply Configuration Click Execute
+	
+- Continue through the installer keeping default settings
+- After install MySQL Workbench and Shell Should open up
 
-- **First** install MySQL server 8.0+ create your root user and password. 
-- **Second** run the commands below in order.
+> 📌 **Note**: You now have a MySQL server running and all that is left is to create the database and tables for the application. 
+
+- Open **MySQL Command Line Client** and run the following commands in order.
 
 ```
 CREATE DATABASE imageperfect;
 
+USE imageperfect;
+
 CREATE TABLE `folders` (
-	`FolderId` bigint unsigned NOT NULL AUTO_INCREMENT,
-	`FolderName` Varchar(200) NOT NULL,
-  	`FolderPath` Varchar(2000) NOT NULL,
-  	`HasChildren` Bool,
-	`CoverImagePath` Varchar(2000),
-	`FolderDescription` Varchar(3000),
-	`FolderRating` tinyint unsigned,
-	`HasFiles` Bool,
-	`IsRoot` Bool,
-	`FolderContentMetaDataScanned` Bool,
-	`AreImagesImported` Bool,
-	PRIMARY KEY (`FolderId`),
-	FULLTEXT KEY `fulltext` (`FolderName`,`FolderPath`, `FolderDescription`)
-);
+  `FolderId` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `FolderName` varchar(200) NOT NULL,
+  `FolderPath` varchar(2000) NOT NULL,
+  `HasChildren` tinyint(1) DEFAULT NULL,
+  `CoverImagePath` varchar(2000) DEFAULT NULL,
+  `FolderDescription` varchar(3000) DEFAULT NULL,
+  `FolderRating` tinyint unsigned DEFAULT NULL,
+  `HasFiles` tinyint(1) DEFAULT NULL,
+  `IsRoot` tinyint(1) DEFAULT NULL,
+  `FolderContentMetaDataScanned` tinyint(1) DEFAULT NULL,
+  `AreImagesImported` tinyint(1) DEFAULT NULL,
+  PRIMARY KEY (`FolderId`),
+  FULLTEXT KEY `fulltext` (`FolderName`,`FolderPath`,`FolderDescription`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE `images` (
-	`ImageId` bigint unsigned NOT NULL AUTO_INCREMENT,
-	`ImagePath` Varchar(2000) NOT NULL,
-	`FileName` Varchar(500) NOT NULL,
-	`ImageRating` tinyint unsigned,
-	`ImageFolderPath` Varchar(2000) NOT NULL,
-	`ImageMetaDataScanned` Bool,
-	`FolderId` bigint unsigned DEFAULT NULL,
-	PRIMARY KEY (`ImageId`),
-	KEY `FolderId` (`FolderId`),
-	FULLTEXT KEY `fulltext` (`ImagePath`),
-	CONSTRAINT `images_ibfk_1` FOREIGN KEY (`FolderId`) REFERENCES `folders` (`FolderId`) ON DELETE CASCADE ON UPDATE CASCADE
-);
+  `ImageId` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `ImagePath` varchar(2000) NOT NULL,
+  `FileName` varchar(500) NOT NULL,
+  `ImageRating` tinyint unsigned DEFAULT NULL,
+  `ImageFolderPath` varchar(2000) NOT NULL,
+  `ImageMetaDataScanned` tinyint(1) DEFAULT NULL,
+  `FolderId` bigint unsigned DEFAULT NULL,
+  PRIMARY KEY (`ImageId`),
+  KEY `FolderId` (`FolderId`),
+  FULLTEXT KEY `fulltext` (`ImagePath`),
+  CONSTRAINT `images_ibfk_1` FOREIGN KEY (`FolderId`) REFERENCES `folders` (`FolderId`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE `tags`(
 	`TagId` bigint unsigned NOT NULL AUTO_INCREMENT,
 	`TagName` Varchar(100) NOT NULL,
 	PRIMARY KEY (`TagId`),
 	CONSTRAINT `tags_uq` UNIQUE (`TagName`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE `folder_tags_join`(
 	`FolderId` bigint unsigned NOT NULL,
@@ -190,7 +207,7 @@ CREATE TABLE `folder_tags_join`(
 	PRIMARY KEY (`FolderId`, `TagId`),
 	CONSTRAINT `folder_tags_join_idfk_1` FOREIGN KEY (`FolderId`) REFERENCES `folders` (`FolderId`) ON DELETE CASCADE ON UPDATE CASCADE,
 	CONSTRAINT `folder_tags_join_idfk_2` FOREIGN KEY (`TagId`) REFERENCES `tags` (`TagId`) ON DELETE CASCADE ON UPDATE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE `image_tags_join`(
 	`ImageId` bigint unsigned NOT NULL,
@@ -199,7 +216,7 @@ CREATE TABLE `image_tags_join`(
 	CONSTRAINT `image_tags_join_ibfk_1` FOREIGN KEY (`ImageId`) REFERENCES `images` (`ImageId`) ON DELETE CASCADE ON UPDATE CASCADE,
 	CONSTRAINT `image_tags_join_ibfk_2` FOREIGN KEY (`TagId`) REFERENCES `tags` (`TagId`) ON DELETE CASCADE ON UPDATE CASCADE
 
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE `settings` (
 	`SettingsId` enum('1') NOT NULL,
@@ -207,7 +224,7 @@ CREATE TABLE `settings` (
 	`FolderPageSize` int unsigned NOT NULL,
 	`ImagePageSize` int unsigned NOT NULL,
 	PRIMARY KEY (`SettingsId`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 INSERT INTO settings (MaxImageWidth, FolderPageSize, ImagePageSize) VALUES (500, 20, 60); 
 
@@ -216,14 +233,14 @@ CREATE TABLE `folder_saved_favorites` (
 	`FolderId` bigint unsigned,
 	PRIMARY KEY (`SavedId`),
 	CONSTRAINT `folderid_uq` UNIQUE (`FolderId`)
-);
-```
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-- **Third** you will also need to adjust a MySql setting to allow loading of bulk data via a csv file. To do this run.
-
-```
 SET PERSIST local_infile = 1;
+
 ```
+
+	
+> 📌 **Important**: Make sure to run SET PRESIST local_infile = 1;
 
 <a id="build-and-install-directions"></a>
 ## 📋 Build And Install Directions
