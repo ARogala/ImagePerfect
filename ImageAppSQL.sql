@@ -266,3 +266,79 @@ with recursive
         where locate(',', rest) > 0
 )
 select distinct word from words order by word
+
+
+
+/*From table inspect 6-3-25*/
+
+CREATE TABLE `folders` (
+  `FolderId` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `FolderName` varchar(200) NOT NULL,
+  `FolderPath` varchar(2000) NOT NULL,
+  `HasChildren` tinyint(1) DEFAULT NULL,
+  `CoverImagePath` varchar(2000) DEFAULT NULL,
+  `FolderDescription` varchar(3000) DEFAULT NULL,
+  `FolderRating` tinyint unsigned DEFAULT NULL,
+  `HasFiles` tinyint(1) DEFAULT NULL,
+  `IsRoot` tinyint(1) DEFAULT NULL,
+  `FolderContentMetaDataScanned` tinyint(1) DEFAULT NULL,
+  `AreImagesImported` tinyint(1) DEFAULT NULL,
+  PRIMARY KEY (`FolderId`),
+  FULLTEXT KEY `fulltext` (`FolderName`,`FolderPath`,`FolderDescription`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+
+CREATE TABLE `images` (
+  `ImageId` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `ImagePath` varchar(2000) NOT NULL,
+  `FileName` varchar(500) NOT NULL,
+  `ImageRating` tinyint unsigned DEFAULT NULL,
+  `ImageFolderPath` varchar(2000) NOT NULL,
+  `ImageMetaDataScanned` tinyint(1) DEFAULT NULL,
+  `FolderId` bigint unsigned DEFAULT NULL,
+  PRIMARY KEY (`ImageId`),
+  KEY `FolderId` (`FolderId`),
+  FULLTEXT KEY `fulltext` (`ImagePath`),
+  CONSTRAINT `images_ibfk_1` FOREIGN KEY (`FolderId`) REFERENCES `folders` (`FolderId`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+
+CREATE TABLE `tags` (
+  `TagId` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `TagName` varchar(100) NOT NULL,
+  PRIMARY KEY (`TagId`),
+  UNIQUE KEY `tags_uq` (`TagName`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+
+CREATE TABLE `folder_tags_join` (
+  `FolderId` bigint unsigned NOT NULL,
+  `TagId` bigint unsigned NOT NULL,
+  PRIMARY KEY (`FolderId`,`TagId`),
+  KEY `folder_tags_join_idfk_2` (`TagId`),
+  CONSTRAINT `folder_tags_join_idfk_1` FOREIGN KEY (`FolderId`) REFERENCES `folders` (`FolderId`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `folder_tags_join_idfk_2` FOREIGN KEY (`TagId`) REFERENCES `tags` (`TagId`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+
+CREATE TABLE `image_tags_join` (
+  `ImageId` bigint unsigned NOT NULL,
+  `TagId` bigint unsigned NOT NULL,
+  PRIMARY KEY (`ImageId`,`TagId`),
+  KEY `image_tags_join_ibfk_2` (`TagId`),
+  CONSTRAINT `image_tags_join_ibfk_1` FOREIGN KEY (`ImageId`) REFERENCES `images` (`ImageId`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `image_tags_join_ibfk_2` FOREIGN KEY (`TagId`) REFERENCES `tags` (`TagId`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+
+CREATE TABLE `settings` (
+  `SettingsId` enum('1') NOT NULL,
+  `MaxImageWidth` int unsigned NOT NULL,
+  `FolderPageSize` int unsigned NOT NULL,
+  `ImagePageSize` int unsigned NOT NULL,
+  PRIMARY KEY (`SettingsId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+
+INSERT INTO settings (MaxImageWidth, FolderPageSize, ImagePageSize) VALUES (500, 20, 60);
+
+CREATE TABLE `folder_saved_favorites` (
+  `SavedId` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `FolderId` bigint unsigned DEFAULT NULL,
+  PRIMARY KEY (`SavedId`),
+  UNIQUE KEY `folderid_uq` (`FolderId`)
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
