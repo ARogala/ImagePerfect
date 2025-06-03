@@ -11,7 +11,7 @@
 - [Quick Start Windows](#quick-start-windows)
 - [MySQL Server Setup](#mysql-server-setup)
 - [Build And Install Directions](#build-and-install-directions)
-- [Backing Up And Restoring The MySQL Database](#backing-up-and-restoring-the-mysql-database)
+- 📊 [Backing Up And Restoring The MySQL Database](#backing-up-and-restoring-the-mysql-database)
 - [Migrating To A New Computer](#migrating-to-a-new-computer)
 - [User Guide](#user-guide)
 - [License](#license)
