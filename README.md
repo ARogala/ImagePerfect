@@ -15,12 +15,12 @@
 - 📦 [Migrating To A New Computer](#migrating-to-a-new-computer)
 - 🔍 [User Guide](#user-guide)
 - 🪪 [License](#license)
-- 📢 [Feedback And Contributions](#feedback-And-contributions)
+- 📢 [Feedback And Contributions](#feedback-and-contributions)
 
 <a id="quick-start-windows"></a>
 ## 🚀 Quick Start Windows
 
-1. [Install MySQL](#mysql-server-setup-windows-end-user) and run provided schema
+1. Follow the [MySQL setup instructions](#mysql-server-setup-windows-end-user) and execute the schema commands.
 2. [Download the Windows build](https://github.com/ARogala/ImagePerfectWinX64Build)
 3. Run `ImagePerfect.exe`
 
@@ -43,7 +43,7 @@ Instead of small, hard-to-see thumbnails and long import times, Image Perfect of
 <a id="why-i-built-image-perfect"></a>
 ## ❓Why I Built Image Perfect
 
-I created Image Perfect both as a way to learn desktop application development and to solve personal pain points I experienced with existing photo organizers. Many tools struggled with large libraries, relied on tiny thumbnails, consumed excessive amounts of RAM, and were not great at folder organization. Shotwell on Linux came close to meeting my needs, but importing became painfully slow and memory-intensive at scale. This project is my solution to those challenges.
+I created Image Perfect both as a way to learn desktop application development and to solve personal pain points I experienced with existing photo organizers. Many tools struggled with large libraries, relied on tiny thumbnails, used excessive amounts of RAM, and were not great at folder organization. Shotwell on Linux came close to meeting my needs, but importing became painfully slow and memory-intensive at scale. This project is my solution to those challenges.
 
 <a id="tech-stack-and-notable-dependencies"></a>
 ## 📚 Tech Stack And Notable Dependencies
@@ -53,12 +53,13 @@ I created Image Perfect both as a way to learn desktop application development a
 - **ORM**: [Dapper](https://github.com/DapperLib/Dapper)
 - **CSV Parsing**: [CsvHelper](https://github.com/JoshClose/CsvHelper)
 - **Image Processing**: [SixLabors ImageSharp](https://github.com/SixLabors/ImageSharp)
+- **.NET 8.0**
 
 <a id="system-requirements"></a>
 ## 🖥️ System Requirements
 - Windows 10/11 64 bit or Ubuntu 64 bit
 - 8GB Ram (Image Perfect will use about 1GB loading high resolution images)
-- Processor -- anything that runs Windows 10/11 will do.
+- Any processor capable of running Windows 10/11 should be sufficient
 
 <a id="core-features"></a>
 ## 👀 Core Features
@@ -108,8 +109,6 @@ I created Image Perfect both as a way to learn desktop application development a
 - Facial recognition
 - Image enhancement tools
 - Improved UI design
-- SQLite option (to remove server setup)
-- Mobile client (view-only)
 - Scan for new folders in file system
 - Smarter image move operations (handle duplicate filenames)
 - Tagging improvements (bulk remove/edit)
@@ -260,7 +259,7 @@ SET PERSIST local_infile = 1;
 ```
 
 	
-> 📌 **Important**: Make sure to run `SET PRESIST local_infile = 1;` or file importing won't work.
+> 📌 **Important**: Make sure to run `SET PERSIST local_infile = 1;` or file importing won't work.
 
 ---
 
@@ -299,7 +298,8 @@ SET PERSIST local_infile = 1;
 <a id="build-and-install-directions"></a>
 ## 📋 Build And Install Directions
 
-- **Important First set up MySQL Server**
+> 📌 **First, ensure MySQL Server is set up and running.**
+
 - Clone this repository
 ```
 git clone https://github.com/ARogala/ImagePerfect.git
@@ -325,7 +325,7 @@ Then to run the application double click on ImagePerfect.exe or you could also r
 ```
 {
   "ConnectionStrings": {
-    "DefaultConnection": "server=127.0.0.1;uid=root;pwd=your-passowrd;database=imageperfect;AllowLoadLocalInfile=true"
+    "DefaultConnection": "server=127.0.0.1;uid=root;pwd=your-password;database=imageperfect;AllowLoadLocalInfile=true"
   }
 }
 ```
@@ -375,13 +375,13 @@ We will use mysqldump command to do this.
 ```
 cd C:\Program Files\MySQL\MySQL Server 8.0\bin
 ```
-2. **To back up**: 
+2. **To backup**: 
 ```
 mysqldump -u root -p imageperfect > C:\MySQLBackup\imageperfect_YYYY_MM_DD.sql
 ```
 
 - It will ask for your root server password after hitting enter.
-- Your back up SQL file will now be in C:\MySQLBackup check and ensure it is there.
+- Your backup SQL file will now be in C:\MySQLBackup check and ensure it is there.
 
 
 3. **To restore**:
@@ -392,14 +392,14 @@ mysql -u root -p imageperfect < C:\MySQLBackup\imageperfect_YYYY_MM_DD.sql
 - It will ask for your root server password after hitting enter.
 - Your database should now be restored.
 	
-NOTE: It would be best to try this before spending too much time organizing your photos in the app. Make sure you can back up before wasting time. Its easy to spend hours adding cover images, tags, and notes about the event/day.
+NOTE: It would be best to try this before spending too much time organizing your photos in the app. Make sure you can backup before wasting time. It's easy to spend hours adding cover images, tags, and notes about the event/day.
 
 ### Ubuntu
 
 This is basically the same as Windows
 
 1. Open a terminal in your desired backup location.
-2. **To back up**:
+2. **To backup**:
 ```
 sudo mysqldump imageperfect > imageperfect_YYYY_MM_DD.sql
 ```
@@ -617,7 +617,7 @@ To view a list of all the tags currently in use; either on images or folders.
 
 You are free to use, modify, and distribute this software under the terms of the AGPL. If you modify and publicly distribute the software — including via a hosted service — you must make your source code available under the same license.
 
-<a id="feedback-And-contributions"></a>
+<a id="feedback-and-contributions"></a>
 ## 📢 Feedback And Contributions
 
 I'm always open to feedback, feature suggestions, or contributions. Please feel free to open issues or pull requests.
