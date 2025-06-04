@@ -137,7 +137,9 @@ I created Image Perfect both as a way to learn desktop application development a
 <a id="mysql-server-setup"></a>
 ## 🖥️ MySQL Server Setup
 
-### Windows
+### Windows Development
+
+> 📌 **Note**: Follow these directions if your a developer and you would like to modify or contribute to Image Perfect 🤠!!
 
 - Download the latest 8.0+ version of MySQL MSI Installer [here](https://dev.mysql.com/downloads/installer/)
 - Run the **mysql-installer-community-8.0.42.0.msi** installer
@@ -158,6 +160,8 @@ I created Image Perfect both as a way to learn desktop application development a
 > 📌 **Note**: You now have a MySQL server running and all that is left is to create the database and tables for the application. 
 
 - Open **MySQL Command Line Client** and run the following commands in order.
+
+<a id="create-database-commands"></a>
 
 ```
 CREATE DATABASE imageperfect;
@@ -242,6 +246,35 @@ SET PERSIST local_infile = 1;
 	
 > 📌 **Important**: Make sure to run SET PRESIST local_infile = 1;
 
+### Windows Server Only
+
+> 📌 **Note**: Follow these directions if you only intend to use the software.
+
+- Download the latest 8.0+ version of MySQL MSI Installer Community Edition [here](https://dev.mysql.com/downloads/installer/)
+- Run the **mysql-installer-community-8.0.42.0.msi** installer
+- Click **Server only** 
+- Click Next
+- Click Execute 
+- After Execute use these settings
+	+ Type and Networking (Manual for Config Type) ![Image](WindowsServerOnlySetup/TypeAndNetworking.png)
+	+ Authentication Method ![Image](WindowsServerOnlySetup/AuthenticationMethod.png)
+	+ Accounts and Roles ![Image](WindowsServerOnlySetup/AccountsAndRoles.png) (KEEP YOUR PW SAFE)
+	+ Windows Service ![Image](WindowsServerOnlySetup/WindowsService.png)
+	+ Server File Permissions ![Image](WindowsServerOnlySetup/ServerFilePermissions.png)
+	+ Apply Configuration Click Execute
+	
+- Continue through the installer keeping default settings
+
+> 📌 **Note**: Picking the configuration type **Manual** sets default memory usage for the MySQL server and creates a my.ini configuration file that can be adjusted later for optimal performance. The configuration file is located in C:\ProgramData\MySQL\MySQL Server 8.0 You can read more about this [here](https://dev.mysql.com/doc/mysql-installer/en/server-type-network.html). Leaving defaults should be fine for most libraries and computers. I plan to test this and suggest some optimal settings. 
+
+
+> 📌 **Note**: You now have a MySQL server running and all that is left is to create the database and tables for the application. 
+
+- Open **MySQL Command Line Client** and run the following [commands](#create-database-commands) in order.
+
+- After running those commands all that is left is to [run](#download-windows-build) Image Perfect.
+
+
 <a id="build-and-install-directions"></a>
 ## 📋 Build And Install Directions
 
@@ -260,7 +293,8 @@ git clone https://github.com/ARogala/ImagePerfect.git
 	- Target framework: net8.0
 	- Deployment mode: Self-contained
 	- Target runtime: win-x64
-	
+
+<a id="download-windows-build"></a>	
 Or just download and use the publish files from [here](https://github.com/ARogala/ImagePerfectWinX64Build)
 
 Then to run the application double click on ImagePerfect.exe or you could also right click the exe and send to desktop as a shortcut.
