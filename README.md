@@ -20,7 +20,7 @@
 <a id="quick-start-windows"></a>
 ## 🚀 Quick Start Windows
 
-1. [Install MySQL](#mysql-server-setup) and run provided schema
+1. [Install MySQL](#mysql-server-setup-windows-end-user) and run provided schema
 2. [Download the Windows build](https://github.com/ARogala/ImagePerfectWinX64Build)
 3. Run `ImagePerfect.exe`
 
@@ -137,6 +137,7 @@ I created Image Perfect both as a way to learn desktop application development a
 <a id="mysql-server-setup"></a>
 ## 🖥️ MySQL Server Setup
 
+<a id="#mysql-server-setup-windows-developers"></a>
 ### Windows Development
 
 > 📌 **Note**: Follow these directions if your a developer and you would like to modify or contribute to Image Perfect 🤠!!
@@ -246,6 +247,7 @@ SET PERSIST local_infile = 1;
 	
 > 📌 **Important**: Make sure to run SET PRESIST local_infile = 1;
 
+<a id="#mysql-server-setup-windows-end-user"></a>
 ### Windows Server Only
 
 > 📌 **Note**: Follow these directions if you only intend to use the software.
