@@ -137,38 +137,46 @@ I created Image Perfect both as a way to learn desktop application development a
 <a id="mysql-server-setup"></a>
 ## 🖥️ MySQL Server Setup
 
+Image Perfect requires a local MySQL 8.0+ server. Follow the instructions below based on whether you’re a **developer** or an **end user**.
+
+---
+
 <a id="mysql-server-setup-windows-developers"></a>
-### Windows Development
+### 🛠️ Windows Development
 
-> 📌 **Note**: Follow these directions if your a developer and you would like to modify or contribute to Image Perfect 🤠!!
+> 📌 **Note**: Follow these steps if you're a developer who wants to **modify or contribute** to ImagePerfect.
 
-- Download the latest 8.0+ version of MySQL MSI Installer [here](https://dev.mysql.com/downloads/installer/)
-- Run the **mysql-installer-community-8.0.42.0.msi** installer
-- Click Full 
-- Click Next
-- Click Execute 
-- After Execute keep clicking next and keep default settings
-	+ Type and Networking ![Image](WindowsServerSetup/TypeNetworking.png)
-	+ Authentication Method ![Image](WindowsServerSetup/AuthenticationMethod.png)
-	+ Accounts and Roles ![Image](WindowsServerSetup/AccountsRoles.png) (KEEP YOUR PW SAFE)
-	+ Windows Service ![Image](WindowsServerSetup/WindowsService.png)
-	+ Server File Permissions ![Image](WindowsServerSetup/ServerFilePermissions.png)
-	+ Apply Configuration Click Execute
+- Download the [MySQL MSI Installer (8.0+)](https://dev.mysql.com/downloads/installer/).
+- Run `mysql-installer-community-8.0.42.0.msi`.
+- Choose **Full Setup**, then click **Next** and **Execute**
+- Continue through the installation, accepting the default settings:
+	+ Type and Networking  
+     ![Type and Networking](WindowsServerSetup/TypeNetworking.png)
+	+ Authentication Method  
+     ![Authentication](WindowsServerSetup/AuthenticationMethod.png)
+	+ Accounts and Roles  
+     ![Accounts and Roles](WindowsServerSetup/AccountsRoles.png)  
+     💡 Keep your password safe!
+	+ Windows Service  
+     ![Windows Service](WindowsServerSetup/WindowsService.png)
+	+ Server File Permissions  
+     ![Permissions](WindowsServerSetup/ServerFilePermissions.png)
+	+ Apply Configuration → **Execute**
 	
-- Continue through the installer keeping default settings
-- After install MySQL Workbench and Shell Should open up
+- After installation, MySQL Workbench and Shell should open automatically.
 
-> 📌 **Note**: You now have a MySQL server running and all that is left is to create the database and tables for the application. 
+> ✅ **Next Step:** Open **MySQL Command Line Client** and run the [SQL commands](#create-database-commands) below to set up the database schema.
 
-- Open **MySQL Command Line Client** and run the following commands in order.
+---
 
 <a id="create-database-commands"></a>
 
-```
+```sql
+-- Create database
 CREATE DATABASE imageperfect;
-
 USE imageperfect;
 
+-- Folders table
 CREATE TABLE `folders` (
   `FolderId` bigint unsigned NOT NULL AUTO_INCREMENT,
   `FolderName` varchar(200) NOT NULL,
@@ -185,6 +193,7 @@ CREATE TABLE `folders` (
   FULLTEXT KEY `fulltext` (`FolderName`,`FolderPath`,`FolderDescription`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+-- Images table
 CREATE TABLE `images` (
   `ImageId` bigint unsigned NOT NULL AUTO_INCREMENT,
   `ImagePath` varchar(2000) NOT NULL,
@@ -199,6 +208,7 @@ CREATE TABLE `images` (
   CONSTRAINT `images_ibfk_1` FOREIGN KEY (`FolderId`) REFERENCES `folders` (`FolderId`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+-- Tags table
 CREATE TABLE `tags`(
 	`TagId` bigint unsigned NOT NULL AUTO_INCREMENT,
 	`TagName` Varchar(100) NOT NULL,
@@ -206,6 +216,7 @@ CREATE TABLE `tags`(
 	CONSTRAINT `tags_uq` UNIQUE (`TagName`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+-- Folder-Tags join table
 CREATE TABLE `folder_tags_join`(
 	`FolderId` bigint unsigned NOT NULL,
 	`TagId` bigint unsigned NOT NULL,
@@ -214,6 +225,7 @@ CREATE TABLE `folder_tags_join`(
 	CONSTRAINT `folder_tags_join_idfk_2` FOREIGN KEY (`TagId`) REFERENCES `tags` (`TagId`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+-- Image-Tags join table
 CREATE TABLE `image_tags_join`(
 	`ImageId` bigint unsigned NOT NULL,
 	`TagId` bigint unsigned NOT NULL,
@@ -223,6 +235,7 @@ CREATE TABLE `image_tags_join`(
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+-- Settings table
 CREATE TABLE `settings` (
 	`SettingsId` enum('1') NOT NULL,
 	`MaxImageWidth` int unsigned NOT NULL,
@@ -233,6 +246,7 @@ CREATE TABLE `settings` (
 
 INSERT INTO settings (MaxImageWidth, FolderPageSize, ImagePageSize) VALUES (500, 20, 60); 
 
+-- Folder Saved Favorites
 CREATE TABLE `folder_saved_favorites` (
 	`SavedId` bigint unsigned NOT NULL AUTO_INCREMENT,
 	`FolderId` bigint unsigned,
@@ -240,41 +254,46 @@ CREATE TABLE `folder_saved_favorites` (
 	CONSTRAINT `folderid_uq` UNIQUE (`FolderId`)
 ) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+-- Enable local file import
 SET PERSIST local_infile = 1;
 
 ```
 
 	
-> 📌 **Important**: Make sure to run SET PRESIST local_infile = 1;
+> 📌 **Important**: Make sure to run `SET PRESIST local_infile = 1;` or file importing won't work.
+
+---
 
 <a id="mysql-server-setup-windows-end-user"></a>
-### Windows Server Only
+### 🧑‍💻 For Windows End Users
 
-> 📌 **Note**: Follow these directions if you only intend to use the software.
+> 📌 **Note**: Use this setup if you only plan to **run** Image Perfect without contributing to the codebase.
 
-- Download the latest 8.0+ version of MySQL MSI Installer Community Edition [here](https://dev.mysql.com/downloads/installer/)
-- Run the **mysql-installer-community-8.0.42.0.msi** installer
-- Click **Server only** 
-- Click Next
-- Click Execute 
-- After Execute use these settings
-	+ Type and Networking (Manual for Config Type) ![Image](WindowsServerOnlySetup/TypeAndNetworking.png)
-	+ Authentication Method ![Image](WindowsServerOnlySetup/AuthenticationMethod.png)
-	+ Accounts and Roles ![Image](WindowsServerOnlySetup/AccountsAndRoles.png) (KEEP YOUR PW SAFE)
-	+ Windows Service ![Image](WindowsServerOnlySetup/WindowsService.png)
-	+ Server File Permissions ![Image](WindowsServerOnlySetup/ServerFilePermissions.png)
-	+ Apply Configuration Click Execute
+- Download the [MySQL MSI Installer (8.0+)](https://dev.mysql.com/downloads/installer/).
+- Run `mysql-installer-community-8.0.42.0.msi`.
+- Choose **Server Only**, then click **Next** and **Execute**.
+- Use the following configuration options:
+	+ Type and Networking (set Config Type to **Manual**)  
+     ![Type and Networking](WindowsServerOnlySetup/TypeAndNetworking.png)
+	+ Authentication Method  
+     ![Authentication](WindowsServerOnlySetup/AuthenticationMethod.png)
+	+  Accounts and Roles  
+     ![Accounts and Roles](WindowsServerOnlySetup/AccountsAndRoles.png)  
+     💡 Save your password!
+	+ Windows Service  
+     ![Windows Service](WindowsServerOnlySetup/WindowsService.png)
+	+ Server File Permissions  
+     ![Permissions](WindowsServerOnlySetup/ServerFilePermissions.png)
+	+ Apply Configuration → **Execute**
 	
 - Continue through the installer keeping default settings
 
-> 📌 **Note**: Picking the configuration type **Manual** sets default memory usage for the MySQL server and creates a my.ini configuration file that can be adjusted later for optimal performance. The configuration file is located in C:\ProgramData\MySQL\MySQL Server 8.0 You can read more about this [here](https://dev.mysql.com/doc/mysql-installer/en/server-type-network.html). Leaving defaults should be fine for most libraries and computers. I plan to test this and suggest some optimal settings. 
+> 📌 **Note**: Choosing **Manual** setup allows later configuration of MySQL memory usage via `my.ini` (located at `C:\ProgramData\MySQL\MySQL Server 8.0`). Learn more [here](https://dev.mysql.com/doc/mysql-installer/en/server-type-network.html). The defaults should work fine for most users.
 
+---
 
-> 📌 **Note**: You now have a MySQL server running and all that is left is to create the database and tables for the application. 
-
-- Open **MySQL Command Line Client** and run the following [commands](#create-database-commands) in order.
-
-- After running those commands all that is left is to [run](#download-windows-build) Image Perfect.
+> ✅ Once MySQL is installed, open **MySQL Command Line Client** and run the [database setup commands](#create-database-commands).  
+> ✅ When that's complete, you're ready to [run Image Perfect](#download-windows-build)!
 
 
 <a id="build-and-install-directions"></a>
