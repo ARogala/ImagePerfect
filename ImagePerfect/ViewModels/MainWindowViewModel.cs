@@ -59,6 +59,9 @@ namespace ImagePerfect.ViewModels
         private int _savedTotalFolderPages = 1;
         private int _savedFolderPage = 1;
 
+        //used to save scrollviewer offset
+        private Vector _savedOffsetVector = new Vector();
+
         private int _imagePageSize = 20;
         private int _totalImagePages = 1;
         private int _currentImagePage = 1;
@@ -245,11 +248,11 @@ namespace ImagePerfect.ViewModels
             PickImagePageSizeCommand = ReactiveCommand.Create(async (string size) => {
                 await PickImagePageSize(size);
             });
-            SaveDirectoryCommand = ReactiveCommand.Create(() => {
-                SaveDirectory();
+            SaveDirectoryCommand = ReactiveCommand.Create((ScrollViewer scrollViewer) => {
+                SaveDirectory(scrollViewer);
             });
-            LoadSavedDirectoryCommand = ReactiveCommand.Create(async () => {
-                await LoadSavedDirectory();
+            LoadSavedDirectoryCommand = ReactiveCommand.Create(async (ScrollViewer scrollViewer) => {
+                await LoadSavedDirectory(scrollViewer);
             });
             SaveFolderAsFavoriteCommand = ReactiveCommand.Create(async (FolderViewModel folderVm) => {
                 await SaveFolderAsFavorite(folderVm);
@@ -390,6 +393,12 @@ namespace ImagePerfect.ViewModels
         {
             get => _savedFolderPage;
             set => _savedFolderPage = value;
+        }
+
+        public Vector SavedOffsetVector
+        {
+            get => _savedOffsetVector;
+            set => _savedOffsetVector = value;
         }
         public int CurrentFolderPage
         {
@@ -569,9 +578,9 @@ namespace ImagePerfect.ViewModels
 
         public ReactiveCommand<string, Task> PickImagePageSizeCommand { get; }
 
-        public ReactiveCommand<Unit, Unit> SaveDirectoryCommand { get; }
+        public ReactiveCommand<ScrollViewer, Unit> SaveDirectoryCommand { get; }
 
-        public ReactiveCommand<Unit, Task> LoadSavedDirectoryCommand { get; }
+        public ReactiveCommand<ScrollViewer, Task> LoadSavedDirectoryCommand { get; }
 
         public ReactiveCommand<FolderViewModel, Task> SaveFolderAsFavoriteCommand { get; }
 
@@ -624,16 +633,17 @@ namespace ImagePerfect.ViewModels
                 return;
             }
         }
-        private void SaveDirectory()
+        private void SaveDirectory(ScrollViewer scrollViewer)
         {
             SavedDirectory = CurrentDirectory;
             SavedFolderPage = CurrentFolderPage;
             SavedTotalFolderPages = TotalFolderPages;
             SavedImagePage = CurrentImagePage;
             SavedTotalImagePages = TotalImagePages;
+            SavedOffsetVector = scrollViewer.Offset;
         }
 
-        private async Task LoadSavedDirectory()
+        private async Task LoadSavedDirectory(ScrollViewer scrollViewer)
         {
             CurrentDirectory = SavedDirectory;
             CurrentFolderPage = SavedFolderPage;
@@ -643,6 +653,7 @@ namespace ImagePerfect.ViewModels
             MaxPage = Math.Max(TotalImagePages, TotalFolderPages);
             MaxCurrentPage = Math.Max(CurrentImagePage, CurrentFolderPage);
             await LoadCurrentDirectory();
+            scrollViewer.Offset = SavedOffsetVector;
         }
         private async Task UpdateSettings()
         {

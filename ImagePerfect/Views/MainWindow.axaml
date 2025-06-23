@@ -203,10 +203,10 @@
 					<Button Margin="10 0 10 0" Command="{Binding OpenCurrentDirectoryWithExplorerCommand}">
 						Open Current Directory
 					</Button>
-					<Button Margin="10 0 10 0" Command="{Binding SaveDirectoryCommand}">
+					<Button Margin="10 0 10 0" Command="{Binding SaveDirectoryCommand}" CommandParameter="{Binding #FoldersAndImagesScrollViewer}">
 						Save Directory
 					</Button>
-					<Button Margin="10 0 10 0" Command="{Binding LoadSavedDirectoryCommand}">
+					<Button Margin="10 0 10 0" Command="{Binding LoadSavedDirectoryCommand}" CommandParameter="{Binding #FoldersAndImagesScrollViewer}">
 						Load Saved Directory
 					</Button>
 					<Button Margin="10 0 10 0" Command="{Binding BackFolderFromDirectoryOptionsPanelCommand}">
@@ -266,7 +266,7 @@
 		<!--Progress Bar-->
 		<ProgressBar Grid.Row="9" Margin="10" IsIndeterminate="True" IsVisible="{Binding ShowLoading}"/>		
 		<!--Folders and Images-->
-		<ScrollViewer Grid.Row="10">
+		<ScrollViewer Grid.Row="10" x:Name="FoldersAndImagesScrollViewer">
 			<StackPanel>
 				<ItemsControl ItemsSource="{Binding LibraryFolders}" x:Name="FoldersItemsControl">
 					<ItemsControl.ItemsPanel>
