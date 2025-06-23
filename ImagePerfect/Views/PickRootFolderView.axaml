@@ -6,5 +6,5 @@
 			 xmlns:vm="using:ImagePerfect.ViewModels"
 			 x:DataType="vm:PickRootFolderViewModel"
              x:Class="ImagePerfect.Views.PickRootFolderView">
-	<Button Margin="0" Width="175" HorizontalContentAlignment="Center"  Command="{Binding SelectLibraryFolderCommand}">Pick Library Folder</Button>
+	<MenuItem Header="Pick Library Folder" Padding="0" Command="{Binding SelectLibraryFolderCommand}" />
 </UserControl>

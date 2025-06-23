@@ -6,5 +6,5 @@
 			 xmlns:vm="using:ImagePerfect.ViewModels"
 			 x:DataType="vm:PickNewFoldersViewModel"
              x:Class="ImagePerfect.Views.PickNewFoldersView">
-	<Button Margin="0" Width="175" HorizontalContentAlignment="Center" Command="{Binding SelectNewFoldersCommand}">Add New Folders</Button>
+	<MenuItem Header="Add New Folders" Padding="0"  Command="{Binding SelectNewFoldersCommand}" />
 </UserControl>
