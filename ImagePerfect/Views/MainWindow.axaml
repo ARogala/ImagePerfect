@@ -21,6 +21,7 @@
 				<MenuItem Header="_File">
 					<MenuItem Header="Filters" Command="{Binding ToggleFiltersCommand}" />
 					<MenuItem Header="Import And Scan" Command="{Binding ToggleImportAndScanCommand}" />
+					<MenuItem Header="Exit" Command="{Binding ExitAppCommand}" />
 				</MenuItem>
 				<MenuItem Header="_File Management">
 					<v:PickNewFoldersView DataContext="{Binding PickNewFolders}"/>
