@@ -18,6 +18,8 @@ using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Image = ImagePerfect.Models.Image;
+using Avalonia;
+using Avalonia.Controls.ApplicationLifetimes;
 
 namespace ImagePerfect.ViewModels
 {
@@ -283,7 +285,12 @@ namespace ImagePerfect.ViewModels
             CopyCoverImageToContainingFolderCommand = ReactiveCommand.Create(async (FolderViewModel folderVm) => { 
                 await CopyCoverImageToContainingFolder(folderVm);
             });
-            CreateNewFolderCommand = ReactiveCommand.Create(() => { CreateNewFolder(); });
+            CreateNewFolderCommand = ReactiveCommand.Create(() => { 
+                CreateNewFolder(); 
+            });
+            ExitAppCommand = ReactiveCommand.Create(() => { 
+                ExitApp();
+            });
             Initialize();
         }
 
@@ -588,6 +595,17 @@ namespace ImagePerfect.ViewModels
 
         public ReactiveCommand<Unit, Unit> CreateNewFolderCommand { get; }
 
+        public ReactiveCommand<Unit, Unit> ExitAppCommand { get; }
+
+
+        private void ExitApp()
+        {
+            //Application.Current.ApplicationLifetime;
+            if (Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            {
+                desktop.Shutdown();
+            }
+        }
         private async Task SaveFolderAsFavorite(FolderViewModel folderVm)
         {
             await _folderMethods.SaveFolderToFavorites(folderVm.FolderId);
