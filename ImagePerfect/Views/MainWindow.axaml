@@ -19,17 +19,23 @@
 		<StackPanel Grid.Row="0">
 			<Menu>
 				<MenuItem Header="_File">
-					<v:PickRootFolderView DataContext="{Binding PickRootFolder}" x:Name="PickRootFolder"/>
-					<Button Margin="0" Width="175" HorizontalContentAlignment="Center" Command="{Binding DeleteLibraryCommand}">Delete Library</Button>
+					<MenuItem Header="Filters" Command="{Binding ToggleFiltersCommand}" />
+					<MenuItem Header="Import And Scan" Command="{Binding ToggleImportAndScanCommand}" />
+				</MenuItem>
+				<MenuItem Header="_File Management">
 					<v:PickNewFoldersView DataContext="{Binding PickNewFolders}"/>
-					<Button Margin="0" Width="175" HorizontalContentAlignment="Center" Command="{Binding ToggleCreateNewFolderCommand}">Create New Folder</Button>
-					<Button Margin="0" Width="175" HorizontalContentAlignment="Center" Command="{Binding ToggleFiltersCommand}">Filters</Button>
-					<Button Margin="0" Width="175" HorizontalContentAlignment="Center" Command="{Binding ToggleSettingsCommand}">Settings</Button>
-					<Button Margin="0" Width="175" HorizontalContentAlignment="Center" Command="{Binding RemoveAllFavoriteFoldersCommand}">Clear Favorite Folders</Button>
-					<Button Margin="0" Width="175" HorizontalContentAlignment="Center" Command="{Binding ToggleManageImagesCommand}">Manage Images</Button>
-					<Button Margin="0" Width="175" HorizontalContentAlignment="Center" Command="{Binding ToggleGetTotalImagesCommand}">Total Images</Button>
-					<Button Margin="0" Width="175" HorizontalContentAlignment="Center" Command="{Binding ToggleImportAndScanCommand}">Import And Scan</Button>
-					<Button Margin="0" Width="175" HorizontalContentAlignment="Center" Command="{Binding ToggleListAllTagsCommand}">Show All Tags</Button>
+					<MenuItem Header="Create New Folder"  Command="{Binding ToggleCreateNewFolderCommand}" />
+					<MenuItem Header="Clear Favorite Folders" Command="{Binding RemoveAllFavoriteFoldersCommand}" />
+					<MenuItem Header="Manage Images" Command="{Binding ToggleManageImagesCommand}" />
+				</MenuItem>
+				<MenuItem Header="_Settings">
+					<MenuItem Header="Settings" Command="{Binding ToggleSettingsCommand}" />
+					<MenuItem Header="Total Images" Command="{Binding ToggleGetTotalImagesCommand}" />
+					<MenuItem Header="Show All Tags" Command="{Binding ToggleListAllTagsCommand}" />
+				</MenuItem>
+				<MenuItem Header="_Library Management">
+					<v:PickRootFolderView DataContext="{Binding PickRootFolder}" x:Name="PickRootFolder"/>
+					<MenuItem Header="Delete Library" Command="{Binding DeleteLibraryCommand}" />
 				</MenuItem>
 			</Menu>
 		</StackPanel>
