@@ -595,7 +595,16 @@ namespace ImagePerfect.ViewModels
 
         private async Task RemoveAllFavoriteFolders()
         {
-            await _folderMethods.RemoveAllFavoriteFolders();
+            var box = MessageBoxManager.GetMessageBoxStandard("Remove Favorite Folders", "Are you sure you want to remove your favorite folders from the data base? The folders on the file system will remain.", ButtonEnum.YesNo);
+            var result = await box.ShowAsync();
+            if (result == ButtonResult.Yes)
+            {
+                await _folderMethods.RemoveAllFavoriteFolders();
+            }
+            else
+            {
+                return;
+            }
         }
         private void SaveDirectory()
         {
