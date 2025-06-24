@@ -1,0 +1,34 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Design.PreviewWith>
+    <Border Padding="20">
+        <!-- Add Controls for Previewer Here -->
+    </Border>
+    </Design.PreviewWith>
+
+    <!-- Add Styles Here -->
+	<!--
+		dark blue #021526
+		ligher blue #03346E
+		lighest blue #6EACDA
+		
+		Dark Red #3D0000
+		Ligher Dark Red #950101
+	-->
+	
+	<Style Selector="StackPanel.menu-bg-color">
+		<Setter Property="Background" Value="#021526" />
+	</Style>
+	<Style Selector="Button.menu-btn">
+		<Setter Property="Background" Value="#000000" />
+	</Style>
+	<Style Selector="Button.menu-btn:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="Background" Value="#03346E" />
+	</Style>
+	<Style Selector="Button.menu-btn-danger">
+		<Setter Property="Background" Value="#3D0000" />
+	</Style>
+	<Style Selector="Button.menu-btn-danger:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="Background" Value="#950101" />
+	</Style>
+</Styles>

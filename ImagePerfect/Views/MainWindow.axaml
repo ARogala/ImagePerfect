@@ -16,7 +16,7 @@
 
 	<Grid ColumnDefinitions="*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,*,Auto,Auto" x:Name="Root">
 		<!--File Menu-->
-		<StackPanel Grid.Row="0">
+		<StackPanel Grid.Row="0" Classes="menu-bg-color">
 			<Menu>
 				<MenuItem Header="_File">
 					<MenuItem Header="Filters" Command="{Binding ToggleFiltersCommand}" />
@@ -40,7 +40,7 @@
 				</MenuItem>
 			</Menu>
 		</StackPanel>
-		<StackPanel Grid.Row="1" IsVisible="{Binding ShowAllTags}">
+		<StackPanel Grid.Row="1" IsVisible="{Binding ShowAllTags}" Classes="menu-bg-color">
 			<ListBox Grid.Row="3" SelectionMode="Multiple" ItemsSource="{Binding TagsList}" Height="200" Width="500">
 				<ListBox.ItemTemplate>
 					<DataTemplate>
@@ -50,19 +50,21 @@
 			</ListBox>
 		</StackPanel>
 		<!--Show Total Images-->
-		<StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" IsVisible="{Binding ShowTotalImages}">
-			<TextBlock Margin="5">Total Images: </TextBlock>
-			<TextBlock Margin="5" Text="{Binding TotalImages,StringFormat='{}{0:0,0}'}"></TextBlock>
+		<StackPanel Grid.Row="2" HorizontalAlignment="Stretch" IsVisible="{Binding ShowTotalImages}" Classes="menu-bg-color">
+			<Grid RowDefinitions="Auto" ColumnDefinitions="Auto,Auto" HorizontalAlignment="Center">
+				<TextBlock Grid.Row="0" Grid.Column="0" Margin="5">Total Images: </TextBlock>
+				<TextBlock Grid.Row="0" Grid.Column="1" Margin="5" Text="{Binding TotalImages,StringFormat='{}{0:0,0}'}"></TextBlock>
+			</Grid>
 		</StackPanel>
 		<!--Filters-->
-		<StackPanel Grid.Row="3" Orientation="Vertical" IsVisible="{Binding ShowFilters}">
+		<StackPanel Grid.Row="3" Orientation="Vertical" IsVisible="{Binding ShowFilters}" Classes="menu-bg-color">
 			<Grid RowDefinitions="Auto, Auto, Auto, Auto, Auto" ColumnDefinitions="*, Auto, *, Auto" MaxWidth="800" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
 				<NumericUpDown Grid.Row="0" Grid.Column="0" Minimum="0" Value="1" Maximum="5" 
 							   Margin="5" ParsingNumberStyle="Integer" FormatString="0"
 							   x:Name="FilterImageRating"/>
 				<Button Grid.Row="0" Grid.Column="1" Margin="5" Width="185" HorizontalContentAlignment="Center"
 						Command="{Binding FilterImagesOnRatingCommand}"
-						CommandParameter="{Binding #FilterImageRating.Value}">
+						CommandParameter="{Binding #FilterImageRating.Value}" Classes="menu-btn">
 					Filter Images on Rating
 				</Button>
 				<NumericUpDown Grid.Row="0" Grid.Column="2" Minimum="0" Value="1" Maximum="10" 
@@ -70,7 +72,7 @@
 							   x:Name="FilterFolderRating"/>
 				<Button Grid.Row="0" Grid.Column="3" Margin="5" Width="185" HorizontalContentAlignment="Center"
 						Command="{Binding FilterFoldersOnRatingCommand}"
-						CommandParameter="{Binding #FilterFolderRating.Value}">
+						CommandParameter="{Binding #FilterFolderRating.Value}" Classes="menu-btn">
 					Filter Folders on Rating
 				</Button>
 				<AutoCompleteBox Grid.Row="1" Grid.Column="0" Margin="5" FilterMode="StartsWith" 
@@ -79,7 +81,7 @@
 								 x:Name="FilterImageTag"/>
 				<Button Grid.Row="1" Grid.Column="1" Margin="5" Width="185" HorizontalContentAlignment="Center"
 						Command="{Binding FilterImagesOnTagCommand}"
-						CommandParameter="{Binding #FilterImageTag.Text}">
+						CommandParameter="{Binding #FilterImageTag.Text}" Classes="menu-btn">
 					Filter Images on Tags
 				</Button>
 				<AutoCompleteBox Grid.Row="1" Grid.Column="2" Margin="5" FilterMode="StartsWith" 
@@ -88,38 +90,38 @@
 								 x:Name="FilterFolderTag"/>
 				<Button Grid.Row="1" Grid.Column="3" Margin="5" Width="185" HorizontalContentAlignment="Center"
 						Command="{Binding FilterFoldersOnTagCommand}"
-						CommandParameter="{Binding #FilterFolderTag.Text}">
+						CommandParameter="{Binding #FilterFolderTag.Text}" Classes="menu-btn">
 					Filter Folders on Tags
 				</Button>
 				<TextBox Grid.Row="2" Grid.Column="0" Margin="5" MaxLength="200" x:Name="FilterFolderDescriptionText"/>
 				<Button Grid.Row="2" Grid.Column="1" Margin="5" Width="185" HorizontalContentAlignment="Center"
 						Command="{Binding FilterFoldersOnDescriptionCommand}"
-						CommandParameter="{Binding #FilterFolderDescriptionText.Text}">
+						CommandParameter="{Binding #FilterFolderDescriptionText.Text}" Classes="menu-btn">
 					Seach Folder Description
 				</Button>
 				<Button Grid.Row="2" Grid.Column="2" Margin="5"
-						Command="{Binding LoadCurrentDirectoryCommand}">
+						Command="{Binding LoadCurrentDirectoryCommand}" Classes="menu-btn">
 					Load Current Directory
 				</Button>
 				<CheckBox Grid.Row="2" Grid.Column="3" Margin="5" IsChecked="{Binding FilterInCurrentDirectory}">
 					Filter in Current Directory
 				</CheckBox>
 				<Button Grid.Row="3" Grid.Column="0" Margin="5" Width="275" HorizontalContentAlignment="Center"
-						Command="{Binding GetAllFoldersWithNoImportedImagesCommand}">
+						Command="{Binding GetAllFoldersWithNoImportedImagesCommand}" Classes="menu-btn">
 					Get Folders With Images Not Imported
 				</Button>
 				<Button Grid.Row="3" Grid.Column="2" Margin="5" Width="300" HorizontalContentAlignment="Center"
-						Command="{Binding GetAllFoldersWithMetadataNotScannedCommand}">
+						Command="{Binding GetAllFoldersWithMetadataNotScannedCommand}" Classes="menu-btn">
 					Get Folders With Metadata Not Scanned
 				</Button>
 				<Button Grid.Row="4" Grid.Column="0" Width="275" Margin="5" HorizontalContentAlignment="Center"
-						Command="{Binding GetAllFoldersWithoutCoversCommand}">
+						Command="{Binding GetAllFoldersWithoutCoversCommand}" Classes="menu-btn">
 					Get Folders Without Covers
 				</Button>
 			</Grid>
 		</StackPanel>
 		<!--Settings-->
-		<StackPanel Grid.Row="4" IsVisible="{Binding ShowSettings}">
+		<StackPanel Grid.Row="4" IsVisible="{Binding ShowSettings}" Classes="menu-bg-color">
 			<Grid RowDefinitions="Auto" ColumnDefinitions="Auto,Auto,Auto" Width="600" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
 				<StackPanel Grid.Row="0" Grid.Column="0" Width="200">
 					<TextBlock Margin="0 10 0 5">Pick Image Width</TextBlock>
@@ -193,75 +195,91 @@
 			</Grid>
 		</StackPanel>
 		<!--Directory Options-->
-		<StackPanel Grid.Row="5">
-			<Grid RowDefinitions="Auto" ColumnDefinitions="*" Margin="0 10 0 15" HorizontalAlignment="Center" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
+		<StackPanel Grid.Row="5" Classes="menu-bg-color">
+			<Grid RowDefinitions="Auto" ColumnDefinitions="*" Margin="0 10 0 10" HorizontalAlignment="Center" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
 				<StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0">
 					<!--
 					<TextBlock Margin="5">Current Directory:</TextBlock>
 					<TextBlock Margin="5" Text="{Binding CurrentDirectory}"/>
 					-->
-					<Button Margin="10 0 10 0" Command="{Binding OpenCurrentDirectoryWithExplorerCommand}">
-						Open Current Directory
-					</Button>
-					<Button Margin="10 0 10 0" Command="{Binding SaveDirectoryCommand}" CommandParameter="{Binding #FoldersAndImagesScrollViewer}">
-						Save Directory
-					</Button>
-					<Button Margin="10 0 10 0" Command="{Binding LoadSavedDirectoryCommand}" CommandParameter="{Binding #FoldersAndImagesScrollViewer}">
+					<Button Margin="5" Command="{Binding LoadSavedDirectoryCommand}" CommandParameter="{Binding #FoldersAndImagesScrollViewer}" Classes="menu-btn">
 						Load Saved Directory
 					</Button>
-					<Button Margin="10 0 10 0" Command="{Binding BackFolderFromDirectoryOptionsPanelCommand}">
+					<Button Margin="5" Command="{Binding BackFolderFromDirectoryOptionsPanelCommand}" Classes="menu-btn">
 						Back Directory
+					</Button>
+					<Button Margin="5" Command="{Binding OpenCurrentDirectoryWithExplorerCommand}" Classes="menu-btn">
+						Open Current Directory
+					</Button>
+					<Button Margin="5" Command="{Binding SaveDirectoryCommand}" CommandParameter="{Binding #FoldersAndImagesScrollViewer}" Classes="menu-btn-danger">
+						Save Directory
 					</Button>
 				</StackPanel>
 			</Grid>
 		</StackPanel>
 		<!--Create New Folder-->
-		<StackPanel Grid.Row="6" MaxWidth="400" IsVisible="{Binding ShowCreateNewFolder}" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
-			<TextBlock Margin="0 5" >Create A New Folder:</TextBlock>
-			<TextBox  Watermark="Enter folder name" Text="{Binding NewFolderName}" />
+		<StackPanel Grid.Row="6" IsVisible="{Binding ShowCreateNewFolder}" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}" Classes="menu-bg-color">
+			<TextBlock Margin="0 5" MaxWidth="400">Create A New Folder:</TextBlock>
+			<TextBox  Watermark="Enter folder name" MaxWidth="400" Text="{Binding NewFolderName}" />
 			<Button
 				Margin="0 10 10 10"
-				Command="{Binding CreateNewFolderCommand}" 
-				IsEnabled="{Binding IsNewFolderEnabled}">
+				HorizontalAlignment="Center"
+				Command="{Binding CreateNewFolderCommand}"
+				IsEnabled="{Binding IsNewFolderEnabled}"
+				Classes="menu-btn">
 				Create Folder
 			</Button>
 		</StackPanel>
 		<!--Manage Images-->
-		<StackPanel Grid.Row="7" Orientation="Horizontal" HorizontalAlignment="Center" IsVisible="{Binding ShowManageImages}" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
-			<Button Margin="5" HorizontalAlignment="Center"
+		<StackPanel Grid.Row="7" IsVisible="{Binding ShowManageImages}" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}" Classes="menu-bg-color">
+			<Grid RowDefinitions="Auto" ColumnDefinitions="*" HorizontalAlignment="Center">
+				<StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0">
+					<Button Margin="5" HorizontalAlignment="Center"
 					Command="{Binding SelectAllImagesCommand}"
-					CommandParameter="{Binding #ImagesItemsControl}">
-				Select All
-			</Button>
-			<Button Margin="5" HorizontalAlignment="Center"
-				Command="{Binding MoveSelectedImagesToTrashCommand}"
-				CommandParameter="{Binding #ImagesItemsControl}">
-				Trash Selected
-			</Button>
-			<Button Margin="5" HorizontalAlignment="Center"
-				Command="{Binding MoveSelectedImagesToNewFolderCommand}"
-				CommandParameter="{Binding #ImagesItemsControl}">
-				Move Selected
-			</Button>
-			<v:PickImageMoveToFolderView DataContext="{Binding #Root.((vm:MainWindowViewModel)DataContext).PickImageMoveToFolder}"/>
+					CommandParameter="{Binding #ImagesItemsControl}"
+					Classes="menu-btn">
+						Select All
+					</Button>
+					<Button Margin="5" HorizontalAlignment="Center"
+						Command="{Binding MoveSelectedImagesToNewFolderCommand}"
+						CommandParameter="{Binding #ImagesItemsControl}"
+						Classes="menu-btn">
+						Move Selected
+					</Button>
+					<v:PickImageMoveToFolderView DataContext="{Binding #Root.((vm:MainWindowViewModel)DataContext).PickImageMoveToFolder}"/>
+					<Button Margin="5" HorizontalAlignment="Center"
+						Command="{Binding MoveSelectedImagesToTrashCommand}"
+						CommandParameter="{Binding #ImagesItemsControl}"
+						Classes="menu-btn-danger">
+						Trash Selected
+					</Button>
+				</StackPanel>
+			</Grid>
 		</StackPanel>
 		<!--Import and Scan Folders-->
-		<StackPanel Grid.Row="8" Orientation="Horizontal" HorizontalAlignment="Center" IsVisible="{Binding ShowImportAndScan}" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
-			<Button Margin="5" HorizontalAlignment="Center"
+		<StackPanel Grid.Row="8" IsVisible="{Binding ShowImportAndScan}" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}" Classes="menu-bg-color">
+			<Grid RowDefinitions="Auto" ColumnDefinitions="*" HorizontalAlignment="Center">
+				<StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0">
+					<Button Margin="5" HorizontalAlignment="Center"
 					Command="{Binding ImportAllFoldersOnCurrentPageCommand}"
-					CommandParameter="{Binding #FoldersItemsControl}">
-				Import All Folders On Current Page
-			</Button>
-			<Button Margin="5" HorizontalAlignment="Center"
-					Command="{Binding ScanAllFoldersOnCurrentPageCommand}"
-					CommandParameter="{Binding #FoldersItemsControl}">
-				Scan All Folders On Current Page
-			</Button>
-			<Button Margin="5" HorizontalAlignment="Center"
-					Command="{Binding AddCoverImageOnCurrentPageCommand}"
-					CommandParameter="{Binding #FoldersItemsControl}">
-				Add Cover Image On Current Page
-			</Button>
+					CommandParameter="{Binding #FoldersItemsControl}"
+					Classes="menu-btn">
+						Import All Folders On Current Page
+					</Button>
+					<Button Margin="5" HorizontalAlignment="Center"
+							Command="{Binding ScanAllFoldersOnCurrentPageCommand}"
+							CommandParameter="{Binding #FoldersItemsControl}"
+							Classes="menu-btn">
+						Scan All Folders On Current Page
+					</Button>
+					<Button Margin="5" HorizontalAlignment="Center"
+							Command="{Binding AddCoverImageOnCurrentPageCommand}"
+							CommandParameter="{Binding #FoldersItemsControl}"
+							Classes="menu-btn">
+						Add Cover Image On Current Page
+					</Button>
+				</StackPanel>
+			</Grid>
 		</StackPanel>
 		<!--Progress Bar-->
 		<ProgressBar Grid.Row="9" Margin="10" IsIndeterminate="True" IsVisible="{Binding ShowLoading}"/>		
@@ -440,34 +458,34 @@
 			</StackPanel>
 		</ScrollViewer>
 		<!--Pagination-->
-		<StackPanel Grid.Row="11" Orientation="Vertical" HorizontalAlignment="Center" Margin="0 10 0 0">
-			<Grid RowDefinitions="Auto" ColumnDefinitions="Auto, Auto, Auto, Auto, Auto" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
+		<StackPanel Grid.Row="11" Orientation="Vertical" HorizontalAlignment="Stretch" Classes="menu-bg-color">
+			<Grid RowDefinitions="Auto" ColumnDefinitions="Auto, Auto, Auto, Auto, Auto" HorizontalAlignment="Center" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
 				<Button Margin="5" Grid.Row="0" Grid.Column="0"
-					Command="{Binding PreviousPageCommand}">
+					Command="{Binding PreviousPageCommand}" Classes="menu-btn">
 					Previous Page
 				</Button>
 				<Button Margin="5" Grid.Row="0" Grid.Column="1"
-						Command="{Binding NextPageCommand}">
+						Command="{Binding NextPageCommand}" Classes="menu-btn">
 					Next Page
 				</Button>
 				<NumericUpDown Minimum="1" Maximum="{Binding MaxPage}" Grid.Row="0" Grid.Column="2" Width="150" Margin="5" Value="{Binding MaxCurrentPage}" x:Name="PageNumber" ParsingNumberStyle="Integer" FormatString="0"/>
 				<Button HorizontalAlignment="Center" Margin="5" Grid.Row="0" Grid.Column="3"
 						Command="{Binding GoToPageCommand}"
-						CommandParameter="{Binding #PageNumber.Value}">
+						CommandParameter="{Binding #PageNumber.Value}" Classes="menu-btn">
 					Go To Page
 				</Button>
-				<Button HorizontalAlignment="Center" Margin="5" Grid.Row="0" Grid.Column="4" Command="{Binding GetAllFavoriteFoldersCommand}">
+				<Button HorizontalAlignment="Center" Margin="5" Grid.Row="0" Grid.Column="4" Command="{Binding GetAllFavoriteFoldersCommand}" Classes="menu-btn">
 					Load Favorite Folders
 				</Button>
 			</Grid>
 		</StackPanel>
-		<StackPanel Grid.Row="12" Orientation="Vertical" HorizontalAlignment="Center" Margin="0 0 0 10">
-			<StackPanel Orientation="Horizontal">
-				<Label>Total Pages:</Label>
-				<TextBlock Text="{Binding MaxPage}" VerticalAlignment="Center"></TextBlock>
-				<Label>Current Page:</Label>
-				<TextBlock Text="{Binding MaxCurrentPage}" VerticalAlignment="Center"></TextBlock>
-			</StackPanel>
+		<StackPanel Grid.Row="12" HorizontalAlignment="Stretch"  Classes="menu-bg-color">
+			<Grid RowDefinitions="Auto" ColumnDefinitions="Auto,Auto,Auto,Auto" HorizontalAlignment="Center" Margin="0 0 0 10">
+				<Label Grid.Row="0" Grid.Column="0">Total Pages:</Label>
+				<TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding MaxPage}" VerticalAlignment="Center"></TextBlock>
+				<Label Grid.Row="0" Grid.Column="2">Current Page:</Label>
+				<TextBlock Grid.Row="0" Grid.Column="3" Text="{Binding MaxCurrentPage}" VerticalAlignment="Center"></TextBlock>
+			</Grid>
 		</StackPanel>
 	</Grid>
 </Window>

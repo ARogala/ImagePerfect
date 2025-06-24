@@ -7,7 +7,7 @@
 			 x:DataType="vm:PickImageMoveToFolderViewModel"
              x:Class="ImagePerfect.Views.PickImageMoveToFolderView">
 	<Button Margin="5" HorizontalAlignment="Center"
-		Command="{Binding SelectMoveImagesToFolderCommand}">
+		Command="{Binding SelectMoveImagesToFolderCommand}" Classes="menu-btn">
 		Select Move To Folder
 	</Button>
 </UserControl>
