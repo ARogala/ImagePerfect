@@ -196,7 +196,7 @@
 		</StackPanel>
 		<!--Directory Options-->
 		<StackPanel Grid.Row="5" Classes="menu-bg-color">
-			<Grid RowDefinitions="Auto" ColumnDefinitions="*" Margin="0 10 0 10" HorizontalAlignment="Center" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
+			<Grid RowDefinitions="Auto" ColumnDefinitions="*" HorizontalAlignment="Center" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
 				<StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0">
 					<!--
 					<TextBlock Margin="5">Current Directory:</TextBlock>
@@ -211,7 +211,7 @@
 					<Button Margin="5" Command="{Binding OpenCurrentDirectoryWithExplorerCommand}" Classes="menu-btn">
 						Open Current Directory
 					</Button>
-					<Button Margin="5" Command="{Binding SaveDirectoryCommand}" CommandParameter="{Binding #FoldersAndImagesScrollViewer}" Classes="menu-btn-danger">
+					<Button Margin="5" Command="{Binding SaveDirectoryCommand}" CommandParameter="{Binding #FoldersAndImagesScrollViewer}" Classes="btn-danger">
 						Save Directory
 					</Button>
 				</StackPanel>
@@ -250,7 +250,7 @@
 					<Button Margin="5" HorizontalAlignment="Center"
 						Command="{Binding MoveSelectedImagesToTrashCommand}"
 						CommandParameter="{Binding #ImagesItemsControl}"
-						Classes="menu-btn-danger">
+						Classes="btn-danger">
 						Trash Selected
 					</Button>
 				</StackPanel>
@@ -300,17 +300,17 @@
 								<Grid RowDefinitions="Auto" ColumnDefinitions="*,*,*,*" MaxWidth="600" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
 									<Button Grid.Row="0" Grid.Column="0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="2" IsEnabled="{Binding !IsRoot}"
 											Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).BackFolderCommand}"
-											CommandParameter="{Binding}">
+											CommandParameter="{Binding}" Classes="main-btn">
 										Back
 									</Button>
 									<Button Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="2" IsEnabled="{Binding !ShowImportImagesButton}"
 											Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).NextFolderCommand}"
-											CommandParameter="{Binding}">
+											CommandParameter="{Binding}" Classes="main-btn">
 										Open
 									</Button>
 									<Button Grid.Row="0" Grid.Column="2" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="2" IsEnabled="{Binding ShowImportImagesButton}"
 										Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).ImportImagesCommand}"
-										CommandParameter="{Binding}">
+										CommandParameter="{Binding}" Classes="main-btn">
 										Import Images
 									</Button>
 									<v:PickFolderCoverImageView Grid.Row="0" Grid.Column="3" DataContext="{Binding #Root.((vm:MainWindowViewModel)DataContext).PickCoverImage}"/>
@@ -318,7 +318,7 @@
 								<Grid RowDefinitions="Auto" ColumnDefinitions="*" MaxWidth="600" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
 									<Button Grid.Row="0" Grid.Column="0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="2"
 											Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).CopyCoverImageToContainingFolderCommand}"
-											CommandParameter="{Binding}">
+											CommandParameter="{Binding}" Classes="main-btn">
 										Copy Cover Image To Containing Folder
 									</Button>
 								</Grid>
@@ -326,19 +326,19 @@
 									<v:PickMoveToFolderView Grid.Row="0" Grid.Column="0" DataContext="{Binding #Root.((vm:MainWindowViewModel)DataContext).PickMoveToFolder}" />
 									<Button Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="2"
 											Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).SaveFolderAsFavoriteCommand}"
-											CommandParameter="{Binding}">
+											CommandParameter="{Binding}" Classes="main-btn">
 										Favorite
 									</Button>
 									<Button Grid.Row="0" Grid.Column="2" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="2" IsEnabled="{Binding !IsRoot}"
 											Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).MoveFolderToTrashCommand}"
-											CommandParameter="{Binding}">
+											CommandParameter="{Binding}" Classes="btn-danger">
 										Trash
 									</Button>
 								</Grid>
 								<Grid RowDefinitions="Auto" ColumnDefinitions="*,*" MaxWidth="600" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
 									<Button Grid.Row="0" Grid.Column="0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="2" IsVisible="{Binding AreImagesImported}"
 											Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).ScanFolderImagesForMetaDataCommand}"
-											CommandParameter="{Binding}">
+											CommandParameter="{Binding}" Classes="main-btn">
 										Scan Images For Metadata
 									</Button>
 									<TextBlock Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="2" IsVisible="{Binding FolderContentMetaDataScanned}">
@@ -349,13 +349,13 @@
 									<TextBox Grid.Row="0" Grid.Column="0" Watermark="Add Description" Height="100" AcceptsReturn="True" TextWrapping="Wrap" Margin="5" MaxLength="3000" Text="{Binding FolderDescription}" />
 									<Button Grid.Row="0" Grid.Column="1" Height="100" Padding="8,40,8,6" Width="100" HorizontalContentAlignment="Center"
 											Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).AddFolderDescriptionCommand}"
-											CommandParameter="{Binding}">
+											CommandParameter="{Binding}" Classes="main-btn">
 										Submit
 									</Button>
 									<TextBox Grid.Row="1" Grid.Column="0" Margin="5" MaxLength="2000" Text="{Binding FolderTags}" />
 									<Button Grid.Row="1" Grid.Column="1" Width="100" HorizontalContentAlignment="Center"
 											Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).EditFolderTagsCommand}"
-											CommandParameter="{Binding}">
+											CommandParameter="{Binding}" Classes="btn-danger">
 										Remove Tag
 									</Button>
 									<AutoCompleteBox Grid.Row="2" Grid.Column="0" MaxLength="100" Margin="5" Watermark="Add A Tag" 
@@ -365,13 +365,13 @@
 													 ValueMemberBinding="{Binding TagName}"/>
 									<Button Grid.Row="2" Grid.Column="1" Width="100" HorizontalContentAlignment="Center"
 											Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).AddFolderTagsCommand}"
-											CommandParameter="{Binding}">
+											CommandParameter="{Binding}" Classes="main-btn">
 										Submit
 									</Button>
 									<NumericUpDown Grid.Row="3" Grid.Column="0" Maximum="10" Minimum="0" Margin="5" Value="{Binding FolderRating}"  />
 									<Button Grid.Row="3" Grid.Column="1" Width="100" HorizontalContentAlignment="Center"
 											Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).AddFolderRatingCommand}"
-											CommandParameter="{Binding}">
+											CommandParameter="{Binding}" Classes="main-btn">
 										Submit
 									</Button>
 								</Grid>
@@ -392,17 +392,17 @@
 								<Grid RowDefinitions="Auto" ColumnDefinitions="*,*,*,Auto" MaxWidth="600" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
 									<Button Grid.Row="0" Grid.Column="0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="2"
 									Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).BackFolderFromImageCommand}"
-									CommandParameter="{Binding}">
+									CommandParameter="{Binding}" Classes="main-btn">
 										Back
 									</Button>
 									<Button Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="2"
 											Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).OpenImageInExternalViewerCommand}"
-											CommandParameter="{Binding}">
+											CommandParameter="{Binding}" Classes="main-btn">
 										Open
 									</Button>
 									<Button Grid.Row="0" Grid.Column="2" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="2"
 											Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).MoveImageToTrashCommand}"
-											CommandParameter="{Binding}">
+											CommandParameter="{Binding}" Classes="btn-danger">
 										Trash
 									</Button>
 									<CheckBox Grid.Row="0" Grid.Column="3" IsChecked="{Binding IsSelected}"></CheckBox>
@@ -412,7 +412,7 @@
 									<TextBox Grid.Row="0" Grid.Column="0" Margin="5" MaxLength="2000" Text="{Binding ImageTags}"/>
 									<Button Grid.Row="0" Grid.Column="1" Width="100" HorizontalContentAlignment="Center"
 											Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).EditImageTagsCommand}"
-											CommandParameter="{Binding}">
+											CommandParameter="{Binding}" Classes="btn-danger">
 										Remove Tag
 									</Button>
 									<AutoCompleteBox Grid.Row="1" Grid.Column="0" MaxLength="100" Margin="5" Watermark="Add A Tag" 
@@ -422,7 +422,7 @@
 													 ValueMemberBinding="{Binding TagName}" />
 									<Button Grid.Row="1" Grid.Column="1" Width="100" HorizontalContentAlignment="Center"
 											Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).AddImageTagsCommand}"
-											CommandParameter="{Binding}">
+											CommandParameter="{Binding}" Classes="main-btn">
 										Submit
 									</Button>
 								</Grid>
@@ -439,7 +439,7 @@
 									</ListBox>
 									<Button Grid.Row="0" Grid.Column="2" Width="100" HorizontalContentAlignment="Center" IsEnabled="{Binding ShowAddMultipleImageTags}"
 											Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).AddMultipleImageTagsCommand}"
-											CommandParameter="{Binding #SelectedTags}">
+											CommandParameter="{Binding #SelectedTags}" Classes="main-btn">
 										Submit
 									</Button>
 								</Grid>
@@ -447,7 +447,7 @@
 									<NumericUpDown Grid.Row="0" Grid.Column="0" Maximum="5" Minimum="0" Margin="5" Value="{Binding ImageRating}"/>
 									<Button Grid.Row="0" Grid.Column="1" Width="100" HorizontalContentAlignment="Center"
 											Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).AddImageRatingCommand}"
-											CommandParameter="{Binding}">
+											CommandParameter="{Binding}" Classes="main-btn">
 										Submit
 									</Button>
 								</Grid>
