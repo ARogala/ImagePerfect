@@ -242,6 +242,9 @@ namespace ImagePerfect.ViewModels
             PickImageWidthCommand = ReactiveCommand.Create(async (string size) => {
                 await PickImageWidth(size);
             });
+            SelectImageWidthCommand = ReactiveCommand.Create(async (decimal size) => { 
+                await SelectImageWidth(size);
+            });
             PickFolderPageSizeCommand = ReactiveCommand.Create(async (string size) => {
                 await PickFolderPageSize(size);
             });
@@ -573,6 +576,8 @@ namespace ImagePerfect.ViewModels
         public ReactiveCommand<Unit, Task> LoadCurrentDirectoryCommand { get; }
 
         public ReactiveCommand<string, Task> PickImageWidthCommand { get; }
+        
+        public ReactiveCommand<decimal, Task> SelectImageWidthCommand { get; }
 
         public ReactiveCommand<string, Task> PickFolderPageSizeCommand { get; }
 
@@ -730,8 +735,14 @@ namespace ImagePerfect.ViewModels
             await RefreshFolders();
             await RefreshImages(CurrentDirectory);
         }
+
+        private async Task SelectImageWidth(decimal size)
+        {
+            MaxImageWidth = (int)size;
+            await UpdateSettings();
+        }
         private async Task PickImageWidth(string size)
-        {           
+        {
             switch (size)
             {
                 case "Small":
