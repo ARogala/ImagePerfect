@@ -9,7 +9,7 @@
 	<Button HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="2" 
 			Command="{Binding SelectMoveToFolderCommand}"
 			CommandParameter="{Binding $parent[StackPanel].DataContext}"
-			IsEnabled="{Binding !$parent[StackPanel].((vm:FolderViewModel)DataContext).IsRoot}">
+			IsEnabled="{Binding !$parent[StackPanel].((vm:FolderViewModel)DataContext).IsRoot}" Classes="main-btn">
 		Move Folder
 	</Button>
 </UserControl>

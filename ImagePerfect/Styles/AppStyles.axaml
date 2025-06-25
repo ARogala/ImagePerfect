@@ -25,10 +25,19 @@
 	<Style Selector="Button.menu-btn:pointerover /template/ ContentPresenter#PART_ContentPresenter">
 		<Setter Property="Background" Value="#03346E" />
 	</Style>
-	<Style Selector="Button.menu-btn-danger">
+	
+	<Style Selector="Button.btn-danger">
 		<Setter Property="Background" Value="#3D0000" />
 	</Style>
-	<Style Selector="Button.menu-btn-danger:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+	<Style Selector="Button.btn-danger:pointerover /template/ ContentPresenter#PART_ContentPresenter">
 		<Setter Property="Background" Value="#950101" />
 	</Style>
+
+	<Style Selector="Button.main-btn">
+		<Setter Property="Background" Value="#021526" />
+	</Style>
+	<Style Selector="Button.main-btn:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+		<Setter Property="Background" Value="#03346E" />
+	</Style>
+	
 </Styles>
