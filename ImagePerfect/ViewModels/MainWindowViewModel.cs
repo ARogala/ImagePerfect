@@ -31,7 +31,8 @@ namespace ImagePerfect.ViewModels
         private readonly ImageMethods _imageMethods;
         private readonly SettingsMethods _settingsMethods;
         private bool _showLoading;
-        private bool _showFilters = false;
+        private bool _showFolderFilters = false;
+        private bool _showImageFilters = false;
         private bool _showSettings = false;
         private bool _showManageImages = false;
         private bool _showCreateNewFolder = false;
@@ -176,8 +177,8 @@ namespace ImagePerfect.ViewModels
             ToggleManageImagesCommand = ReactiveCommand.Create(() => {
                 ToggleManageImages();
             });
-            ToggleFiltersCommand = ReactiveCommand.Create(() => {
-                ToggleFilters();
+            ToggleFiltersCommand = ReactiveCommand.Create((string showFilter) => {
+                ToggleFilters(showFilter);
             });
             ToggleCreateNewFolderCommand = ReactiveCommand.Create(() => {
                 ToggleCreateNewFolder();
@@ -334,10 +335,15 @@ namespace ImagePerfect.ViewModels
             get => _showSettings;
             set => this.RaiseAndSetIfChanged(ref _showSettings, value);  
         }
-        public bool ShowFilters
+        public bool ShowFolderFilters
         {
-            get => _showFilters;
-            set => this.RaiseAndSetIfChanged(ref _showFilters, value);  
+            get => _showFolderFilters;
+            set => this.RaiseAndSetIfChanged(ref _showFolderFilters, value);  
+        }
+        public bool ShowImageFilters
+        {
+            get => _showImageFilters;
+            set => this.RaiseAndSetIfChanged(ref _showImageFilters, value);
         }
         public int MaxCurrentPage
         {
@@ -545,7 +551,7 @@ namespace ImagePerfect.ViewModels
 
         public ReactiveCommand<Unit, Unit> ToggleSettingsCommand { get; }
 
-        public ReactiveCommand<Unit, Unit> ToggleFiltersCommand { get; }
+        public ReactiveCommand<string, Unit> ToggleFiltersCommand { get; }
 
         public ReactiveCommand<Unit, Unit> ToggleManageImagesCommand { get; }
 
@@ -826,16 +832,32 @@ namespace ImagePerfect.ViewModels
                 ShowSettings = true;
             }
         }
-        private void ToggleFilters()
+        private void ToggleFilters(string showFilter)
         {
-            if (ShowFilters)
+            Debug.WriteLine(showFilter);
+            if(showFilter == "FolderFilters")
             {
-                ShowFilters = false;
+                if (ShowFolderFilters)
+                {
+                    ShowFolderFilters = false;
+                }
+                else
+                {
+                    ShowFolderFilters = true;
+                }
             }
-            else
+            if(showFilter == "ImageFilters")
             {
-                ShowFilters = true;
+                if (ShowImageFilters)
+                {
+                    ShowImageFilters = false;
+                }
+                else
+                {
+                    ShowImageFilters = true;
+                }
             }
+            
         }
 
         private void ToggleCreateNewFolder()
