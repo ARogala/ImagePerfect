@@ -253,6 +253,21 @@ CREATE TABLE `folder_saved_favorites` (
 	CONSTRAINT `folderid_uq` UNIQUE (`FolderId`)
 ) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+-- Saved Directory Table
+CREATE TABLE `saved_directory` (
+	`SavedDirectoryId` enum('1') NOT NULL,
+	`SavedDirectory` Varchar(2000) NOT NULL,
+	`SavedFolderPage` int unsigned NOT NULL,
+	`SavedTotalFolderPages` int unsigned NOT NULL,
+	`SavedImagePage` int unsigned NOT NULL,
+	`SavedTotalImagePages` int unsigned NOT NULL,
+	`XVector` double NOT NULL,
+	`YVector` double NOT NULL,
+	PRIMARY KEY (`SavedDirectoryId`)
+);
+
+INSERT INTO saved_directory (SavedDirectory, SavedFolderPage, SavedTotalFolderPages, SavedImagePage, SavedTotalImagePages, XVector, YVector) VALUES ("",1,1,1,1,0,0);
+
 -- Enable local file import
 SET PERSIST local_infile = 1;
 
