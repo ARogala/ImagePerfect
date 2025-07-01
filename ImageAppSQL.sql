@@ -106,6 +106,20 @@ CREATE TABLE `folder_saved_favorites` (
 	CONSTRAINT `folderid_uq` UNIQUE (`FolderId`)
 );
 
+CREATE TABLE `saved_directory` (
+	`SavedDirectoryId` enum('1') NOT NULL,
+	`SavedDirectory` Varchar(2000) NOT NULL,
+	`SavedFolderPage` int unsigned NOT NULL,
+	`SavedTotalFolderPages` int unsigned NOT NULL,
+	`SavedImagePage` int unsigned NOT NULL,
+	`SavedTotalImagePages` int unsigned NOT NULL,
+	`XVector` double NOT NULL,
+	`YVector` double NOT NULL,
+	PRIMARY KEY (`SavedDirectoryId`)
+);
+
+INSERT INTO saved_directory (SavedDirectory, SavedFolderPage, SavedTotalFolderPages, SavedImagePage, SavedTotalImagePages, XVector, YVector) VALUES ("",1,1,1,1,0,0);
+
 /*get all tags for image*/
 SELECT * FROM images 
 JOIN image_tags_join ON image_tags_join.ImageId = images.ImageId

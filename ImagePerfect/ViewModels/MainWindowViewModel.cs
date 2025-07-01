@@ -30,6 +30,7 @@ namespace ImagePerfect.ViewModels
         private readonly ImageCsvMethods _imageCsvMethods;
         private readonly ImageMethods _imageMethods;
         private readonly SettingsMethods _settingsMethods;
+        private readonly SaveDirectoryMethods _saveDirectoryMethods;
         private bool _showLoading;
         private bool _showFolderFilters = false;
         private bool _showImageFilters = false;
@@ -103,6 +104,7 @@ namespace ImagePerfect.ViewModels
             _imageCsvMethods = new ImageCsvMethods(_unitOfWork);
             _imageMethods = new ImageMethods(_unitOfWork);
             _settingsMethods = new SettingsMethods(_unitOfWork);
+            _saveDirectoryMethods = new SaveDirectoryMethods(_unitOfWork);
             _showLoading = false;
 
             NextFolderCommand = ReactiveCommand.Create((FolderViewModel currentFolder) => {
@@ -252,8 +254,8 @@ namespace ImagePerfect.ViewModels
             PickImagePageSizeCommand = ReactiveCommand.Create(async (string size) => {
                 await PickImagePageSize(size);
             });
-            SaveDirectoryCommand = ReactiveCommand.Create((ScrollViewer scrollViewer) => {
-                SaveDirectory(scrollViewer);
+            SaveDirectoryCommand = ReactiveCommand.Create(async (ScrollViewer scrollViewer) => {
+                await SaveDirectory(scrollViewer);
             });
             LoadSavedDirectoryCommand = ReactiveCommand.Create(async (ScrollViewer scrollViewer) => {
                 await LoadSavedDirectory(scrollViewer);
@@ -589,7 +591,7 @@ namespace ImagePerfect.ViewModels
 
         public ReactiveCommand<string, Task> PickImagePageSizeCommand { get; }
 
-        public ReactiveCommand<ScrollViewer, Unit> SaveDirectoryCommand { get; }
+        public ReactiveCommand<ScrollViewer, Task> SaveDirectoryCommand { get; }
 
         public ReactiveCommand<ScrollViewer, Task> LoadSavedDirectoryCommand { get; }
 
@@ -617,7 +619,55 @@ namespace ImagePerfect.ViewModels
 
         public ReactiveCommand<Unit, Unit> ExitAppCommand { get; }
 
+        private async void Initialize()
+        {
+            await GetRootFolder();
+            await GetTagsList();
+            await GetSettings();
 
+            SaveDirectory saveDirectory = await _saveDirectoryMethods.GetSavedDirectory();
+            if (saveDirectory.SavedDirectory != "") 
+            {
+                //update variables
+                SavedDirectory = saveDirectory.SavedDirectory;
+                SavedFolderPage = saveDirectory.SavedFolderPage;
+                SavedTotalFolderPages = saveDirectory.SavedTotalFolderPages;
+                SavedImagePage = saveDirectory.SavedImagePage;
+                SavedTotalImagePages = saveDirectory.SavedTotalImagePages;
+                SavedOffsetVector = new Vector(saveDirectory.XVector, saveDirectory.YVector);
+            }
+            else
+            {
+                //initially set SavedDirectory to CurrentDirectory so method wont fail if btn clicked before saving a directory
+                SavedDirectory = CurrentDirectory;
+            }
+            
+        }
+
+        private async Task GetSettings()
+        {
+            Settings settings = await _settingsMethods.GetSettings();
+            MaxImageWidth = settings.MaxImageWidth;
+            FolderPageSize = settings.FolderPageSize;
+            ImagePageSize = settings.ImagePageSize;
+        }
+        private async Task GetRootFolder()
+        {
+            Folder? rootFolder = await _folderMethods.GetRootFolder();
+            if (rootFolder != null)
+            {
+                FolderViewModel rootFolderVm = await FolderMapper.GetFolderVm(rootFolder);
+                LibraryFolders.Add(rootFolderVm);
+                RootFolderLocation = PathHelper.RemoveOneFolderFromPath(rootFolder.FolderPath);
+                CurrentDirectory = RootFolderLocation;
+            }
+        }
+
+        //should technically have its own repo but only plan on having only this one method just keeping it in images repo.
+        private async Task GetTagsList()
+        {
+            TagsList = await _imageMethods.GetTagsList();
+        }
         private void ExitApp()
         {
             //Application.Current.ApplicationLifetime;
@@ -644,14 +694,30 @@ namespace ImagePerfect.ViewModels
                 return;
             }
         }
-        private void SaveDirectory(ScrollViewer scrollViewer)
+        private async Task SaveDirectory(ScrollViewer scrollViewer)
         {
+            //update variables
             SavedDirectory = CurrentDirectory;
             SavedFolderPage = CurrentFolderPage;
             SavedTotalFolderPages = TotalFolderPages;
             SavedImagePage = CurrentImagePage;
             SavedTotalImagePages = TotalImagePages;
-            SavedOffsetVector = scrollViewer.Offset;
+            double XVector = scrollViewer.Offset.X;
+            double YVector = scrollViewer.Offset.Y;
+            SavedOffsetVector = new Vector(XVector, YVector);
+            //persist to database
+            SaveDirectory saveDirectory = new()
+            {
+                SavedDirectoryId = 1,
+                SavedDirectory = CurrentDirectory,
+                SavedFolderPage = CurrentFolderPage,
+                SavedTotalFolderPages = TotalFolderPages,
+                SavedImagePage = CurrentImagePage,
+                SavedTotalImagePages = TotalImagePages,
+                XVector = scrollViewer.Offset.X,
+                YVector = scrollViewer.Offset.Y
+            };
+            await _saveDirectoryMethods.UpdateSaveDirectory(saveDirectory);
         }
 
         private async Task LoadSavedDirectory(ScrollViewer scrollViewer)
@@ -1269,40 +1335,7 @@ namespace ImagePerfect.ViewModels
             }
             ShowLoading = false;
         }
-        private async void Initialize()
-        {
-            await GetRootFolder();
-            await GetTagsList();
-            await GetSettings();
-            //initially set SavedDirectory to CurrentDirectory so method wont fail if btn clicked before saving a directory
-            SavedDirectory = CurrentDirectory;
-        }
-
-        private async Task GetSettings()
-        {
-            Settings settings = await _settingsMethods.GetSettings();
-            MaxImageWidth = settings.MaxImageWidth;
-            FolderPageSize = settings.FolderPageSize;
-            ImagePageSize = settings.ImagePageSize;
-        }
-        private async Task GetRootFolder()
-        {
-            Folder? rootFolder = await _folderMethods.GetRootFolder();
-            if (rootFolder != null) 
-            {
-                FolderViewModel rootFolderVm = await FolderMapper.GetFolderVm(rootFolder);
-                LibraryFolders.Add(rootFolderVm);
-                RootFolderLocation = PathHelper.RemoveOneFolderFromPath(rootFolder.FolderPath);
-                CurrentDirectory = RootFolderLocation;
-            }
-        }
-
-        //should technically have its own repo but only plan on having only this one method just keeping it in images repo.
-        private async Task GetTagsList()
-        {
-            TagsList = await _imageMethods.GetTagsList();
-        }
-
+        
         private async Task ImportImages(FolderViewModel imageFolder)
         {
             string newPath = string.Empty;
