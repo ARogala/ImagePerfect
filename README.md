@@ -94,8 +94,9 @@ I created Image Perfect both as a way to learn desktop application development a
 		- Rename folders and images
 		- Re-import images in a folder (so you can add images to a folder from the file system then re-scan)
 		
-	+ #### File System Issue/Bug
+	+ #### File System Issue/Bug/Limitations
 		- Known issue: folders imported containing only ZIP files cannot be opened
+			+ To fix delete the folder in app, unzip the files and then re-import it.
 		- On Ubuntu folders imported with the same name but different case will show all folders within each folder in both folders. 
 
 
