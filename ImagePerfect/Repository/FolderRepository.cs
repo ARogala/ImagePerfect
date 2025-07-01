@@ -345,12 +345,16 @@ namespace ImagePerfect.Repository
             string sql3 = @"ALTER TABLE images AUTO_INCREMENT = 1";
             string sql4 = @"DELETE FROM tags WHERE TagId >= 1";
             string sql5 = @"ALTER TABLE tags AUTO_INCREMENT = 1";
+            string sql6 = @"DELETE FROM folder_saved_favorites WHERE SavedId >=1";
+            string sql7 = @"UPDATE saved_directory SET SavedDirectory = '', SavedFolderPage=1, SavedTotalFolderPages=1, SavedImagePage=1, SavedTotalImagePages=1, XVector=0, YVector=0 WHERE SavedDirectoryId=1";
 
             rowsEffected = await _connection.ExecuteAsync(sql1, transaction: txn);
             await _connection.ExecuteAsync(sql2, transaction: txn);
             await _connection.ExecuteAsync(sql3, transaction: txn);
             await _connection.ExecuteAsync(sql4, transaction: txn);
             await _connection.ExecuteAsync(sql5, transaction: txn);
+            await _connection.ExecuteAsync(sql6, transaction: txn);
+            await _connection.ExecuteAsync(sql7, transaction: txn);
 
             await txn.CommitAsync();
             await _connection.CloseAsync();
