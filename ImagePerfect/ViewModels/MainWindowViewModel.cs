@@ -32,7 +32,6 @@ namespace ImagePerfect.ViewModels
         private readonly SettingsMethods _settingsMethods;
         private readonly SaveDirectoryMethods _saveDirectoryMethods;
         private bool _showLoading;
-        private bool _showManageImages = false;
         private int _totalImages = 0;
         private string _currentDirectory = string.Empty;
         private string _savedDirectory = string.Empty;
@@ -300,11 +299,6 @@ namespace ImagePerfect.ViewModels
         {
             get => _totalImages;
             set => this.RaiseAndSetIfChanged(ref _totalImages, value);  
-        }
-        public bool ShowManageImages
-        {
-            get => _showManageImages;
-            set => this.RaiseAndSetIfChanged(ref _showManageImages, value);
         }
         public int MaxCurrentPage
         {
@@ -813,14 +807,7 @@ namespace ImagePerfect.ViewModels
         }
         private void ToggleManageImages()
         {
-            if (ShowManageImages)
-            {
-                ShowManageImages = false;
-            }
-            else
-            {
-                ShowManageImages = true;
-            }
+            ToggleUI.ToggleManageImages();
         }
         private void ToggleSettings()
         {
