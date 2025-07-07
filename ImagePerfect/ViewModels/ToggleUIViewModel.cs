@@ -15,6 +15,7 @@ namespace ImagePerfect.ViewModels
         private bool _showSettings = false;
         private bool _showTotalImages = false;
         private bool _showCreateNewFolder = false;
+        private bool _showManageImages = false;
         public bool ShowAllTags
         {
             get => _showAllTags;
@@ -50,91 +51,49 @@ namespace ImagePerfect.ViewModels
             get => _showCreateNewFolder;
             set => this.RaiseAndSetIfChanged(ref _showCreateNewFolder, value);
         }
+        public bool ShowManageImages
+        {
+            get => _showManageImages;
+            set => this.RaiseAndSetIfChanged(ref _showManageImages, value);
+        }
 
         public void ToggleListAllTags()
         {
-            if (ShowAllTags)
-            {
-                ShowAllTags = false;
-            }
-            else
-            {
-                ShowAllTags = true;
-            }
+            ShowAllTags = !ShowAllTags;
         }
 
         public void ToggleImportAndScan()
         {
-            if (ShowImportAndScan)
-            {
-                ShowImportAndScan = false;
-            }
-            else
-            {
-                ShowImportAndScan = true;
-            }
+            ShowImportAndScan = !ShowImportAndScan;
         }
 
         public void ToggleFilters(string showFilter)
         {
             if (showFilter == "FolderFilters")
             {
-                if (ShowFolderFilters)
-                {
-                    ShowFolderFilters = false;
-                }
-                else
-                {
-                    ShowFolderFilters = true;
-                }
+                ShowFolderFilters = !ShowFolderFilters;
             }
             if (showFilter == "ImageFilters")
             {
-                if (ShowImageFilters)
-                {
-                    ShowImageFilters = false;
-                }
-                else
-                {
-                    ShowImageFilters = true;
-                }
+                ShowImageFilters = !ShowImageFilters;
             }
         }
         public void ToggleSettings()
         {
-            if (ShowSettings)
-            {
-                ShowSettings = false;
-            }
-            else
-            {
-                ShowSettings = true;
-            }
+            ShowSettings = !ShowSettings;
         }
 
         public void ToggleGetTotalImages()
         {
-            if (ShowTotalImages)
-            {
-                ShowTotalImages = false;
-            }
-            else
-            {
-                ShowTotalImages = true;
-            }
+            ShowTotalImages = !ShowTotalImages;
         }
         public void ToggleCreateNewFolder()
         {
-            if (ShowCreateNewFolder)
-            {
-                ShowCreateNewFolder = false;
-            }
-            else
-            {
-                ShowCreateNewFolder = true;
-            }
+            ShowCreateNewFolder = !ShowCreateNewFolder;
         }
-
-
+        public void ToggleManageImages()
+        {
+            ShowManageImages = !ShowManageImages;
+        }
     }
 }

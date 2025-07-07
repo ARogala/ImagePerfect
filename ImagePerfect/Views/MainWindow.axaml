@@ -258,7 +258,7 @@
 			</Button>
 		</StackPanel>
 		<!--Manage Images-->
-		<StackPanel Grid.Row="8" IsVisible="{Binding ShowManageImages}" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}" Classes="menu-bg-color">
+		<StackPanel Grid.Row="8" IsVisible="{Binding ToggleUI.ShowManageImages}" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}" Classes="menu-bg-color">
 			<Grid RowDefinitions="Auto" ColumnDefinitions="*" HorizontalAlignment="Center">
 				<StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0">
 					<Button Margin="5" HorizontalAlignment="Center"
