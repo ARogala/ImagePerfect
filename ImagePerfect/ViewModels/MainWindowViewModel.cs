@@ -34,7 +34,6 @@ namespace ImagePerfect.ViewModels
         private bool _showLoading;
         private bool _showManageImages = false;
         private bool _showCreateNewFolder = false;
-        private bool _showTotalImages = false;
         private int _totalImages = 0;
         private string _currentDirectory = string.Empty;
         private string _savedDirectory = string.Empty;
@@ -303,12 +302,6 @@ namespace ImagePerfect.ViewModels
             get => _totalImages;
             set => this.RaiseAndSetIfChanged(ref _totalImages, value);  
         }
-        public bool ShowTotalImages
-        {
-            get => _showTotalImages;
-            set => this.RaiseAndSetIfChanged(ref _showTotalImages, value);
-        }
-
         public bool ShowManageImages
         {
             get => _showManageImages;
@@ -821,13 +814,9 @@ namespace ImagePerfect.ViewModels
         }
         private async void ToggleGetTotalImages()
         {
-            if (ShowTotalImages)
+            ToggleUI.ToggleGetTotalImages();
+            if(ToggleUI.ShowTotalImages == true)
             {
-                ShowTotalImages = false;
-            }
-            else
-            {
-                ShowTotalImages = true;
                 TotalImages = await _imageMethods.GetTotalImages();
             }
         }

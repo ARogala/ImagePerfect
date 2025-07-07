@@ -54,7 +54,7 @@
 			</ListBox>
 		</StackPanel>
 		<!--Show Total Images-->
-		<StackPanel Grid.Row="2" HorizontalAlignment="Stretch" IsVisible="{Binding ShowTotalImages}" Classes="menu-bg-color">
+		<StackPanel Grid.Row="2" HorizontalAlignment="Stretch" IsVisible="{Binding ToggleUI.ShowTotalImages}" Classes="menu-bg-color">
 			<Grid RowDefinitions="Auto" ColumnDefinitions="Auto,Auto" HorizontalAlignment="Center">
 				<TextBlock Grid.Row="0" Grid.Column="0" Margin="5">Total Images: </TextBlock>
 				<TextBlock Grid.Row="0" Grid.Column="1" Margin="5" Text="{Binding TotalImages,StringFormat='{}{0:0,0}'}"></TextBlock>
