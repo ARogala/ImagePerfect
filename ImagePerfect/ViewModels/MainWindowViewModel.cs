@@ -1274,67 +1274,70 @@ namespace ImagePerfect.ViewModels
             }
             ShowLoading = false;
         }
-        private async Task MapTagsToSingleImageUpdateObservable(ImageViewModel imageVm)
-        {
-            try
-            {
-                for (int i = 0; i < displayImages.Count; i++)
-                {
-                    //only map the one that is being updated
-                    if (displayImages[i].ImageId == imageVm.ImageId)
-                    {
-                        //need to map tags to image
-                        displayImages[i] = ImageMapper.MapTagsToImage(displayImages[i], displayImageTags);
-                        ImageViewModel imageViewModel = await ImageMapper.GetImageVm(displayImages[i]);
-                        Images[i] = imageViewModel;
-                        return;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Something went wrong click ok to reload current directory. {ex}", ButtonEnum.Ok);
-                await box.ShowAsync();
-                await LoadCurrentDirectory();
-            }
-        }
-        private async Task RefreshImageProps(ImageViewModel imageVm, string path = "", int folderId = 0)
-        {
-            ShowLoading = true;
-            switch (currentFilter)
-            {
-                case Filters.None:
-                    (List<Image> images, List<ImageTag> tags) imageResult;
-                    if (string.IsNullOrEmpty(path))
-                    {
-                        imageResult = await _imageMethods.GetAllImagesInFolder(folderId);
-                    }
-                    else
-                    {
-                        imageResult = await _imageMethods.GetAllImagesInFolder(path);
-                    }
-                    displayImages = imageResult.images;
-                    displayImageTags = imageResult.tags;
-                    displayImages = ImagePagination();
-                    await MapTagsToSingleImageUpdateObservable(imageVm);
-                    break;
-                case Filters.ImageRatingFilter:
-                    (List<Image> images, List<ImageTag> tags) imageRatingResult = await _imageMethods.GetAllImagesAtRating(selectedRatingForFilter, FilterInCurrentDirectory, CurrentDirectory);
-                    displayImages = imageRatingResult.images;
-                    displayImageTags = imageRatingResult.tags;
-                    displayImages = ImagePagination();
-                    await MapTagsToSingleImageUpdateObservable(imageVm);
-                    break;
-                case Filters.ImageTagFilter:
-                    (List<Image> images, List<ImageTag> tags) imageTagResult = await _imageMethods.GetAllImagesWithTag(tagForFilter, FilterInCurrentDirectory, CurrentDirectory);
-                    displayImages = imageTagResult.images;
-                    displayImageTags = imageTagResult.tags;
-                    displayImages = ImagePagination();
-                    await MapTagsToSingleImageUpdateObservable(imageVm);
-                    break;
-            }
-            ShowLoading = false;
-        }
+
+        //RefreshImageProps is not needed and was taking time in app -- comment out for now but should
+        //be able to completely remove
+        //private async Task MapTagsToSingleImageUpdateObservable(ImageViewModel imageVm)
+        //{
+        //    try
+        //    {
+        //        for (int i = 0; i < displayImages.Count; i++)
+        //        {
+        //            //only map the one that is being updated
+        //            if (displayImages[i].ImageId == imageVm.ImageId)
+        //            {
+        //                //need to map tags to image
+        //                displayImages[i] = ImageMapper.MapTagsToImage(displayImages[i], displayImageTags);
+        //                ImageViewModel imageViewModel = await ImageMapper.GetImageVm(displayImages[i]);
+        //                Images[i] = imageViewModel;
+        //                return;
+        //            }
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Something went wrong click ok to reload current directory. {ex}", ButtonEnum.Ok);
+        //        await box.ShowAsync();
+        //        await LoadCurrentDirectory();
+        //    }
+        //}
+        //private async Task RefreshImageProps(ImageViewModel imageVm, string path = "", int folderId = 0)
+        //{
+        //    ShowLoading = true;
+        //    switch (currentFilter)
+        //    {
+        //        case Filters.None:
+        //            (List<Image> images, List<ImageTag> tags) imageResult;
+        //            if (string.IsNullOrEmpty(path))
+        //            {
+        //                imageResult = await _imageMethods.GetAllImagesInFolder(folderId);
+        //            }
+        //            else
+        //            {
+        //                imageResult = await _imageMethods.GetAllImagesInFolder(path);
+        //            }
+        //            displayImages = imageResult.images;
+        //            displayImageTags = imageResult.tags;
+        //            displayImages = ImagePagination();
+        //            await MapTagsToSingleImageUpdateObservable(imageVm);
+        //            break;
+        //        case Filters.ImageRatingFilter:
+        //            (List<Image> images, List<ImageTag> tags) imageRatingResult = await _imageMethods.GetAllImagesAtRating(selectedRatingForFilter, FilterInCurrentDirectory, CurrentDirectory);
+        //            displayImages = imageRatingResult.images;
+        //            displayImageTags = imageRatingResult.tags;
+        //            displayImages = ImagePagination();
+        //            await MapTagsToSingleImageUpdateObservable(imageVm);
+        //            break;
+        //        case Filters.ImageTagFilter:
+        //            (List<Image> images, List<ImageTag> tags) imageTagResult = await _imageMethods.GetAllImagesWithTag(tagForFilter, FilterInCurrentDirectory, CurrentDirectory);
+        //            displayImages = imageTagResult.images;
+        //            displayImageTags = imageTagResult.tags;
+        //            displayImages = ImagePagination();
+        //            await MapTagsToSingleImageUpdateObservable(imageVm);
+        //            break;
+        //    }
+        //    ShowLoading = false;
+        //}
         
         private async Task ImportImages(FolderViewModel imageFolder)
         {
@@ -1653,7 +1656,8 @@ namespace ImagePerfect.ViewModels
                 //Update TagsList to show in UI AutoCompleteBox clear NewTag in box as well
                 await GetTagsList();
                 imageVm.NewTag = "";
-                await RefreshImageProps(imageVm, CurrentDirectory);   
+                //not needed -- comment out for now.
+                //await RefreshImageProps(imageVm, CurrentDirectory);   
             }
             else
             {
