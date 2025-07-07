@@ -33,7 +33,6 @@ namespace ImagePerfect.ViewModels
         private readonly SaveDirectoryMethods _saveDirectoryMethods;
         private bool _showLoading;
         private bool _showManageImages = false;
-        private bool _showCreateNewFolder = false;
         private int _totalImages = 0;
         private string _currentDirectory = string.Empty;
         private string _savedDirectory = string.Empty;
@@ -386,14 +385,6 @@ namespace ImagePerfect.ViewModels
             get => _showLoading;
             set => this.RaiseAndSetIfChanged(ref _showLoading, value);
         }
-
-        public bool ShowCreateNewFolder 
-        { 
-            get => _showCreateNewFolder;
-            set => this.RaiseAndSetIfChanged(ref _showCreateNewFolder, value);
-        }
-
-
         public bool IsNewFolderEnabled
         {
             get => _isNewFolderEnabled;
@@ -842,14 +833,7 @@ namespace ImagePerfect.ViewModels
 
         private void ToggleCreateNewFolder()
         {
-            if (ShowCreateNewFolder)
-            {
-                ShowCreateNewFolder = false;
-            }
-            else
-            {
-                ShowCreateNewFolder = true;
-            }
+            ToggleUI.ToggleCreateNewFolder();
         }
         private List<Image> ImagePagination()
         {
