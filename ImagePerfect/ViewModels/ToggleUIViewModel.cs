@@ -12,6 +12,7 @@ namespace ImagePerfect.ViewModels
         private bool _showFolderFilters = false;
         private bool _showImageFilters = false;
         private bool _showSettings = false;
+        private bool _showTotalImages = false;
         public bool ShowAllTags
         {
             get => _showAllTags;
@@ -36,6 +37,11 @@ namespace ImagePerfect.ViewModels
         {
             get => _showSettings;
             set => this.RaiseAndSetIfChanged(ref _showSettings, value);
+        }
+        public bool ShowTotalImages
+        {
+            get => _showTotalImages;
+            set => this.RaiseAndSetIfChanged(ref _showTotalImages, value);
         }
 
         public void ToggleListAllTags()
@@ -96,6 +102,18 @@ namespace ImagePerfect.ViewModels
             else
             {
                 ShowSettings = true;
+            }
+        }
+
+        public void ToggleGetTotalImages()
+        {
+            if (ShowTotalImages)
+            {
+                ShowTotalImages = false;
+            }
+            else
+            {
+                ShowTotalImages = true;
             }
         }
 
