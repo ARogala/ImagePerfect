@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using ReactiveUI;
 
+//sub-ViewModel has no VIEW it is just to help factor out MainWindowViewModel
 namespace ImagePerfect.ViewModels
 {
 	public class ToggleUIViewModel : ViewModelBase
@@ -13,6 +14,7 @@ namespace ImagePerfect.ViewModels
         private bool _showImageFilters = false;
         private bool _showSettings = false;
         private bool _showTotalImages = false;
+        private bool _showCreateNewFolder = false;
         public bool ShowAllTags
         {
             get => _showAllTags;
@@ -42,6 +44,11 @@ namespace ImagePerfect.ViewModels
         {
             get => _showTotalImages;
             set => this.RaiseAndSetIfChanged(ref _showTotalImages, value);
+        }
+        public bool ShowCreateNewFolder
+        {
+            get => _showCreateNewFolder;
+            set => this.RaiseAndSetIfChanged(ref _showCreateNewFolder, value);
         }
 
         public void ToggleListAllTags()
@@ -114,6 +121,17 @@ namespace ImagePerfect.ViewModels
             else
             {
                 ShowTotalImages = true;
+            }
+        }
+        public void ToggleCreateNewFolder()
+        {
+            if (ShowCreateNewFolder)
+            {
+                ShowCreateNewFolder = false;
+            }
+            else
+            {
+                ShowCreateNewFolder = true;
             }
         }
 
