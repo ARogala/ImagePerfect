@@ -43,7 +43,8 @@
 				</MenuItem>
 			</Menu>
 		</StackPanel>
-		<StackPanel Grid.Row="1" IsVisible="{Binding ShowAllTags}" Classes="menu-bg-color">
+		<!--Show All Tags-->
+		<StackPanel Grid.Row="1" IsVisible="{Binding ToggleUI.ShowAllTags}" Classes="menu-bg-color">
 			<ListBox Grid.Row="3" SelectionMode="Multiple" ItemsSource="{Binding TagsList}" Height="200" Width="500">
 				<ListBox.ItemTemplate>
 					<DataTemplate>

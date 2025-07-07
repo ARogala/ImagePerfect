@@ -39,7 +39,6 @@ namespace ImagePerfect.ViewModels
         private bool _showCreateNewFolder = false;
         private bool _showTotalImages = false;
         private bool _showImportAndScan = false;
-        private bool _showAllTags = false;
         private int _totalImages = 0;
         private string _currentDirectory = string.Empty;
         private string _savedDirectory = string.Empty;
@@ -314,12 +313,6 @@ namespace ImagePerfect.ViewModels
             set => this.RaiseAndSetIfChanged(ref _showTotalImages, value);
         }
 
-        public bool ShowAllTags
-        {
-            get => _showAllTags;
-            set => this.RaiseAndSetIfChanged(ref _showAllTags, value);
-        }
-
         public bool ShowImportAndScan
         {
             get => _showImportAndScan;
@@ -491,6 +484,8 @@ namespace ImagePerfect.ViewModels
             get => _rootFolderLocation;
             set => _rootFolderLocation = value;
         }
+
+        public ToggleUIViewModel ToggleUI { get; } = new ToggleUIViewModel();
 
         //pass in this MainWindowViewModel so we can refresh UI
         public PickRootFolderViewModel PickRootFolder { get => new PickRootFolderViewModel(_unitOfWork, this); }
@@ -844,14 +839,7 @@ namespace ImagePerfect.ViewModels
 
         private void ToggleListAllTags()
         {
-            if (ShowAllTags)
-            {
-                ShowAllTags = false;
-            }
-            else
-            {
-                ShowAllTags = true;
-            }
+            ToggleUI.ToggleListAllTags();
         }
         private void ToggleImportAndScan()
         {
