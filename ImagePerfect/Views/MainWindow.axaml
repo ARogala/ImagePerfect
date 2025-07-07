@@ -61,7 +61,7 @@
 			</Grid>
 		</StackPanel>
 		<!--Folder Filters-->
-		<StackPanel Grid.Row="3" Orientation="Vertical" IsVisible="{Binding ShowFolderFilters}" Classes="menu-bg-color">
+		<StackPanel Grid.Row="3" Orientation="Vertical" IsVisible="{Binding ToggleUI.ShowFolderFilters}" Classes="menu-bg-color">
 			<Grid RowDefinitions="Auto, Auto" ColumnDefinitions="Auto, Auto, Auto, Auto" HorizontalAlignment="Center" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
 				<NumericUpDown Grid.Row="0" Grid.Column="0" Minimum="0" Value="1" Maximum="10" Width="200"
 							   Margin="5" ParsingNumberStyle="Integer" FormatString="0"
@@ -113,7 +113,7 @@
 			</Grid>
 		</StackPanel>
 		<!--Image Filters-->
-		<StackPanel Grid.Row="4" Orientation="Vertical" IsVisible="{Binding ShowImageFilters}" Classes="menu-bg-color">
+		<StackPanel Grid.Row="4" Orientation="Vertical" IsVisible="{Binding ToggleUI.ShowImageFilters}" Classes="menu-bg-color">
 			<Grid RowDefinitions="Auto" ColumnDefinitions="Auto, Auto, Auto, Auto" HorizontalAlignment="Center" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
 				<NumericUpDown Grid.Row="0" Grid.Column="0" Minimum="0" Value="1" Maximum="5" Width="200"
 							   Margin="5" ParsingNumberStyle="Integer" FormatString="0"
@@ -284,7 +284,7 @@
 			</Grid>
 		</StackPanel>
 		<!--Import and Scan Folders-->
-		<StackPanel Grid.Row="9" IsVisible="{Binding ShowImportAndScan}" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}" Classes="menu-bg-color">
+		<StackPanel Grid.Row="9" IsVisible="{Binding ToggleUI.ShowImportAndScan}" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}" Classes="menu-bg-color">
 			<Grid RowDefinitions="Auto" ColumnDefinitions="*" HorizontalAlignment="Center">
 				<StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0">
 					<Button Margin="5" HorizontalAlignment="Center"

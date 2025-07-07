@@ -32,13 +32,10 @@ namespace ImagePerfect.ViewModels
         private readonly SettingsMethods _settingsMethods;
         private readonly SaveDirectoryMethods _saveDirectoryMethods;
         private bool _showLoading;
-        private bool _showFolderFilters = false;
-        private bool _showImageFilters = false;
         private bool _showSettings = false;
         private bool _showManageImages = false;
         private bool _showCreateNewFolder = false;
         private bool _showTotalImages = false;
-        private bool _showImportAndScan = false;
         private int _totalImages = 0;
         private string _currentDirectory = string.Empty;
         private string _savedDirectory = string.Empty;
@@ -313,12 +310,6 @@ namespace ImagePerfect.ViewModels
             set => this.RaiseAndSetIfChanged(ref _showTotalImages, value);
         }
 
-        public bool ShowImportAndScan
-        {
-            get => _showImportAndScan;
-            set => this.RaiseAndSetIfChanged(ref _showImportAndScan, value);    
-        }
-
         public bool ShowManageImages
         {
             get => _showManageImages;
@@ -330,16 +321,7 @@ namespace ImagePerfect.ViewModels
             get => _showSettings;
             set => this.RaiseAndSetIfChanged(ref _showSettings, value);  
         }
-        public bool ShowFolderFilters
-        {
-            get => _showFolderFilters;
-            set => this.RaiseAndSetIfChanged(ref _showFolderFilters, value);  
-        }
-        public bool ShowImageFilters
-        {
-            get => _showImageFilters;
-            set => this.RaiseAndSetIfChanged(ref _showImageFilters, value);
-        }
+  
         public int MaxCurrentPage
         {
             get => _maxCurrentPage;
@@ -843,14 +825,7 @@ namespace ImagePerfect.ViewModels
         }
         private void ToggleImportAndScan()
         {
-            if (ShowImportAndScan) 
-            { 
-                ShowImportAndScan = false;
-            }
-            else
-            {
-                ShowImportAndScan = true;
-            }
+            ToggleUI.ToggleImportAndScan();
         }
         private async void ToggleGetTotalImages()
         {
@@ -888,30 +863,7 @@ namespace ImagePerfect.ViewModels
         }
         private void ToggleFilters(string showFilter)
         {
-            Debug.WriteLine(showFilter);
-            if(showFilter == "FolderFilters")
-            {
-                if (ShowFolderFilters)
-                {
-                    ShowFolderFilters = false;
-                }
-                else
-                {
-                    ShowFolderFilters = true;
-                }
-            }
-            if(showFilter == "ImageFilters")
-            {
-                if (ShowImageFilters)
-                {
-                    ShowImageFilters = false;
-                }
-                else
-                {
-                    ShowImageFilters = true;
-                }
-            }
-            
+            ToggleUI.ToggleFilters(showFilter);
         }
 
         private void ToggleCreateNewFolder()
