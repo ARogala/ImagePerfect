@@ -32,7 +32,6 @@ namespace ImagePerfect.ViewModels
         private readonly SettingsMethods _settingsMethods;
         private readonly SaveDirectoryMethods _saveDirectoryMethods;
         private bool _showLoading;
-        private bool _showSettings = false;
         private bool _showManageImages = false;
         private bool _showCreateNewFolder = false;
         private bool _showTotalImages = false;
@@ -315,13 +314,6 @@ namespace ImagePerfect.ViewModels
             get => _showManageImages;
             set => this.RaiseAndSetIfChanged(ref _showManageImages, value);
         }
-
-        public bool ShowSettings
-        {
-            get => _showSettings;
-            set => this.RaiseAndSetIfChanged(ref _showSettings, value);  
-        }
-  
         public int MaxCurrentPage
         {
             get => _maxCurrentPage;
@@ -852,14 +844,7 @@ namespace ImagePerfect.ViewModels
         }
         private void ToggleSettings()
         {
-            if (ShowSettings)
-            {
-                ShowSettings = false;
-            }
-            else
-            {
-                ShowSettings = true;
-            }
+            ToggleUI.ToggleSettings();
         }
         private void ToggleFilters(string showFilter)
         {
