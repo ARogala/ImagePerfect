@@ -279,8 +279,8 @@ namespace ImagePerfect.ViewModels
             SelectAllImagesCommand = ReactiveCommand.Create((ItemsControl imagesItemsControl) => {
                 SelectAllImages(imagesItemsControl);
             });
-            MoveSelectedImagesToNewFolderCommand = ReactiveCommand.Create(async (ItemsControl imagesItemsControl) => { 
-                await MoveSelectedImagesToNewFolder(imagesItemsControl);
+            MoveSelectedImagesToNewFolderCommand = ReactiveCommand.Create(async (ItemsControl imagesItemsControl) => {
+                await MoveImages.MoveSelectedImagesToNewFolder(imagesItemsControl);
             });
             ImportAllFoldersOnCurrentPageCommand = ReactiveCommand.Create(async (ItemsControl foldersItemsControl) => { 
                 await ImportAllFoldersOnCurrentPage(foldersItemsControl);
@@ -1638,108 +1638,6 @@ namespace ImagePerfect.ViewModels
                 var box = MessageBoxManager.GetMessageBoxStandard("Open Folder", "Sorry something went wrong.", ButtonEnum.Ok);
                 await box.ShowAsync();
                 return;
-            }
-        }
-
-        private async Task MoveSelectedImagesToNewFolder(ItemsControl imagesItemsControl)
-        {
-            List<ImageViewModel> allImages = imagesItemsControl.Items.OfType<ImageViewModel>().ToList();
-            List<ImageViewModel> imagesToMove = new List<ImageViewModel>();
-            Folder imagesCurrentFolder = await _folderMethods.GetFolderAtDirectory(allImages[0].ImageFolderPath);
-
-            if (SelectedImagesNewDirectory == null || SelectedImagesNewDirectory == "")
-            {
-                var box = MessageBoxManager.GetMessageBoxStandard("Move Images", "You need to select the move to folder first.", ButtonEnum.Ok);
-                await box.ShowAsync();
-                return;
-            }
-            //get folder at SelectedImagesNewDirectory
-            Folder imagesNewFolder = await _folderMethods.GetFolderAtDirectory(SelectedImagesNewDirectory);
-            if(imagesNewFolder.FolderPath == imagesCurrentFolder.FolderPath)
-            {
-                var box = MessageBoxManager.GetMessageBoxStandard("Move Images", "New folder path cannot be the same as the current folder path.", ButtonEnum.Ok);
-                await box.ShowAsync();
-                return;
-            }
-            //prevent a double import and only allow move to folders that are already imported
-            if(imagesNewFolder.HasFiles == true && imagesNewFolder.AreImagesImported == false)
-            {
-                var box = MessageBoxManager.GetMessageBoxStandard("Move Images", "The move to folder has to have its current images imported first.", ButtonEnum.Ok);
-                await box.ShowAsync();
-                return;
-            }
-           
-            foreach (ImageViewModel image in allImages) 
-            {
-                if (image.IsSelected && File.Exists(image.ImagePath))
-                {
-                    imagesToMove.Add(image);
-                }
-            }
-            if(imagesToMove.Count == 0)
-            {
-                var box = MessageBoxManager.GetMessageBoxStandard("Move Images", "You need to select images to move.", ButtonEnum.Ok);
-                await box.ShowAsync();
-                return;
-            }
-            var boxYesNo = MessageBoxManager.GetMessageBoxStandard("Move Images", $"Are you sure you want to move these images to {SelectedImagesNewDirectory}?", ButtonEnum.YesNo);
-            var boxResult = await boxYesNo.ShowAsync();
-            if (boxResult == ButtonResult.Yes)
-            {
-                ShowLoading = true;
-                //modify ImagePath, ImageFolderPath and FolderId for each image in imagesToMove 
-                List<ImageViewModel> imagesToMoveModifiedPaths = PathHelper.ModifyImagePathsForMoveImagesToNewFolder(imagesToMove, imagesNewFolder);
-                for (int i = 0; i < imagesToMoveModifiedPaths.Count; i++)
-                {
-                    if (File.Exists(imagesToMoveModifiedPaths[i].ImagePath))
-                    {
-                        var box = MessageBoxManager.GetMessageBoxStandard("Move Images", "One or more images in the destination has the same file name. Pick a different folder", ButtonEnum.Ok);
-                        await box.ShowAsync();
-                        ShowLoading = false;
-                        //reset SelectedImageNewDirectory
-                        SelectedImagesNewDirectory = string.Empty;
-                        return;
-                    }
-                }
-                //get image move sql
-                string imageMoveSql = SqlStringBuilder.BuildSqlForMoveImagesToNewFolder(imagesToMoveModifiedPaths);
-                //move images in db
-                bool success = await _imageMethods.MoveSelectedImageToNewFolder(imageMoveSql);
-                //move images on disk
-                if (success) 
-                {
-                    for (int i = 0; i < imagesToMoveModifiedPaths.Count; i++) 
-                    {
-                        File.Move(imagesToMove[i].ImagePath, imagesToMoveModifiedPaths[i].ImagePath);
-                    }
-                    //after adding new images to a folder make sure the user is alerted to rescann them for metadata 
-                    imagesNewFolder.FolderContentMetaDataScanned = false;
-                    await _folderMethods.UpdateFolder(imagesNewFolder);
-                    //if new folder did not have images before it does now so set to true
-                    if (imagesNewFolder.HasFiles == false)
-                    {
-                        imagesNewFolder.HasFiles = true;
-                        imagesNewFolder.AreImagesImported = true;
-                        await _folderMethods.UpdateFolder(imagesNewFolder);
-                    }
-                    //update imagesCurrentFolder HasFiles, AreImagesImported, and FolderContentMetaDataScanned
-                    //set all back to false if moved all images to new folder
-                    IEnumerable<string> folderFiles = Directory.EnumerateFiles(imagesCurrentFolder.FolderPath).Where(s => s.ToLower().EndsWith(".jpeg") || s.ToLower().EndsWith(".jpg") || s.ToLower().EndsWith(".png") || s.ToLower().EndsWith(".gif"));
-                    if (!folderFiles.Any())
-                    {
-                        imagesCurrentFolder.HasFiles = false;
-                        imagesCurrentFolder.AreImagesImported = false;
-                        imagesCurrentFolder.FolderContentMetaDataScanned = false;
-                        await _folderMethods.UpdateFolder(imagesCurrentFolder);
-                    }
-                    //reset SelectedImageNewDirectory
-                    SelectedImagesNewDirectory = string.Empty;
-                    //refresh UI
-                    await RefreshImages("", allImages[0].FolderId);
-                    await RefreshFolders(imagesCurrentFolder.FolderPath);
-                    ShowLoading = false;
-                }
-                ShowLoading = false;
             }
         }
 
