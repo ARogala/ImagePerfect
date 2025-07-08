@@ -8,6 +8,9 @@ using MsBox.Avalonia;
 using ReactiveUI;
 using ImagePerfect.Models;
 using ImagePerfect.Helpers;
+using Image = ImagePerfect.Models.Image;
+using Avalonia.Controls;
+using System.Linq;
 
 namespace ImagePerfect.ViewModels
 {
@@ -65,6 +68,66 @@ namespace ImagePerfect.ViewModels
                         await _mainWindowViewModel.RefreshImages("", imageVm.FolderId);
                         _mainWindowViewModel.ShowLoading = false;
                     }
+                }
+                _mainWindowViewModel.ShowLoading = false;
+            }
+        }
+
+        public async Task MoveSelectedImagesToTrash(ItemsControl imagesItemsControl)
+        {
+            List<ImageViewModel> allImages = imagesItemsControl.Items.OfType<ImageViewModel>().ToList();
+            List<ImageViewModel> imagesToDelete = new List<ImageViewModel>();
+            foreach (ImageViewModel image in allImages)
+            {
+                if (image.IsSelected && File.Exists(image.ImagePath))
+                {
+                    imagesToDelete.Add(image);
+                }
+            }
+            if (imagesToDelete.Count == 0)
+            {
+                var box = MessageBoxManager.GetMessageBoxStandard("Delete Images", "You need to select images to delete.", ButtonEnum.Ok);
+                await box.ShowAsync();
+                return;
+            }
+            var boxYesNo = MessageBoxManager.GetMessageBoxStandard("Delete Images", "Are you sure you want to delete these images?", ButtonEnum.YesNo);
+            var boxResult = await boxYesNo.ShowAsync();
+            if (boxResult == ButtonResult.Yes)
+            {
+                _mainWindowViewModel.ShowLoading = true;
+                Folder imagesFolder = await _folderMethods.GetFolderAtDirectory(allImages[0].ImageFolderPath);
+                Folder? rootFolder = await _folderMethods.GetRootFolder();
+                string trashFolderPath = PathHelper.GetTrashFolderPath(rootFolder.FolderPath);
+
+                //create ImagePerfectTRASH if it doesnt exist
+                if (!Directory.Exists(trashFolderPath))
+                {
+                    Directory.CreateDirectory(trashFolderPath);
+                }
+
+                string sql = SqlStringBuilder.BuildSqlForMoveImagesToTrash(imagesToDelete);
+                bool success = await _imageMethods.DeleteSelectedImages(sql);
+                if (success)
+                {
+                    foreach (ImageViewModel image in imagesToDelete)
+                    {
+                        //move file to trash folder
+                        string newImagePath = PathHelper.GetImageFileTrashPath(image, trashFolderPath);
+                        File.Move(image.ImagePath, newImagePath);
+                    }
+                    //update imagesFolder HasFiles, AreImagesImported, and FolderContentMetaDataScanned
+                    //set all back to false if moved all images to trash
+                    IEnumerable<string> folderFiles = Directory.EnumerateFiles(imagesFolder.FolderPath).Where(s => s.ToLower().EndsWith(".jpeg") || s.ToLower().EndsWith(".jpg") || s.ToLower().EndsWith(".png") || s.ToLower().EndsWith(".gif"));
+                    if (!folderFiles.Any())
+                    {
+                        imagesFolder.HasFiles = false;
+                        imagesFolder.AreImagesImported = false;
+                        imagesFolder.FolderContentMetaDataScanned = false;
+                        await _folderMethods.UpdateFolder(imagesFolder);
+                    }
+                    //refresh UI
+                    await _mainWindowViewModel.RefreshImages("", allImages[0].FolderId);
+                    _mainWindowViewModel.ShowLoading = false;
                 }
                 _mainWindowViewModel.ShowLoading = false;
             }
