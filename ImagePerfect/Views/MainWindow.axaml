@@ -263,7 +263,6 @@
 				<StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0">
 					<Button Margin="5" HorizontalAlignment="Center"
 					Command="{Binding SelectAllImagesCommand}"
-					CommandParameter="{Binding #ImagesItemsControl}"
 					Classes="menu-btn">
 						Select All
 					</Button>

@@ -276,8 +276,8 @@ namespace ImagePerfect.ViewModels
             {
                 await MoveImages.MoveSelectedImagesToTrash(imagesItemsControl);
             });
-            SelectAllImagesCommand = ReactiveCommand.Create((ItemsControl imagesItemsControl) => {
-                SelectAllImages(imagesItemsControl);
+            SelectAllImagesCommand = ReactiveCommand.Create(() => {
+                MoveImages.SelectAllImages();
             });
             MoveSelectedImagesToNewFolderCommand = ReactiveCommand.Create(async (ItemsControl imagesItemsControl) => {
                 await MoveImages.MoveSelectedImagesToNewFolder(imagesItemsControl);
@@ -561,7 +561,7 @@ namespace ImagePerfect.ViewModels
 
         public ReactiveCommand<ItemsControl, Task> MoveSelectedImagesToTrashCommand { get; }
 
-        public ReactiveCommand<ItemsControl, Unit> SelectAllImagesCommand { get; }
+        public ReactiveCommand<Unit, Unit> SelectAllImagesCommand { get; }
 
         public ReactiveCommand<ItemsControl, Task> MoveSelectedImagesToNewFolderCommand { get; }
 
@@ -1641,20 +1641,6 @@ namespace ImagePerfect.ViewModels
             }
         }
 
-        private void SelectAllImages(ItemsControl imagesItemsControl)
-        {
-            for(int i =0; i < Images.Count; i++)
-            {
-                if (Images[i].IsSelected == true)
-                {
-                    Images[i].IsSelected = false;
-                }
-                else
-                {
-                    Images[i].IsSelected = true;
-                }
-            }
-        }
         private async Task CopyCoverImageToContainingFolder(FolderViewModel folderVm)
         {
             if (PathHelper.RemoveOneFolderFromPath(folderVm.FolderPath) == RootFolderLocation) 

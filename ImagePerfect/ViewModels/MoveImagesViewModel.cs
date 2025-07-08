@@ -234,5 +234,20 @@ namespace ImagePerfect.ViewModels
                 _mainWindowViewModel.ShowLoading = false;
             }
         }
+
+        public void SelectAllImages()
+        {
+            for (int i = 0; i < _mainWindowViewModel.Images.Count; i++)
+            {
+                if (_mainWindowViewModel.Images[i].IsSelected == true)
+                {
+                    _mainWindowViewModel.Images[i].IsSelected = false;
+                }
+                else
+                {
+                    _mainWindowViewModel.Images[i].IsSelected = true;
+                }
+            }
+        }
 	}
 }
