@@ -99,6 +99,7 @@ namespace ImagePerfect.ViewModels
             _saveDirectoryMethods = new SaveDirectoryMethods(_unitOfWork);
             _showLoading = false;
 
+            MoveFolderToTrash = new MoveFolderToTrashViewModel(_unitOfWork, this);
             CreateNewFolder = new CreateNewFolderViewModel(_unitOfWork, this);
 
             NextFolderCommand = ReactiveCommand.Create((FolderViewModel currentFolder) => {
@@ -152,8 +153,8 @@ namespace ImagePerfect.ViewModels
             MoveImageToTrashCommand = ReactiveCommand.Create(async (ImageViewModel imageVm) => {
                 await MoveImageToTrash(imageVm);
             });
-            MoveFolderToTrashCommand = ReactiveCommand.Create((FolderViewModel folderVm) => {
-                MoveFolderToTrash(folderVm);
+            MoveFolderToTrashCommand = ReactiveCommand.Create(async (FolderViewModel folderVm) => {
+                await MoveFolderToTrash.MoveFolderToTrash(folderVm);
             });
             ScanFolderImagesForMetaDataCommand = ReactiveCommand.Create(async (FolderViewModel folderVm) => {
                 await ScanFolderImagesForMetaData(folderVm);
@@ -443,6 +444,7 @@ namespace ImagePerfect.ViewModels
             set => _rootFolderLocation = value;
         }
 
+        public MoveFolderToTrashViewModel MoveFolderToTrash { get; }
         public CreateNewFolderViewModel CreateNewFolder { get; }
         public ToggleUIViewModel ToggleUI { get; } = new ToggleUIViewModel();
 
@@ -495,7 +497,7 @@ namespace ImagePerfect.ViewModels
 
         public ReactiveCommand<ImageViewModel, Task> MoveImageToTrashCommand { get; }
 
-        public ReactiveCommand<FolderViewModel, Unit> MoveFolderToTrashCommand { get; }
+        public ReactiveCommand<FolderViewModel, Task> MoveFolderToTrashCommand { get; }
 
         public ReactiveCommand<FolderViewModel, Task> ScanFolderImagesForMetaDataCommand { get; }
 
@@ -1859,62 +1861,6 @@ namespace ImagePerfect.ViewModels
             }
         }
         
-        private async void MoveFolderToTrash(FolderViewModel folderVm)
-        {
-            //only allow delete if folder does not contain children/sub directories
-            List<Folder> folderAndSubFolders = await _folderMethods.GetDirectoryTree(folderVm.FolderPath);
-            if (folderAndSubFolders.Count > 1) 
-            {
-                var box = MessageBoxManager.GetMessageBoxStandard("Delete Folder", "This folder contains sub folders clean those up first.", ButtonEnum.Ok);
-                await box.ShowAsync();
-                return;
-            }
-            var boxYesNo = MessageBoxManager.GetMessageBoxStandard("Delete Folder", "Are you sure you want to delete your folder?", ButtonEnum.YesNo);
-            var boxResult = await boxYesNo.ShowAsync();
-            if (boxResult == ButtonResult.Yes) 
-            {
-                ShowLoading = true;
-                //the folders parent
-                string pathThatContainsFolder = PathHelper.RemoveOneFolderFromPath(folderVm.FolderPath);                
-                Folder? rootFolder = await _folderMethods.GetRootFolder();
-                string trashFolderPath = PathHelper.GetTrashFolderPath(rootFolder.FolderPath);
-
-                //create ImagePerfectTRASH if it doesnt exist
-                if (!Directory.Exists(trashFolderPath))
-                {
-                    Directory.CreateDirectory(trashFolderPath);
-                }
-                if (Directory.Exists(folderVm.FolderPath))
-                {
-                    //delete folder from db -- does not delete sub folders.
-                    //images table child of folders ON DELETE CASCADE is applied on sql to delete all images if a folder is deleted
-                    bool success = await _folderMethods.DeleteFolder(folderVm.FolderId);
-                    if (success) 
-                    {
-                        //move folder to trash folder
-                        string newFolderPath = PathHelper.GetFolderTrashPath(folderVm, trashFolderPath);
-                        Directory.Move(folderVm.FolderPath, newFolderPath);
-                        //update the parent folder HasChildren prop
-                        List<Folder> parentFolderDirTree = await _folderMethods.GetDirectoryTree(pathThatContainsFolder);
-                        Folder parentFolder = await _folderMethods.GetFolderAtDirectory(pathThatContainsFolder);
-                        if (parentFolderDirTree.Count > 1)
-                        {
-                            parentFolder.HasChildren = true;
-                            await _folderMethods.UpdateFolder(parentFolder);
-                        }
-                        else
-                        {
-                            parentFolder.HasChildren = false;
-                            await _folderMethods.UpdateFolder(parentFolder);
-                        }
-                        //refresh UI
-                        await RefreshFolders(pathThatContainsFolder);
-                        ShowLoading = false;
-                    }
-                }
-            }
-        }
-
         private async Task CopyCoverImageToContainingFolder(FolderViewModel folderVm)
         {
             if (PathHelper.RemoveOneFolderFromPath(folderVm.FolderPath) == RootFolderLocation) 
