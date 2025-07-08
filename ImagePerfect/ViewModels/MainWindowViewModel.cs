@@ -67,7 +67,7 @@ namespace ImagePerfect.ViewModels
         private int _maxCurrentPage = 1;
 
         //Filters
-        private enum Filters
+        public enum Filters
         {
             None,
             ImageRatingFilter,
@@ -80,7 +80,7 @@ namespace ImagePerfect.ViewModels
             AllFoldersWithMetadataNotScanned,
             AllFoldersWithoutCovers
         }
-        private Filters currentFilter = Filters.None;
+        public Filters currentFilter = Filters.None;
         private int selectedRatingForFilter = 0;
         private string tagForFilter = string.Empty;
         private string textForFilter = string.Empty;
@@ -98,6 +98,8 @@ namespace ImagePerfect.ViewModels
             _settingsMethods = new SettingsMethods(_unitOfWork);
             _saveDirectoryMethods = new SaveDirectoryMethods(_unitOfWork);
             _showLoading = false;
+
+            CreateNewFolder = new CreateNewFolderViewModel(_unitOfWork, this);
 
             NextFolderCommand = ReactiveCommand.Create((FolderViewModel currentFolder) => {
                 NextFolder(currentFolder);
@@ -286,8 +288,8 @@ namespace ImagePerfect.ViewModels
             CopyCoverImageToContainingFolderCommand = ReactiveCommand.Create(async (FolderViewModel folderVm) => { 
                 await CopyCoverImageToContainingFolder(folderVm);
             });
-            CreateNewFolderCommand = ReactiveCommand.Create(() => { 
-                CreateNewFolder(); 
+            CreateNewFolderCommand = ReactiveCommand.Create(async () => {
+                await CreateNewFolder.CreateNewFolder();
             });
             ExitAppCommand = ReactiveCommand.Create(() => { 
                 ExitApp();
@@ -437,6 +439,7 @@ namespace ImagePerfect.ViewModels
             set => _rootFolderLocation = value;
         }
 
+        public CreateNewFolderViewModel CreateNewFolder { get; }
         public ToggleUIViewModel ToggleUI { get; } = new ToggleUIViewModel();
 
         //pass in this MainWindowViewModel so we can refresh UI
@@ -562,7 +565,7 @@ namespace ImagePerfect.ViewModels
 
         public ReactiveCommand<ItemsControl, Task> ScanAllFoldersOnCurrentPageCommand { get; }
 
-        public ReactiveCommand<Unit, Unit> CreateNewFolderCommand { get; }
+        public ReactiveCommand<Unit, Task> CreateNewFolderCommand { get; }
 
         public ReactiveCommand<Unit, Unit> ExitAppCommand { get; }
 
@@ -2127,52 +2130,6 @@ namespace ImagePerfect.ViewModels
             }
             ShowLoading = false;
         }
-
-        private async void CreateNewFolder()
-        {
-            //first check if directory exists
-            string newFolderPath = PathHelper.GetNewFolderPath(CurrentDirectory, NewFolderName);
-            if (Directory.Exists(newFolderPath))
-            {
-                var box = MessageBoxManager.GetMessageBoxStandard("New Folder", "A folder with this name already exists.", ButtonEnum.Ok);
-                await box.ShowAsync();
-                return;
-            }
-            //add dir to database -- also need to update parent folders HasChildren bool value
-            Folder newFolder = new Folder
-            {
-                FolderName = NewFolderName,
-                FolderPath = newFolderPath,
-                HasChildren = false,
-                CoverImagePath = "",
-                FolderDescription = "",
-                FolderRating = 0,
-                HasFiles = false,
-                IsRoot = false,
-                FolderContentMetaDataScanned = false,
-                AreImagesImported = false,
-            };
-            bool success = await _folderMethods.CreateNewFolder(newFolder);
-
-            //create on disk
-            if (success)
-            {
-                try
-                {
-                    Directory.CreateDirectory(newFolderPath);
-                    //refresh UI
-                    currentFilter = Filters.None;
-                    await RefreshFolders();
-                }
-                catch (Exception e)
-                {
-                    var box = MessageBoxManager.GetMessageBoxStandard("New Folder", $"Error {e}.", ButtonEnum.Ok);
-                    await box.ShowAsync();
-                    return;
-                }
-            }
-        }
-
 
         private async void GetAllFolders()
         {
