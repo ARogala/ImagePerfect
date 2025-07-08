@@ -168,25 +168,29 @@ namespace ImagePerfect.ViewModels
                 await GoToPage(Decimal.ToInt32(pageNumber));
             });
             ToggleSettingsCommand = ReactiveCommand.Create(() => {
-                ToggleSettings();
+                ToggleUI.ToggleSettings();
             });
             ToggleManageImagesCommand = ReactiveCommand.Create(() => {
-                ToggleManageImages();
+                ToggleUI.ToggleManageImages();
             });
             ToggleFiltersCommand = ReactiveCommand.Create((string showFilter) => {
-                ToggleFilters(showFilter);
+                ToggleUI.ToggleFilters(showFilter);
             });
             ToggleCreateNewFolderCommand = ReactiveCommand.Create(() => {
-                ToggleCreateNewFolder();
+                ToggleUI.ToggleCreateNewFolder();
             });
-            ToggleGetTotalImagesCommand = ReactiveCommand.Create(() => { 
-                ToggleGetTotalImages();
+            ToggleGetTotalImagesCommand = ReactiveCommand.Create(async () => {
+                ToggleUI.ToggleGetTotalImages();
+                if (ToggleUI.ShowTotalImages == true)
+                {
+                    TotalImages = await _imageMethods.GetTotalImages();
+                }
             });
             ToggleImportAndScanCommand = ReactiveCommand.Create(() => {
-                ToggleImportAndScan();
+                ToggleUI.ToggleImportAndScan();
             });
             ToggleListAllTagsCommand = ReactiveCommand.Create(() => {
-                ToggleListAllTags();
+                ToggleUI.ToggleListAllTags();
             });
             FilterImagesOnRatingCommand = ReactiveCommand.Create(async (decimal rating) => {
                 ResetPagination();
@@ -509,7 +513,7 @@ namespace ImagePerfect.ViewModels
 
         public ReactiveCommand<Unit, Unit> ToggleCreateNewFolderCommand { get; }
 
-        public ReactiveCommand<Unit, Unit> ToggleGetTotalImagesCommand { get; }
+        public ReactiveCommand<Unit, Task> ToggleGetTotalImagesCommand { get; }
 
         public ReactiveCommand<Unit, Unit> ToggleImportAndScanCommand { get; }
 
@@ -791,40 +795,7 @@ namespace ImagePerfect.ViewModels
             await RefreshFolders(CurrentDirectory);
             await RefreshImages(CurrentDirectory);
         }
-
-        private void ToggleListAllTags()
-        {
-            ToggleUI.ToggleListAllTags();
-        }
-        private void ToggleImportAndScan()
-        {
-            ToggleUI.ToggleImportAndScan();
-        }
-        private async void ToggleGetTotalImages()
-        {
-            ToggleUI.ToggleGetTotalImages();
-            if(ToggleUI.ShowTotalImages == true)
-            {
-                TotalImages = await _imageMethods.GetTotalImages();
-            }
-        }
-        private void ToggleManageImages()
-        {
-            ToggleUI.ToggleManageImages();
-        }
-        private void ToggleSettings()
-        {
-            ToggleUI.ToggleSettings();
-        }
-        private void ToggleFilters(string showFilter)
-        {
-            ToggleUI.ToggleFilters(showFilter);
-        }
-
-        private void ToggleCreateNewFolder()
-        {
-            ToggleUI.ToggleCreateNewFolder();
-        }
+        
         private List<Image> ImagePagination()
         {
             //same as FolderPagination
