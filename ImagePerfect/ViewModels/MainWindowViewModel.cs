@@ -42,9 +42,9 @@ namespace ImagePerfect.ViewModels
         private bool _isNewFolderEnabled;
         private List<Tag> _tagsList = new List<Tag>();
 
-        private List<Folder> displayFolders = new List<Folder>();
+        public List<Folder> displayFolders = new List<Folder>();
         private List<FolderTag> displayFolderTags = new List<FolderTag>();
-        private List<Image> displayImages = new List<Image>();
+        public List<Image> displayImages = new List<Image>();
         private List<ImageTag> displayImageTags = new List<ImageTag>();
         //pagination
         private int _folderPageSize = 20;
@@ -99,6 +99,7 @@ namespace ImagePerfect.ViewModels
             _saveDirectoryMethods = new SaveDirectoryMethods(_unitOfWork);
             _showLoading = false;
 
+            MoveImages = new MoveImagesViewModel(_unitOfWork, this);
             MoveFolderToTrash = new MoveFolderToTrashViewModel(_unitOfWork, this);
             CreateNewFolder = new CreateNewFolderViewModel(_unitOfWork, this);
 
@@ -151,7 +152,7 @@ namespace ImagePerfect.ViewModels
                 OpenCurrentDirectoryWithExplorer();
             });
             MoveImageToTrashCommand = ReactiveCommand.Create(async (ImageViewModel imageVm) => {
-                await MoveImageToTrash(imageVm);
+                await MoveImages.MoveImageToTrash(imageVm);
             });
             MoveFolderToTrashCommand = ReactiveCommand.Create(async (FolderViewModel folderVm) => {
                 await MoveFolderToTrash.MoveFolderToTrash(folderVm);
@@ -444,6 +445,7 @@ namespace ImagePerfect.ViewModels
             set => _rootFolderLocation = value;
         }
 
+        public MoveImagesViewModel MoveImages { get; }
         public MoveFolderToTrashViewModel MoveFolderToTrash { get; }
         public CreateNewFolderViewModel CreateNewFolder { get; }
         public ToggleUIViewModel ToggleUI { get; } = new ToggleUIViewModel();
@@ -1090,7 +1092,7 @@ namespace ImagePerfect.ViewModels
                 await LoadCurrentDirectory();
             }
         }
-        private async Task RefreshImages(string path = "", int folderId = 0)
+        public async Task RefreshImages(string path = "", int folderId = 0)
         {
             ShowLoading = true;
             switch (currentFilter)
@@ -1814,53 +1816,6 @@ namespace ImagePerfect.ViewModels
                 ShowLoading = false;
             }
         }
-
-        private async Task MoveImageToTrash(ImageViewModel imageVm)
-        {
-           
-            var boxYesNo = MessageBoxManager.GetMessageBoxStandard("Delete Image", "Are you sure you want to delete your image?", ButtonEnum.YesNo);
-            var boxResult = await boxYesNo.ShowAsync();
-            if (boxResult == ButtonResult.Yes) 
-            {
-                ShowLoading = true;
-                (List<Folder> folders, List<FolderTag> tags) folderResult = await _folderMethods.GetFoldersInDirectory(imageVm.ImageFolderPath);
-                displayFolders = folderResult.folders;
-                (List<Image> images, List<ImageTag> tags) imageResultA = await _imageMethods.GetAllImagesInFolder(imageVm.FolderId);
-                displayImages = imageResultA.images;
-                if (displayImages.Count == 1 && displayFolders.Count == 0)
-                {
-                    var box = MessageBoxManager.GetMessageBoxStandard("Delete Image", "This is the last image in the folder go back and delete the folder", ButtonEnum.Ok);
-                    await box.ShowAsync();
-                    return;
-                }
-                Folder? rootFolder = await _folderMethods.GetRootFolder();
-                string trashFolderPath = PathHelper.GetTrashFolderPath(rootFolder.FolderPath);
-
-                //create ImagePerfectTRASH if it doesnt exist
-                if (!Directory.Exists(trashFolderPath))
-                {
-                    Directory.CreateDirectory(trashFolderPath);
-                }
-                if (File.Exists(imageVm.ImagePath))
-                {
-                    //delete image from db
-                    bool success = await _imageMethods.DeleteImage(imageVm.ImageId);
-
-                    if (success)
-                    {
-                        //move file to trash folder
-                        string newImagePath = PathHelper.GetImageFileTrashPath(imageVm, trashFolderPath);
-                        File.Move(imageVm.ImagePath, newImagePath);
-
-                        //refresh UI
-                        await RefreshImages("",imageVm.FolderId);
-                        ShowLoading = false;
-                    }
-                }
-                ShowLoading = false;
-            }
-        }
-        
         private async Task CopyCoverImageToContainingFolder(FolderViewModel folderVm)
         {
             if (PathHelper.RemoveOneFolderFromPath(folderVm.FolderPath) == RootFolderLocation) 
