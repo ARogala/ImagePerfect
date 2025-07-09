@@ -29,7 +29,6 @@ namespace ImagePerfect.ViewModels
         private readonly FolderMethods _folderMethods;
         private readonly ImageCsvMethods _imageCsvMethods;
         private readonly ImageMethods _imageMethods;
-        private readonly SettingsMethods _settingsMethods;
         private readonly SaveDirectoryMethods _saveDirectoryMethods;
         private bool _showLoading;
         private int _totalImages = 0;
@@ -95,10 +94,10 @@ namespace ImagePerfect.ViewModels
             _folderMethods = new FolderMethods(_unitOfWork);
             _imageCsvMethods = new ImageCsvMethods(_unitOfWork);
             _imageMethods = new ImageMethods(_unitOfWork);
-            _settingsMethods = new SettingsMethods(_unitOfWork);
             _saveDirectoryMethods = new SaveDirectoryMethods(_unitOfWork);
             _showLoading = false;
 
+            SettingsVm = new SettingsViewModel(_unitOfWork, this);
             MoveImages = new MoveImagesViewModel(_unitOfWork, this);
             MoveFolderToTrash = new MoveFolderToTrashViewModel(_unitOfWork, this);
             CreateNewFolder = new CreateNewFolderViewModel(_unitOfWork, this);
@@ -243,16 +242,16 @@ namespace ImagePerfect.ViewModels
                 await LoadCurrentDirectory();
             });
             PickImageWidthCommand = ReactiveCommand.Create(async (string size) => {
-                await PickImageWidth(size);
+                await SettingsVm.PickImageWidth(size);
             });
             SelectImageWidthCommand = ReactiveCommand.Create(async (decimal size) => { 
-                await SelectImageWidth(size);
+                await SettingsVm.SelectImageWidth(size);
             });
             PickFolderPageSizeCommand = ReactiveCommand.Create(async (string size) => {
-                await PickFolderPageSize(size);
+                await SettingsVm.PickFolderPageSize(size);
             });
             PickImagePageSizeCommand = ReactiveCommand.Create(async (string size) => {
-                await PickImagePageSize(size);
+                await SettingsVm.PickImagePageSize(size);
             });
             SaveDirectoryCommand = ReactiveCommand.Create(async (ScrollViewer scrollViewer) => {
                 await SaveDirectory(scrollViewer);
@@ -445,6 +444,7 @@ namespace ImagePerfect.ViewModels
             set => _rootFolderLocation = value;
         }
 
+        public SettingsViewModel SettingsVm { get; }
         public MoveImagesViewModel MoveImages { get; }
         public MoveFolderToTrashViewModel MoveFolderToTrash { get; }
         public CreateNewFolderViewModel CreateNewFolder { get; }
@@ -581,7 +581,7 @@ namespace ImagePerfect.ViewModels
         {
             await GetRootFolder();
             await GetTagsList();
-            await GetSettings();
+            await SettingsVm.GetSettings();
 
             SaveDirectory saveDirectory = await _saveDirectoryMethods.GetSavedDirectory();
             if (saveDirectory.SavedDirectory != "") 
@@ -602,13 +602,6 @@ namespace ImagePerfect.ViewModels
             
         }
 
-        private async Task GetSettings()
-        {
-            Settings settings = await _settingsMethods.GetSettings();
-            MaxImageWidth = settings.MaxImageWidth;
-            FolderPageSize = settings.FolderPageSize;
-            ImagePageSize = settings.ImagePageSize;
-        }
         private async Task GetRootFolder()
         {
             Folder? rootFolder = await _folderMethods.GetRootFolder();
@@ -690,109 +683,7 @@ namespace ImagePerfect.ViewModels
             await LoadCurrentDirectory();
             scrollViewer.Offset = SavedOffsetVector;
         }
-        private async Task UpdateSettings()
-        {
-            //update database
-            Settings settings = new()
-            {
-                SettingsId = 1,
-                MaxImageWidth = MaxImageWidth,
-                FolderPageSize = FolderPageSize,
-                ImagePageSize = ImagePageSize,
-            };
-            await _settingsMethods.UpdateSettings(settings);
-        }
-
-        private async Task PickImagePageSize(string size)
-        {
-            switch (size)
-            {
-                case "20":
-                    ImagePageSize = 20;
-                    break;
-                case "40":
-                    ImagePageSize = 40;
-                    break;
-                case "60":
-                    ImagePageSize = 60;
-                    break;
-                case "80":
-                    ImagePageSize = 80;
-                    break;
-                case "100":
-                    ImagePageSize = 100;
-                    break;
-                case "125":
-                    ImagePageSize = 125;
-                    break;
-                case "150":
-                    ImagePageSize = 150;
-                    break;
-                case "175":
-                    ImagePageSize = 175;
-                    break;
-                case "200":
-                    ImagePageSize = 200;
-                    break;
-            }
-            await UpdateSettings();
-            ResetPagination();
-            await RefreshFolders();
-            await RefreshImages(CurrentDirectory);
-        }
-        private async Task PickFolderPageSize(string size)
-        {
-            switch (size) 
-            {
-                case "20":
-                    FolderPageSize = 20;
-                    break;
-                case "40":
-                    FolderPageSize = 40;
-                    break;
-                case "60":
-                    FolderPageSize = 60;
-                    break;
-                case "80":
-                    FolderPageSize = 80;
-                    break;
-                case "100":
-                    FolderPageSize = 100;
-                    break;
-            }
-            await UpdateSettings();
-            ResetPagination();
-            await RefreshFolders();
-            await RefreshImages(CurrentDirectory);
-        }
-
-        private async Task SelectImageWidth(decimal size)
-        {
-            MaxImageWidth = (int)size;
-            await UpdateSettings();
-        }
-        private async Task PickImageWidth(string size)
-        {
-            switch (size)
-            {
-                case "Small":
-                    MaxImageWidth = 300;
-                    break;
-                case "Medium":
-                    MaxImageWidth = 400;
-                    break;
-                case "Large":
-                    MaxImageWidth = 500;
-                    break;
-                case "XLarge":
-                    MaxImageWidth = 550;
-                    break;
-                case "XXLarge":
-                    MaxImageWidth = 600;
-                    break;
-            }
-            await UpdateSettings();
-        }
+       
         private async Task LoadCurrentDirectory()
         {
             currentFilter = Filters.None;
@@ -853,7 +744,7 @@ namespace ImagePerfect.ViewModels
             return displayFoldersTemp;
         }
 
-        private void ResetPagination()
+        public void ResetPagination()
         {
             CurrentFolderPage = 1;
             TotalFolderPages = 1;
