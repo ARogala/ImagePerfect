@@ -97,6 +97,7 @@ namespace ImagePerfect.ViewModels
             _saveDirectoryMethods = new SaveDirectoryMethods(_unitOfWork);
             _showLoading = false;
 
+            FavoriteFoldersVm = new FavoriteFoldersViewModel(_unitOfWork);
             SettingsVm = new SettingsViewModel(_unitOfWork, this);
             MoveImages = new MoveImagesViewModel(_unitOfWork, this);
             MoveFolderToTrash = new MoveFolderToTrashViewModel(_unitOfWork, this);
@@ -260,16 +261,15 @@ namespace ImagePerfect.ViewModels
                 await LoadSavedDirectory(scrollViewer);
             });
             SaveFolderAsFavoriteCommand = ReactiveCommand.Create(async (FolderViewModel folderVm) => {
-                await SaveFolderAsFavorite(folderVm);
+                await FavoriteFoldersVm.SaveFolderAsFavorite(folderVm);
             });
             GetAllFavoriteFoldersCommand = ReactiveCommand.Create(async () => {
                 ResetPagination();
                 currentFilter = Filters.AllFavoriteFolders;
                 await RefreshFolders();
             });
-            RemoveAllFavoriteFoldersCommand = ReactiveCommand.Create(async () =>
-            {
-                await RemoveAllFavoriteFolders();
+            RemoveAllFavoriteFoldersCommand = ReactiveCommand.Create(async () => {
+                await FavoriteFoldersVm.RemoveAllFavoriteFolders();
             });
             MoveSelectedImagesToTrashCommand = ReactiveCommand.Create(async (ItemsControl imagesItemsControl) =>
             {
@@ -444,6 +444,7 @@ namespace ImagePerfect.ViewModels
             set => _rootFolderLocation = value;
         }
 
+        public FavoriteFoldersViewModel FavoriteFoldersVm { get; }
         public SettingsViewModel SettingsVm { get; }
         public MoveImagesViewModel MoveImages { get; }
         public MoveFolderToTrashViewModel MoveFolderToTrash { get; }
@@ -627,24 +628,7 @@ namespace ImagePerfect.ViewModels
                 desktop.Shutdown();
             }
         }
-        private async Task SaveFolderAsFavorite(FolderViewModel folderVm)
-        {
-            await _folderMethods.SaveFolderToFavorites(folderVm.FolderId);
-        }
-
-        private async Task RemoveAllFavoriteFolders()
-        {
-            var box = MessageBoxManager.GetMessageBoxStandard("Remove Favorite Folders", "Are you sure you want to remove your favorite folders from the data base? The folders on the file system will remain.", ButtonEnum.YesNo);
-            var result = await box.ShowAsync();
-            if (result == ButtonResult.Yes)
-            {
-                await _folderMethods.RemoveAllFavoriteFolders();
-            }
-            else
-            {
-                return;
-            }
-        }
+       
         private async Task SaveDirectory(ScrollViewer scrollViewer)
         {
             //update variables
