@@ -97,6 +97,7 @@ namespace ImagePerfect.ViewModels
             _saveDirectoryMethods = new SaveDirectoryMethods(_unitOfWork);
             _showLoading = false;
 
+            SavedDirectoryVm = new SavedDirectoryViewModel(_unitOfWork, this);
             FavoriteFoldersVm = new FavoriteFoldersViewModel(_unitOfWork);
             SettingsVm = new SettingsViewModel(_unitOfWork, this);
             MoveImages = new MoveImagesViewModel(_unitOfWork, this);
@@ -255,10 +256,10 @@ namespace ImagePerfect.ViewModels
                 await SettingsVm.PickImagePageSize(size);
             });
             SaveDirectoryCommand = ReactiveCommand.Create(async (ScrollViewer scrollViewer) => {
-                await SaveDirectory(scrollViewer);
+                await SavedDirectoryVm.SaveDirectory(scrollViewer);
             });
             LoadSavedDirectoryCommand = ReactiveCommand.Create(async (ScrollViewer scrollViewer) => {
-                await LoadSavedDirectory(scrollViewer);
+                await SavedDirectoryVm.LoadSavedDirectory(scrollViewer);
             });
             SaveFolderAsFavoriteCommand = ReactiveCommand.Create(async (FolderViewModel folderVm) => {
                 await FavoriteFoldersVm.SaveFolderAsFavorite(folderVm);
@@ -444,6 +445,7 @@ namespace ImagePerfect.ViewModels
             set => _rootFolderLocation = value;
         }
 
+        public SavedDirectoryViewModel SavedDirectoryVm { get; }
         public FavoriteFoldersViewModel FavoriteFoldersVm { get; }
         public SettingsViewModel SettingsVm { get; }
         public MoveImagesViewModel MoveImages { get; }
@@ -629,46 +631,7 @@ namespace ImagePerfect.ViewModels
             }
         }
        
-        private async Task SaveDirectory(ScrollViewer scrollViewer)
-        {
-            //update variables
-            SavedDirectory = CurrentDirectory;
-            SavedFolderPage = CurrentFolderPage;
-            SavedTotalFolderPages = TotalFolderPages;
-            SavedImagePage = CurrentImagePage;
-            SavedTotalImagePages = TotalImagePages;
-            double XVector = scrollViewer.Offset.X;
-            double YVector = scrollViewer.Offset.Y;
-            SavedOffsetVector = new Vector(XVector, YVector);
-            //persist to database
-            SaveDirectory saveDirectory = new()
-            {
-                SavedDirectoryId = 1,
-                SavedDirectory = CurrentDirectory,
-                SavedFolderPage = CurrentFolderPage,
-                SavedTotalFolderPages = TotalFolderPages,
-                SavedImagePage = CurrentImagePage,
-                SavedTotalImagePages = TotalImagePages,
-                XVector = scrollViewer.Offset.X,
-                YVector = scrollViewer.Offset.Y
-            };
-            await _saveDirectoryMethods.UpdateSaveDirectory(saveDirectory);
-        }
-
-        private async Task LoadSavedDirectory(ScrollViewer scrollViewer)
-        {
-            CurrentDirectory = SavedDirectory;
-            CurrentFolderPage = SavedFolderPage;
-            TotalFolderPages = SavedTotalFolderPages;
-            CurrentImagePage = SavedImagePage;
-            TotalImagePages = SavedTotalImagePages;
-            MaxPage = Math.Max(TotalImagePages, TotalFolderPages);
-            MaxCurrentPage = Math.Max(CurrentImagePage, CurrentFolderPage);
-            await LoadCurrentDirectory();
-            scrollViewer.Offset = SavedOffsetVector;
-        }
-       
-        private async Task LoadCurrentDirectory()
+        public async Task LoadCurrentDirectory()
         {
             currentFilter = Filters.None;
             await RefreshFolders(CurrentDirectory);
