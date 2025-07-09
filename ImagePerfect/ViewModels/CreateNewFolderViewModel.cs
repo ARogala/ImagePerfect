@@ -6,11 +6,14 @@ using ImagePerfect.Repository.IRepository;
 using ImagePerfect.Models;
 using ImagePerfect.Helpers;
 using System.Threading.Tasks;
+using ReactiveUI;
 
 namespace ImagePerfect.ViewModels
 {
 	public class CreateNewFolderViewModel : ViewModelBase
 	{
+        private string _newFolderName = string.Empty;
+        private bool _isNewFolderEnabled;
         private readonly IUnitOfWork _unitOfWork;
         private readonly FolderMethods _folderMethods;
         private readonly MainWindowViewModel _mainWindowViewModel;
@@ -20,10 +23,34 @@ namespace ImagePerfect.ViewModels
             _mainWindowViewModel = mainWindowViewModel;
             _folderMethods = new FolderMethods(_unitOfWork);
         }
-		public async Task CreateNewFolder()
+
+        public string NewFolderName
+        {
+            get => _newFolderName;
+            set
+            {
+                this.RaiseAndSetIfChanged(ref _newFolderName, value);
+                if (value == "" || _mainWindowViewModel.CurrentDirectory == _mainWindowViewModel.RootFolderLocation || _mainWindowViewModel.currentFilter != MainWindowViewModel.Filters.None)
+                {
+                    IsNewFolderEnabled = false;
+                }
+                else
+                {
+                    IsNewFolderEnabled = true;
+                }
+            }
+        }
+
+        public bool IsNewFolderEnabled
+        {
+            get => _isNewFolderEnabled;
+            set => this.RaiseAndSetIfChanged(ref _isNewFolderEnabled, value);
+        }
+
+        public async Task CreateNewFolder()
 		{
             //first check if directory exists
-            string newFolderPath = PathHelper.GetNewFolderPath(_mainWindowViewModel.CurrentDirectory, _mainWindowViewModel.NewFolderName);
+            string newFolderPath = PathHelper.GetNewFolderPath(_mainWindowViewModel.CurrentDirectory, NewFolderName);
             if (Directory.Exists(newFolderPath))
             {
                 var box = MessageBoxManager.GetMessageBoxStandard("New Folder", "A folder with this name already exists.", ButtonEnum.Ok);
@@ -33,7 +60,7 @@ namespace ImagePerfect.ViewModels
             //add dir to database -- also need to update parent folders HasChildren bool value
             Folder newFolder = new Folder
             {
-                FolderName = _mainWindowViewModel.NewFolderName,
+                FolderName = NewFolderName,
                 FolderPath = newFolderPath,
                 HasChildren = false,
                 CoverImagePath = "",

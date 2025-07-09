@@ -247,12 +247,12 @@
 		<!--Create New Folder-->
 		<StackPanel Grid.Row="7" IsVisible="{Binding ToggleUI.ShowCreateNewFolder}" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}" Classes="menu-bg-color">
 			<TextBlock Margin="0 5" MaxWidth="400">Create A New Folder:</TextBlock>
-			<TextBox  Watermark="Enter folder name" MaxWidth="400" Text="{Binding NewFolderName}" />
+			<TextBox  Watermark="Enter folder name" MaxWidth="400" Text="{Binding CreateNewFolder.NewFolderName}" />
 			<Button
 				Margin="0 10 10 10"
 				HorizontalAlignment="Center"
 				Command="{Binding CreateNewFolderCommand}"
-				IsEnabled="{Binding IsNewFolderEnabled}"
+				IsEnabled="{Binding CreateNewFolder.IsNewFolderEnabled}"
 				Classes="menu-btn">
 				Create Folder
 			</Button>

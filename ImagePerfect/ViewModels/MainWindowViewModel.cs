@@ -36,8 +36,6 @@ namespace ImagePerfect.ViewModels
         private string _selectedImagesNewDirectory = string.Empty;
         private bool _filterInCurrentDirectory = false;
         private string _rootFolderLocation = string.Empty;
-        private string _newFolderName = string.Empty;
-        private bool _isNewFolderEnabled;
         private List<Tag> _tagsList = new List<Tag>();
 
         public List<Folder> displayFolders = new List<Folder>();
@@ -386,29 +384,7 @@ namespace ImagePerfect.ViewModels
             get => _showLoading;
             set => this.RaiseAndSetIfChanged(ref _showLoading, value);
         }
-        public bool IsNewFolderEnabled
-        {
-            get => _isNewFolderEnabled;
-            set => this.RaiseAndSetIfChanged(ref _isNewFolderEnabled, value);
-        }
-
-        public string NewFolderName
-        {
-            get => _newFolderName;
-            set 
-            {
-                this.RaiseAndSetIfChanged(ref _newFolderName, value);
-                if (value == "" || CurrentDirectory == RootFolderLocation || currentFilter != Filters.None) 
-                { 
-                    IsNewFolderEnabled = false;
-                }
-                else
-                {
-                    IsNewFolderEnabled = true;
-                }
-            }
-        }
-
+        
         public string CurrentDirectory
         {
             get => _currentDirectory;
