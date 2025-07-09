@@ -9,7 +9,8 @@ using Avalonia;
 
 namespace ImagePerfect.ViewModels
 {
-	public class SavedDirectoryViewModel : ViewModelBase
+    //see InitializeViewModel as that class initally sets up the SavedDirectory
+    public class SavedDirectoryViewModel : ViewModelBase
 	{
         private readonly IUnitOfWork _unitOfWork;
         private readonly SaveDirectoryMethods _saveDirectoryMethods;
