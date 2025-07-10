@@ -89,6 +89,7 @@ namespace ImagePerfect.ViewModels
             _imageMethods = new ImageMethods(_unitOfWork);
             _showLoading = false;
 
+            ScanImagesForMetaDataVm = new ScanImagesForMetaDataViewModel(_unitOfWork, this);
             ImportImagesVm = new ImportImagesViewModel(_unitOfWork, this);
             InitializeVm = new InitializeViewModel(_unitOfWork, this);
             SavedDirectoryVm = new SavedDirectoryViewModel(_unitOfWork, this);
@@ -153,7 +154,7 @@ namespace ImagePerfect.ViewModels
                 await MoveFolderToTrash.MoveFolderToTrash(folderVm);
             });
             ScanFolderImagesForMetaDataCommand = ReactiveCommand.Create(async (FolderViewModel folderVm) => {
-                await ScanFolderImagesForMetaData(folderVm);
+                await ScanImagesForMetaDataVm.ScanFolderImagesForMetaData(folderVm);
             });
             NextPageCommand = ReactiveCommand.Create(() => {
                 NextPage();
@@ -283,7 +284,7 @@ namespace ImagePerfect.ViewModels
                 await AddCoverImageOnCurrentPage(folderItemsControl);
             });
             ScanAllFoldersOnCurrentPageCommand = ReactiveCommand.Create(async (ItemsControl foldersItemsControl) => {
-                await ScanAllFoldersOnCurrentPage(foldersItemsControl);
+                await ScanImagesForMetaDataVm.ScanAllFoldersOnCurrentPage(foldersItemsControl);
             });
             CopyCoverImageToContainingFolderCommand = ReactiveCommand.Create(async (FolderViewModel folderVm) => { 
                 await CopyCoverImageToContainingFolder(folderVm);
@@ -393,6 +394,7 @@ namespace ImagePerfect.ViewModels
             set => this.RaiseAndSetIfChanged(ref _filterInCurrentDirectory, value);
         }
 
+        public ScanImagesForMetaDataViewModel ScanImagesForMetaDataVm { get; }
         public ImportImagesViewModel ImportImagesVm { get; }
         public InitializeViewModel InitializeVm { get; }
         public SavedDirectoryViewModel SavedDirectoryVm { get; }
@@ -1391,81 +1393,6 @@ namespace ImagePerfect.ViewModels
             await RefreshFolders();
         }
         
-        private async Task ScanAllFoldersOnCurrentPage(ItemsControl foldersItemsControl)
-        {
-            var boxYesNo = MessageBoxManager.GetMessageBoxStandard("Scan All Folders", "CAUTION this could take a long time are you sure? Make sure to import images first.", ButtonEnum.YesNo);
-            var boxResult = await boxYesNo.ShowAsync();
-            if (boxResult == ButtonResult.Yes)
-            {
-                List<FolderViewModel> allFolders = foldersItemsControl.Items.OfType<FolderViewModel>().ToList();
-                foreach (FolderViewModel folder in allFolders)
-                {
-                    if (folder.HasFiles == true && folder.AreImagesImported == true && folder.FolderContentMetaDataScanned == false)
-                    {
-                        await ScanFolderImagesForMetaData(folder);
-                    }
-                }
-                ResetPagination();
-            }
-        }
-        /*
-         * complicated because tags are in image_tags_join table also the tags on image metadata may or may not be in the tags table in database
-         * goal is to take metadata from image and write to database. The two should be identical after this point. 
-         * With image metadata taking more importance because the app also writes tags and rating to image metadata -- so count that as the master record
-         * 
-         * Because ImageRating is on the images table and tags are on image_tags_join it is easy to update the ImageRating 
-         * in one database trip but the tags are much more complicated because the tag metadata from the image itself will not have
-         * the tagId needed for the database also these metadata tags may or may not be in the tags table.
-         * 
-         * thus for now the most efficient thing i could think to do was to update the ratings in one shot
-         * then since not every image will even have a tag only update the ones that have tags -- least amout of db round trips
-         * Also for the images that do have tags clear the image_tag_join table 1st so we dont double up on tags in the db. 
-         * 
-         * perfect heck no... But it works fine for a few hundred or maybe thousand images. 
-         * Really how many images are going to be on one folder? I am assuming at most maybe a few thousand
-         * 
-         */
-        private async Task ScanFolderImagesForMetaData(FolderViewModel folderVm)
-        {
-            ShowLoading = true;
-            //get all images at folder id
-            (List<Image> images, List<ImageTag> tags) imageResultA = await _imageMethods.GetAllImagesInFolder(folderVm.FolderId);
-            List<Image> images = imageResultA.images;
-            //scan images for metadata
-            List<Image> imagesPlusUpdatedMetaData = await ImageMetaDataHelper.ScanImagesForMetaData(images);
-            string imageUpdateSql = SqlStringBuilder.BuildImageSqlForScanMetadata(imagesPlusUpdatedMetaData);
-            bool success = await _imageMethods.UpdateImageRatingFromMetaData(imageUpdateSql, folderVm.FolderId);
-            foreach (Image image in imagesPlusUpdatedMetaData) 
-            {
-                if (image.Tags.Count > 0)
-                {
-                    //avoid duplicates
-                    await _imageMethods.ClearImageTagsJoinForMetaData(image);
-                    foreach (ImageTag tag in image.Tags)
-                    {
-                        await _imageMethods.UpdateImageTagFromMetaData(tag);
-                    }
-                }
-            }
-            //show data scanned success
-            if (success)
-            {
-                //Update TagsList to show in UI AutoCompleteBox
-                await GetTagsList();
-                //refresh UI
-                if (currentFilter == Filters.AllFoldersWithMetadataNotScanned || currentFilter == Filters.AllFoldersWithNoImportedImages)
-                {
-                    //have to call hard refresh for these two cases as they will not be returned from the query to update props
-                    await RefreshFolders();
-                }
-                else
-                {
-                    await RefreshFolderProps(CurrentDirectory, folderVm);
-                }
-            }
-            ShowLoading = false;
-        }
-
         private async void GetAllFolders()
         {
             List<Folder> allFolders = await _folderMethods.GetAllFolders();
