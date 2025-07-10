@@ -9,6 +9,12 @@ namespace ImagePerfect.ViewModels
 {
 	public class SettingsViewModel : ViewModelBase
 	{
+        //FolderPageSize and ImagePageSize are needed for pagination as well.
+        //image width max of 600 min of 300
+        private int _maxImageWidth = 600;
+        private int _folderPageSize = 20;
+        private int _imagePageSize = 20;
+
         private readonly IUnitOfWork _unitOfWork;
         
         private readonly SettingsMethods _settingsMethods;
@@ -20,15 +26,31 @@ namespace ImagePerfect.ViewModels
             _settingsMethods = new SettingsMethods(_unitOfWork);
         }
 
+        public int ImagePageSize
+        {
+            get => _imagePageSize;
+            set => this.RaiseAndSetIfChanged(ref _imagePageSize, value);
+        }
+        public int FolderPageSize
+        {
+            get => _folderPageSize;
+            set => this.RaiseAndSetIfChanged(ref _folderPageSize, value);
+        }
+        public int MaxImageWidth
+        {
+            get => _maxImageWidth;
+            set => this.RaiseAndSetIfChanged(ref _maxImageWidth, value);
+        }
+
         private async Task UpdateSettings()
         {
             //update database
             Settings settings = new()
             {
                 SettingsId = 1,
-                MaxImageWidth = _mainWindowViewModel.MaxImageWidth,
-                FolderPageSize = _mainWindowViewModel.FolderPageSize,
-                ImagePageSize = _mainWindowViewModel.ImagePageSize,
+                MaxImageWidth = MaxImageWidth,
+                FolderPageSize = FolderPageSize,
+                ImagePageSize = ImagePageSize,
             };
             await _settingsMethods.UpdateSettings(settings);
         }
@@ -36,9 +58,9 @@ namespace ImagePerfect.ViewModels
         public async Task GetSettings()
         {
             Settings settings = await _settingsMethods.GetSettings();
-            _mainWindowViewModel.MaxImageWidth = settings.MaxImageWidth;
-            _mainWindowViewModel.FolderPageSize = settings.FolderPageSize;
-            _mainWindowViewModel.ImagePageSize = settings.ImagePageSize;
+            MaxImageWidth = settings.MaxImageWidth;
+            FolderPageSize = settings.FolderPageSize;
+            ImagePageSize = settings.ImagePageSize;
         }
 
         public async Task PickImagePageSize(string size)
@@ -46,31 +68,31 @@ namespace ImagePerfect.ViewModels
             switch (size)
             {
                 case "20":
-                    _mainWindowViewModel.ImagePageSize = 20;
+                    ImagePageSize = 20;
                     break;
                 case "40":
-                    _mainWindowViewModel.ImagePageSize = 40;
+                    ImagePageSize = 40;
                     break;
                 case "60":
-                    _mainWindowViewModel.ImagePageSize = 60;
+                    ImagePageSize = 60;
                     break;
                 case "80":
-                    _mainWindowViewModel.ImagePageSize = 80;
+                    ImagePageSize = 80;
                     break;
                 case "100":
-                    _mainWindowViewModel.ImagePageSize = 100;
+                    ImagePageSize = 100;
                     break;
                 case "125":
-                    _mainWindowViewModel.ImagePageSize = 125;
+                    ImagePageSize = 125;
                     break;
                 case "150":
-                    _mainWindowViewModel.ImagePageSize = 150;
+                    ImagePageSize = 150;
                     break;
                 case "175":
-                    _mainWindowViewModel.ImagePageSize = 175;
+                    ImagePageSize = 175;
                     break;
                 case "200":
-                    _mainWindowViewModel.ImagePageSize = 200;
+                    ImagePageSize = 200;
                     break;
             }
             await UpdateSettings();
@@ -83,19 +105,19 @@ namespace ImagePerfect.ViewModels
             switch (size)
             {
                 case "20":
-                    _mainWindowViewModel.FolderPageSize = 20;
+                    FolderPageSize = 20;
                     break;
                 case "40":
-                    _mainWindowViewModel.FolderPageSize = 40;
+                    FolderPageSize = 40;
                     break;
                 case "60":
-                    _mainWindowViewModel.FolderPageSize = 60;
+                    FolderPageSize = 60;
                     break;
                 case "80":
-                    _mainWindowViewModel.FolderPageSize = 80;
+                    FolderPageSize = 80;
                     break;
                 case "100":
-                    _mainWindowViewModel.FolderPageSize = 100;
+                    FolderPageSize = 100;
                     break;
             }
             await UpdateSettings();
@@ -105,7 +127,7 @@ namespace ImagePerfect.ViewModels
         }
         public async Task SelectImageWidth(decimal size)
         {
-            _mainWindowViewModel.MaxImageWidth = (int)size;
+            MaxImageWidth = (int)size;
             await UpdateSettings();
         }
         public async Task PickImageWidth(string size)
@@ -113,19 +135,19 @@ namespace ImagePerfect.ViewModels
             switch (size)
             {
                 case "Small":
-                    _mainWindowViewModel.MaxImageWidth = 300;
+                    MaxImageWidth = 300;
                     break;
                 case "Medium":
-                    _mainWindowViewModel.MaxImageWidth = 400;
+                    MaxImageWidth = 400;
                     break;
                 case "Large":
-                    _mainWindowViewModel.MaxImageWidth = 500;
+                    MaxImageWidth = 500;
                     break;
                 case "XLarge":
-                    _mainWindowViewModel.MaxImageWidth = 550;
+                    MaxImageWidth = 550;
                     break;
                 case "XXLarge":
-                    _mainWindowViewModel.MaxImageWidth = 600;
+                    MaxImageWidth = 600;
                     break;
             }
             await UpdateSettings();
