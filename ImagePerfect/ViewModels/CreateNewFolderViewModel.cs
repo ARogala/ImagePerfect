@@ -30,7 +30,7 @@ namespace ImagePerfect.ViewModels
             set
             {
                 this.RaiseAndSetIfChanged(ref _newFolderName, value);
-                if (value == "" || _mainWindowViewModel.CurrentDirectory == _mainWindowViewModel.RootFolderLocation || _mainWindowViewModel.currentFilter != MainWindowViewModel.Filters.None)
+                if (value == "" || _mainWindowViewModel.CurrentDirectory == _mainWindowViewModel.InitializeVm.RootFolderLocation || _mainWindowViewModel.currentFilter != MainWindowViewModel.Filters.None)
                 {
                     IsNewFolderEnabled = false;
                 }

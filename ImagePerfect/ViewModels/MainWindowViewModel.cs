@@ -35,7 +35,6 @@ namespace ImagePerfect.ViewModels
         private string _savedDirectory = string.Empty;
         private string _selectedImagesNewDirectory = string.Empty;
         private bool _filterInCurrentDirectory = false;
-        private string _rootFolderLocation = string.Empty;
         private List<Tag> _tagsList = new List<Tag>();
 
         public List<Folder> displayFolders = new List<Folder>();
@@ -391,11 +390,6 @@ namespace ImagePerfect.ViewModels
         {
             get => _filterInCurrentDirectory;
             set => this.RaiseAndSetIfChanged(ref _filterInCurrentDirectory, value);
-        }
-        public string RootFolderLocation
-        {
-            get => _rootFolderLocation;
-            set => _rootFolderLocation = value;
         }
 
         public InitializeViewModel InitializeVm { get; }
@@ -925,7 +919,7 @@ namespace ImagePerfect.ViewModels
         //think all three BackFolder methods can just be reduced to this one
         private async void BackFolderFromDirectoryOptionsPanel()
         {
-            if(CurrentDirectory == RootFolderLocation)
+            if(CurrentDirectory == InitializeVm.RootFolderLocation)
             {
                 return;
             }
@@ -1331,7 +1325,7 @@ namespace ImagePerfect.ViewModels
 
         private async Task CopyCoverImageToContainingFolder(FolderViewModel folderVm)
         {
-            if (PathHelper.RemoveOneFolderFromPath(folderVm.FolderPath) == RootFolderLocation) 
+            if (PathHelper.RemoveOneFolderFromPath(folderVm.FolderPath) == InitializeVm.RootFolderLocation) 
             {
                 var box = MessageBoxManager.GetMessageBoxStandard("Copy Cover", "Cannot copy from root folder.", ButtonEnum.Ok);
                 await box.ShowAsync();
