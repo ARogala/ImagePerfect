@@ -119,7 +119,7 @@ namespace ImagePerfect.ViewModels
                 await ImportImagesVm.ImportImages(imageFolder);
             });
             AddFolderDescriptionCommand = ReactiveCommand.Create((FolderViewModel folderVm) => {
-                UpdateFolder(folderVm, "Description");
+                ModifyFolderDataVm.UpdateFolder(folderVm, "Description");
             });
             AddFolderTagsCommand = ReactiveCommand.Create((FolderViewModel folderVm) => {
                 AddFolderTag(folderVm);
@@ -128,7 +128,7 @@ namespace ImagePerfect.ViewModels
                 EditFolderTag(folderVm);
             });
             AddFolderRatingCommand = ReactiveCommand.Create((FolderViewModel folderVm) => {
-                UpdateFolder(folderVm, "Rating");
+                ModifyFolderDataVm.UpdateFolder(folderVm, "Rating");
             });
             AddImageTagsCommand = ReactiveCommand.Create((ImageViewModel imageVm) => {
                 ModifyImageDataVm.AddImageTag(imageVm);
@@ -1040,18 +1040,6 @@ namespace ImagePerfect.ViewModels
             }
             else 
             {
-                return;
-            }
-        }
-
-        private async void UpdateFolder(FolderViewModel folderVm, string fieldUpdated)
-        {
-            Folder folder = FolderMapper.GetFolderFromVm(folderVm);
-            bool success = await _folderMethods.UpdateFolder(folder);
-            if (!success)
-            {
-                var box = MessageBoxManager.GetMessageBoxStandard($"Add {fieldUpdated}", $"Folder {fieldUpdated} update error. Try again.", ButtonEnum.Ok);
-                await box.ShowAsync();
                 return;
             }
         }
