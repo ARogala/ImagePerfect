@@ -136,7 +136,7 @@ namespace ImagePerfect.ViewModels
                 AddMultipleImageTags(selectedTagsListBox);
             });
             EditImageTagsCommand = ReactiveCommand.Create((ImageViewModel imageVm) => {
-                EditImageTag(imageVm);
+                ModifyImageDataVm.EditImageTag(imageVm);
             });
             AddImageRatingCommand = ReactiveCommand.Create((ImageViewModel imageVm) => {
                 ModifyImageDataVm.UpdateImage(imageVm, "Rating");
@@ -1105,39 +1105,6 @@ namespace ImagePerfect.ViewModels
             }
         }
 
-        //remove the tag from the image_tag_join table 
-        //Also need to remove imageMetaData
-        private async void EditImageTag(ImageViewModel imageVm)
-        {
-            if(imageVm.ImageTags == null || imageVm.ImageTags == "")
-            {
-                if(imageVm.Tags.Count == 1)
-                {
-                    await _imageMethods.DeleteImageTag(imageVm.Tags[0]);
-                    //remove tag from image metadata
-                    await ImageMetaDataHelper.WriteTagToImage(imageVm);
-                }
-                else if(imageVm.Tags.Count == 0)
-                {
-                    return;
-                }
-            }
-            List<string> imageTags = imageVm.ImageTags.Split(",").ToList();
-            ImageTag tagToRemove = null;
-            foreach(ImageTag tag in imageVm.Tags)
-            {
-                if (!imageTags.Contains(tag.TagName))
-                {
-                    tagToRemove = tag;
-                }
-            }
-            if (tagToRemove != null) 
-            { 
-                await _imageMethods.DeleteImageTag(tagToRemove);
-                //remove tag from image metadata
-                await ImageMetaDataHelper.WriteTagToImage(imageVm);
-            }
-        }
         //update ImageTags in db, and update image metadata
         private async void AddImageTag(ImageViewModel imageVm)
         {
