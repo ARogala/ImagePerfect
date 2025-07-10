@@ -8,6 +8,8 @@ using ReactiveUI;
 using ImagePerfect.ObjectMappers;
 using ImagePerfect.Helpers;
 using System.Linq;
+using Avalonia.Controls;
+using Image = ImagePerfect.Models.Image;
 
 namespace ImagePerfect.ViewModels
 {
@@ -112,6 +114,82 @@ namespace ImagePerfect.ViewModels
                 imageVm.ImageTags = imageVm.ImageTags.Remove(removeStartAtIndex);
                 //clear NewTag in box if try to input duplicate tag
                 imageVm.NewTag = "";
+            }
+        }
+
+        public async void AddMultipleImageTags(ListBox selectedTagsListBox)
+        {
+            if (selectedTagsListBox.DataContext != null && selectedTagsListBox.SelectedItems != null)
+            {
+                ImageViewModel imageVm = (ImageViewModel)selectedTagsListBox.DataContext;
+                List<Tag> tagsToAdd = new List<Tag>();
+                //nothing selected just return
+                if (selectedTagsListBox.SelectedItems.Count == 0)
+                {
+                    return;
+                }
+                //if no current tags just add all to list
+                if (imageVm.ImageTags == "" || imageVm.ImageTags == null)
+                {
+                    foreach (Tag selectedTag in selectedTagsListBox.SelectedItems)
+                    {
+                        tagsToAdd.Add(selectedTag);
+                    }
+                }
+                //else only add non duplicates
+                else
+                {
+                    foreach (Tag selectedTag in selectedTagsListBox.SelectedItems)
+                    {
+                        if (!imageVm.ImageTags.Contains(selectedTag.TagName))
+                        {
+                            tagsToAdd.Add(selectedTag);
+                        }
+                    }
+                }
+                //add new tags to ImageTags -- KEEP!! THIS IS NEEDED TO WRITE METADATA
+                foreach (Tag selectedTag in tagsToAdd)
+                {
+                    if (string.IsNullOrEmpty(imageVm.ImageTags))
+                    {
+                        imageVm.ImageTags = selectedTag.TagName;
+                    }
+                    else
+                    {
+                        imageVm.ImageTags = imageVm.ImageTags + "," + selectedTag.TagName;
+                    }
+                }
+                //build sql for bulk insert
+                string sql = SqlStringBuilder.BuildSqlForAddMultipleImageTags(tagsToAdd, imageVm);
+                //update sql db
+                bool success = await _imageMethods.AddMultipleImageTags(sql);
+                //write new tags to image file
+                if (success)
+                {
+                    //write new tags to image metadata
+                    await ImageMetaDataHelper.WriteTagToImage(imageVm);
+                }
+                else
+                {
+                    List<string> imageTags = imageVm.ImageTags.Split(",").ToList();
+                    //if fail remove the tags from the Tags list in the UI
+                    foreach (Tag tag in tagsToAdd)
+                    {
+                        imageTags.Remove(tag.TagName);
+                    }
+                    for (int i = 0; i < imageTags.Count; i++)
+                    {
+                        if (i == 0)
+                        {
+                            imageVm.ImageTags = imageTags[i];
+                        }
+                        else
+                        {
+                            imageVm.ImageTags = imageVm.ImageTags + "," + imageTags[i];
+
+                        }
+                    }
+                }
             }
         }
     }
