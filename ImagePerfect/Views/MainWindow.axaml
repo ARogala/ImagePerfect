@@ -149,7 +149,7 @@
 			<Grid RowDefinitions="Auto" ColumnDefinitions="Auto,Auto,Auto" Width="600" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
 				<StackPanel Grid.Row="0" Grid.Column="0" Width="200">
 					<TextBlock Margin="0 10 0 5">Pick Image Width</TextBlock>
-					<TextBlock Margin="0 10 0 5" Text="{Binding MaxImageWidth}" />
+					<TextBlock Margin="0 10 0 5" Text="{Binding SettingsVm.MaxImageWidth}" />
 					<RadioButton GroupName="PickImageWidth" x:Name="ImageWidthSmall" Content="Small"
 								 Command="{Binding PickImageWidthCommand}"
 								 CommandParameter="{Binding #ImageWidthSmall.Content}"/>
@@ -166,12 +166,12 @@
 								 Command="{Binding PickImageWidthCommand}"
 								 CommandParameter="{Binding #ImageWidthXXLarge.Content}"/>
 					
-					<NumericUpDown FormatString="0" Maximum="600" Minimum="300" Margin="5" Value="{Binding MaxImageWidth}" x:Name="ImageWidthSelect" />
+					<NumericUpDown FormatString="0" Maximum="600" Minimum="300" Margin="5" Value="{Binding SettingsVm.MaxImageWidth}" x:Name="ImageWidthSelect" />
 					<Button Command="{Binding SelectImageWidthCommand}" CommandParameter="{Binding #ImageWidthSelect.Value}" Classes="menu-btn">Save Selected Width</Button>
 				</StackPanel>
 				<StackPanel Grid.Row="0" Grid.Column="1" Width="200">
 					<TextBlock Margin="0 10 0 5">Pick Folder Pagination Size</TextBlock>
-					<TextBlock Margin="0 10 0 5" Text="{Binding FolderPageSize}"/>
+					<TextBlock Margin="0 10 0 5" Text="{Binding SettingsVm.FolderPageSize}"/>
 					<RadioButton GroupName="PickFolderPaginationSize" x:Name="FolderPagination20" Content="20"
 								 Command="{Binding PickFolderPageSizeCommand}"
 								 CommandParameter="{Binding #FolderPagination20.Content}"/>
@@ -190,7 +190,7 @@
 				</StackPanel>
 				<StackPanel Grid.Row="0" Grid.Column="2" Width="200">
 					<TextBlock Margin="0 10 0 5">Pick Image Pagination Size</TextBlock>
-					<TextBlock Margin="0 10 0 5" Text="{Binding ImagePageSize}"/>
+					<TextBlock Margin="0 10 0 5" Text="{Binding SettingsVm.ImagePageSize}"/>
 					<RadioButton GroupName="PickImagePaginationSize" x:Name="ImagePagination20" Content="20"
 								 Command="{Binding PickImagePageSizeCommand}"
 								 CommandParameter="{Binding #ImagePagination20.Content}"/>
@@ -321,8 +321,8 @@
 					<ItemsControl.ItemTemplate>
 						<DataTemplate DataType="vm:FolderViewModel">
 							<StackPanel Margin="1">
-								<TextBlock MaxWidth="{Binding #Root.((vm:MainWindowViewModel)DataContext).MaxImageWidth}" Text="{Binding FolderName}"/>
-								<Image MaxWidth="{Binding #Root.((vm:MainWindowViewModel)DataContext).MaxImageWidth}" Source="{Binding CoverImageBitmap}" />
+								<TextBlock MaxWidth="{Binding #Root.((vm:MainWindowViewModel)DataContext).SettingsVm.MaxImageWidth}" Text="{Binding FolderName}"/>
+								<Image MaxWidth="{Binding #Root.((vm:MainWindowViewModel)DataContext).SettingsVm.MaxImageWidth}" Source="{Binding CoverImageBitmap}" />
 								<Grid RowDefinitions="Auto" ColumnDefinitions="*,*,*,*" MaxWidth="600" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
 									<Button Grid.Row="0" Grid.Column="0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="2" IsEnabled="{Binding !IsRoot}"
 											Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).BackFolderCommand}"
@@ -414,7 +414,7 @@
 					<ItemsControl.ItemTemplate>
 						<DataTemplate DataType="vm:ImageViewModel">
 							<StackPanel Margin="1">
-								<Image MaxWidth="{Binding #Root.((vm:MainWindowViewModel)DataContext).MaxImageWidth}" Source="{Binding ImageBitmap}" />
+								<Image MaxWidth="{Binding #Root.((vm:MainWindowViewModel)DataContext).SettingsVm.MaxImageWidth}" Source="{Binding ImageBitmap}" />
 								<Grid RowDefinitions="Auto" ColumnDefinitions="*,*,*,Auto" MaxWidth="600" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
 									<Button Grid.Row="0" Grid.Column="0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="2"
 									Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).BackFolderFromImageCommand}"
