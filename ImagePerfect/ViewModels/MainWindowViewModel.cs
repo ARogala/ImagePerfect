@@ -89,6 +89,7 @@ namespace ImagePerfect.ViewModels
             _imageMethods = new ImageMethods(_unitOfWork);
             _showLoading = false;
 
+            ModifyImageDataVm = new ModifyImageDataViewModel(_unitOfWork, this);
             ExternalProgramVm = new ExternalProgramViewModel(this);
             CoverImageVm = new CoverImageViewModel(_unitOfWork, this);
             ScanImagesForMetaDataVm = new ScanImagesForMetaDataViewModel(_unitOfWork, this);
@@ -138,7 +139,7 @@ namespace ImagePerfect.ViewModels
                 EditImageTag(imageVm);
             });
             AddImageRatingCommand = ReactiveCommand.Create((ImageViewModel imageVm) => {
-                UpdateImage(imageVm, "Rating");
+                ModifyImageDataVm.UpdateImage(imageVm, "Rating");
             });
             DeleteLibraryCommand = ReactiveCommand.Create(() => {
                 DeleteLibrary();
@@ -396,6 +397,7 @@ namespace ImagePerfect.ViewModels
             set => this.RaiseAndSetIfChanged(ref _filterInCurrentDirectory, value);
         }
 
+        public ModifyImageDataViewModel ModifyImageDataVm { get; }
         public ExternalProgramViewModel ExternalProgramVm { get; }
         public CoverImageViewModel CoverImageVm { get; }
         public ScanImagesForMetaDataViewModel ScanImagesForMetaDataVm { get; }
@@ -1101,25 +1103,6 @@ namespace ImagePerfect.ViewModels
             {
                 folderVm.NewTag = "";
             }
-        }
-
-        //update image sql and metadata only. 
-        private async void UpdateImage(ImageViewModel imageVm, string fieldUpdated)
-        {
-            Image image = ImageMapper.GetImageFromVm(imageVm);
-            bool success = await _imageMethods.UpdateImage(image);
-            if (!success)
-            {
-                var box = MessageBoxManager.GetMessageBoxStandard($"Add {fieldUpdated}", $"Image {fieldUpdated} update error. Try again.", ButtonEnum.Ok);
-                await box.ShowAsync();
-                return;     
-            }
-            //write rating to image metadata
-            if (fieldUpdated == "Rating")
-            {
-                ImageMetaDataHelper.AddRatingToImage(image);
-            }
-           
         }
 
         //remove the tag from the image_tag_join table 
