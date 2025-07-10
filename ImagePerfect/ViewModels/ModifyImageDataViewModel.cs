@@ -7,6 +7,7 @@ using MsBox.Avalonia;
 using ReactiveUI;
 using ImagePerfect.ObjectMappers;
 using ImagePerfect.Helpers;
+using System.Linq;
 
 namespace ImagePerfect.ViewModels
 {
@@ -37,6 +38,40 @@ namespace ImagePerfect.ViewModels
             if (fieldUpdated == "Rating")
             {
                 ImageMetaDataHelper.AddRatingToImage(image);
+            }
+        }
+
+        //remove the tag from the image_tag_join table 
+        //Also need to remove imageMetaData
+        public async void EditImageTag(ImageViewModel imageVm)
+        {
+            if (imageVm.ImageTags == null || imageVm.ImageTags == "")
+            {
+                if (imageVm.Tags.Count == 1)
+                {
+                    await _imageMethods.DeleteImageTag(imageVm.Tags[0]);
+                    //remove tag from image metadata
+                    await ImageMetaDataHelper.WriteTagToImage(imageVm);
+                }
+                else if (imageVm.Tags.Count == 0)
+                {
+                    return;
+                }
+            }
+            List<string> imageTags = imageVm.ImageTags.Split(",").ToList();
+            ImageTag tagToRemove = null;
+            foreach (ImageTag tag in imageVm.Tags)
+            {
+                if (!imageTags.Contains(tag.TagName))
+                {
+                    tagToRemove = tag;
+                }
+            }
+            if (tagToRemove != null)
+            {
+                await _imageMethods.DeleteImageTag(tagToRemove);
+                //remove tag from image metadata
+                await ImageMetaDataHelper.WriteTagToImage(imageVm);
             }
         }
     }
