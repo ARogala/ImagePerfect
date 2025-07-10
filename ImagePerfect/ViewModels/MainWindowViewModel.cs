@@ -89,6 +89,7 @@ namespace ImagePerfect.ViewModels
             _imageMethods = new ImageMethods(_unitOfWork);
             _showLoading = false;
 
+            ExternalProgramVm = new ExternalProgramViewModel(this);
             CoverImageVm = new CoverImageViewModel(_unitOfWork, this);
             ScanImagesForMetaDataVm = new ScanImagesForMetaDataViewModel(_unitOfWork, this);
             ImportImagesVm = new ImportImagesViewModel(_unitOfWork, this);
@@ -143,10 +144,10 @@ namespace ImagePerfect.ViewModels
                 DeleteLibrary();
             });
             OpenImageInExternalViewerCommand = ReactiveCommand.Create((ImageViewModel imageVm) => {
-                OpenImageInExternalViewer(imageVm);
+                ExternalProgramVm.OpenImageInExternalViewer(imageVm);
             });
             OpenCurrentDirectoryWithExplorerCommand = ReactiveCommand.Create(() => {
-                OpenCurrentDirectoryWithExplorer();
+                ExternalProgramVm.OpenCurrentDirectoryWithExplorer();
             });
             MoveImageToTrashCommand = ReactiveCommand.Create(async (ImageViewModel imageVm) => {
                 await MoveImages.MoveImageToTrash(imageVm);
@@ -395,6 +396,7 @@ namespace ImagePerfect.ViewModels
             set => this.RaiseAndSetIfChanged(ref _filterInCurrentDirectory, value);
         }
 
+        public ExternalProgramViewModel ExternalProgramVm { get; }
         public CoverImageViewModel CoverImageVm { get; }
         public ScanImagesForMetaDataViewModel ScanImagesForMetaDataVm { get; }
         public ImportImagesViewModel ImportImagesVm { get; }
@@ -1268,38 +1270,7 @@ namespace ImagePerfect.ViewModels
                 }
             }
         }
-        private async void OpenImageInExternalViewer(ImageViewModel imageVm)
-        {
-            string externalImageViewerExePath = PathHelper.GetExternalImageViewerExePath();
-            string imagePathForProcessStart = PathHelper.FormatImageFilePathForProcessStart(imageVm.ImagePath);
-            if (File.Exists(imageVm.ImagePath) && File.Exists(externalImageViewerExePath)) 
-            {
-                Process.Start(externalImageViewerExePath, imagePathForProcessStart);
-            }
-            else
-            {
-                var box = MessageBoxManager.GetMessageBoxStandard("Open Image", "You need to install nomacs.", ButtonEnum.Ok);
-                await box.ShowAsync();
-                return;
-            }
-        }
-
-        private async void OpenCurrentDirectoryWithExplorer()
-        {
-            string externalFileExplorerExePath = PathHelper.GetExternalFileExplorerExePath();
-            string folderPathForProcessStart = PathHelper.FormatImageFilePathForProcessStart(CurrentDirectory); //not an image path but all this did was wrap it in quotes
-            if (File.Exists(externalFileExplorerExePath) && Directory.Exists(CurrentDirectory))
-            {
-                Process.Start(externalFileExplorerExePath, folderPathForProcessStart);
-            }
-            else
-            {
-                var box = MessageBoxManager.GetMessageBoxStandard("Open Folder", "Sorry something went wrong.", ButtonEnum.Ok);
-                await box.ShowAsync();
-                return;
-            }
-        }
-
+        
         private async void GetAllFolders()
         {
             List<Folder> allFolders = await _folderMethods.GetAllFolders();
