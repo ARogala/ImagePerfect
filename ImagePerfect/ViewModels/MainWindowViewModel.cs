@@ -89,6 +89,7 @@ namespace ImagePerfect.ViewModels
             _imageMethods = new ImageMethods(_unitOfWork);
             _showLoading = false;
 
+            ModifyFolderDataVm = new ModifyFolderDataViewModel(_unitOfWork, this);
             ModifyImageDataVm = new ModifyImageDataViewModel(_unitOfWork, this);
             ExternalProgramVm = new ExternalProgramViewModel(this);
             CoverImageVm = new CoverImageViewModel(_unitOfWork, this);
@@ -397,6 +398,7 @@ namespace ImagePerfect.ViewModels
             set => this.RaiseAndSetIfChanged(ref _filterInCurrentDirectory, value);
         }
 
+        public ModifyFolderDataViewModel ModifyFolderDataVm { get; }
         public ModifyImageDataViewModel ModifyImageDataVm { get; }
         public ExternalProgramViewModel ExternalProgramVm { get; }
         public CoverImageViewModel CoverImageVm { get; }
