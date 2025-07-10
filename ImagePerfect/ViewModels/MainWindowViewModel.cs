@@ -1043,15 +1043,5 @@ namespace ImagePerfect.ViewModels
                 return;
             }
         }
-
-        private async void GetAllFolders()
-        {
-            List<Folder> allFolders = await _folderMethods.GetAllFolders();
-            foreach (Folder folder in allFolders) 
-            {
-                FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(folder);
-                LibraryFolders.Add(folderViewModel);
-            }
-        }
     }
 }
