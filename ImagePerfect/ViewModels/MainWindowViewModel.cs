@@ -130,7 +130,7 @@ namespace ImagePerfect.ViewModels
                 UpdateFolder(folderVm, "Rating");
             });
             AddImageTagsCommand = ReactiveCommand.Create((ImageViewModel imageVm) => {
-                AddImageTag(imageVm);
+                ModifyImageDataVm.AddImageTag(imageVm);
             });
             AddMultipleImageTagsCommand = ReactiveCommand.Create((ListBox selectedTagsListBox) => {
                 AddMultipleImageTags(selectedTagsListBox);
@@ -1105,46 +1105,6 @@ namespace ImagePerfect.ViewModels
             }
         }
 
-        //update ImageTags in db, and update image metadata
-        private async void AddImageTag(ImageViewModel imageVm)
-        {
-            //click submit with empty input just return
-            if(imageVm.NewTag == "" || imageVm.NewTag == null)
-            {
-                return;
-            }
-            //add NewTag to ImageTags -- KEEP!! THIS IS NEEDED TO WRITE METADATA
-            if (string.IsNullOrEmpty(imageVm.ImageTags))
-            {
-                imageVm.ImageTags = imageVm.NewTag;
-            }
-            else
-            {
-                imageVm.ImageTags = imageVm.ImageTags + "," + imageVm.NewTag;
-            }
-            Image image = ImageMapper.GetImageFromVm(imageVm);
-            //update image table and tags table in db -- success will be false if you try to input a duplicate tag
-            bool success = await _imageMethods.UpdateImageTags(image, imageVm.NewTag);
-            if (success) 
-            {
-                //write new tag to image metadata
-                await ImageMetaDataHelper.WriteTagToImage(imageVm);
-                //Update TagsList to show in UI AutoCompleteBox clear NewTag in box as well
-                await GetTagsList();
-                imageVm.NewTag = "";
-            }
-            else
-            {
-                //remove the NewTag from the Tags list in the UI (New tag was duplicate and not added in this case)
-                int tagsMaxIndex = imageVm.ImageTags.Length - 1;
-                int newTagTotalCharsToRemove = imageVm.NewTag.Length; //total chars to remove
-                int removeStartAtIndex = tagsMaxIndex - newTagTotalCharsToRemove;
-                imageVm.ImageTags = imageVm.ImageTags.Remove(removeStartAtIndex);
-                //clear NewTag in box if try to input duplicate tag
-                imageVm.NewTag = "";
-            }
-        }
-        
         private async void AddMultipleImageTags(ListBox selectedTagsListBox)
         {
             if (selectedTagsListBox.DataContext != null && selectedTagsListBox.SelectedItems != null)
