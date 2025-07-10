@@ -89,6 +89,7 @@ namespace ImagePerfect.ViewModels
             _imageMethods = new ImageMethods(_unitOfWork);
             _showLoading = false;
 
+            CoverImageVm = new CoverImageViewModel(_unitOfWork, this);
             ScanImagesForMetaDataVm = new ScanImagesForMetaDataViewModel(_unitOfWork, this);
             ImportImagesVm = new ImportImagesViewModel(_unitOfWork, this);
             InitializeVm = new InitializeViewModel(_unitOfWork, this);
@@ -281,13 +282,13 @@ namespace ImagePerfect.ViewModels
                 await ImportImagesVm.ImportAllFoldersOnCurrentPage(foldersItemsControl);
             });
             AddCoverImageOnCurrentPageCommand = ReactiveCommand.Create(async (ItemsControl folderItemsControl) => { 
-                await AddCoverImageOnCurrentPage(folderItemsControl);
+                await CoverImageVm.AddCoverImageOnCurrentPage(folderItemsControl);
             });
             ScanAllFoldersOnCurrentPageCommand = ReactiveCommand.Create(async (ItemsControl foldersItemsControl) => {
                 await ScanImagesForMetaDataVm.ScanAllFoldersOnCurrentPage(foldersItemsControl);
             });
             CopyCoverImageToContainingFolderCommand = ReactiveCommand.Create(async (FolderViewModel folderVm) => { 
-                await CopyCoverImageToContainingFolder(folderVm);
+                await CoverImageVm.CopyCoverImageToContainingFolder(folderVm);
             });
             CreateNewFolderCommand = ReactiveCommand.Create(async () => {
                 await CreateNewFolder.CreateNewFolder();
@@ -394,6 +395,7 @@ namespace ImagePerfect.ViewModels
             set => this.RaiseAndSetIfChanged(ref _filterInCurrentDirectory, value);
         }
 
+        public CoverImageViewModel CoverImageVm { get; }
         public ScanImagesForMetaDataViewModel ScanImagesForMetaDataVm { get; }
         public ImportImagesViewModel ImportImagesVm { get; }
         public InitializeViewModel InitializeVm { get; }
@@ -1298,101 +1300,6 @@ namespace ImagePerfect.ViewModels
             }
         }
 
-        private async Task CopyCoverImageToContainingFolder(FolderViewModel folderVm)
-        {
-            if (PathHelper.RemoveOneFolderFromPath(folderVm.FolderPath) == InitializeVm.RootFolderLocation) 
-            {
-                var box = MessageBoxManager.GetMessageBoxStandard("Copy Cover", "Cannot copy from root folder.", ButtonEnum.Ok);
-                await box.ShowAsync();
-                return;
-            }
-            if(folderVm.CoverImagePath == "" || folderVm.CoverImagePath == null)
-            {
-                var box = MessageBoxManager.GetMessageBoxStandard("Copy Cover", "The folder must have a cover selected to copy.", ButtonEnum.Ok);
-                await box.ShowAsync();
-                return;
-            }
-            
-            
-            string coverImageCurrentPath = folderVm.CoverImagePath;
-            string coverImageNewPath = PathHelper.GetCoverImagePathForCopyCoverImageToContainingFolder(folderVm);
-            Folder containingFolder = await _folderMethods.GetFolderAtDirectory(PathHelper.RemoveOneFolderFromPath(folderVm.FolderPath));
-            if (containingFolder.CoverImagePath != "")
-            {
-                var boxYesNo = MessageBoxManager.GetMessageBoxStandard("Copy Cover", "Containing folder already has a cover. Do you want to copy another?", ButtonEnum.YesNo);
-                var boxResult = await boxYesNo.ShowAsync();
-                if (boxResult == ButtonResult.No)
-                {
-                    return;
-                }
-            }
-            if (File.Exists(coverImageNewPath)) 
-            {
-                var box = MessageBoxManager.GetMessageBoxStandard("Copy Cover", "A cover image in the destination has the same file name. Pick a different cover", ButtonEnum.Ok);
-                await box.ShowAsync();
-                return;
-            }
-            //add cover image path to containing folder
-            bool success = await _folderMethods.UpdateCoverImage(coverImageNewPath, containingFolder.FolderId);
-            //copy file in file system
-            if (success) 
-            {
-                File.Copy(coverImageCurrentPath, coverImageNewPath);
-            }
-        }
-        private async Task AddCoverImageOnCurrentPage(ItemsControl foldersItemsControl)
-        {
-            List<FolderViewModel> allFolders = foldersItemsControl.Items.OfType<FolderViewModel>().ToList();
-            Random random = new Random();
-            foreach (FolderViewModel folder in allFolders)
-            {
-                if (folder.HasFiles == true && folder.AreImagesImported == true)
-                {
-                    (List<Image> images, List<ImageTag> tags) imageResult = await _imageMethods.GetAllImagesInFolder(folder.FolderId);
-                    List<Image> images = imageResult.images;
-                    int randomIndex = random.Next(0, images.Count - 1);
-                    //set random fall back cover
-                    string cover = images[randomIndex].ImagePath;
-                    //get cover clean
-                    foreach (Image image in images) 
-                    { 
-                        if (image.ImagePath.ToLower().Contains("cover") && image.ImagePath.ToLower().Contains("clean"))
-                        {
-                            cover = image.ImagePath;    
-                            break;
-                        }
-                    }
-                    //if no cover clean get poster
-                    if (!(cover.ToLower().Contains("cover") && cover.ToLower().Contains("clean")))
-                    {
-                        foreach (Image image in images)
-                        {
-                            if (image.ImagePath.ToLower().Contains("poster"))
-                            {
-                                cover = image.ImagePath;
-                                break;
-                            }
-                        }
-                    }
-                    //if no poster or no cover clean get cover
-                    if (!(cover.ToLower().Contains("poster") || (cover.ToLower().Contains("cover") && cover.ToLower().Contains("clean"))))
-                    {
-                        foreach (Image image in images)
-                        {
-                            if (image.ImagePath.ToLower().Contains("cover"))
-                            {
-                                cover = image.ImagePath;
-                                break;
-                            }
-                        }
-                    }
-                    folder.CoverImagePath = cover;
-                    await _folderMethods.UpdateFolder(FolderMapper.GetFolderFromVm(folder));
-                }
-            }
-            await RefreshFolders();
-        }
-        
         private async void GetAllFolders()
         {
             List<Folder> allFolders = await _folderMethods.GetAllFolders();
