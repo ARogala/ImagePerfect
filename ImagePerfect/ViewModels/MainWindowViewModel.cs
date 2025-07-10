@@ -89,6 +89,7 @@ namespace ImagePerfect.ViewModels
             _imageMethods = new ImageMethods(_unitOfWork);
             _showLoading = false;
 
+            ImportImagesVm = new ImportImagesViewModel(_unitOfWork, this);
             InitializeVm = new InitializeViewModel(_unitOfWork, this);
             SavedDirectoryVm = new SavedDirectoryViewModel(_unitOfWork, this);
             FavoriteFoldersVm = new FavoriteFoldersViewModel(_unitOfWork);
@@ -110,7 +111,7 @@ namespace ImagePerfect.ViewModels
                 BackFolderFromDirectoryOptionsPanel();
             });
             ImportImagesCommand = ReactiveCommand.Create(async (FolderViewModel imageFolder) => {
-                await ImportImages(imageFolder);
+                await ImportImagesVm.ImportImages(imageFolder);
             });
             AddFolderDescriptionCommand = ReactiveCommand.Create((FolderViewModel folderVm) => {
                 UpdateFolder(folderVm, "Description");
@@ -276,7 +277,7 @@ namespace ImagePerfect.ViewModels
                 await MoveImages.MoveSelectedImagesToNewFolder(imagesItemsControl);
             });
             ImportAllFoldersOnCurrentPageCommand = ReactiveCommand.Create(async (ItemsControl foldersItemsControl) => { 
-                await ImportAllFoldersOnCurrentPage(foldersItemsControl);
+                await ImportImagesVm.ImportAllFoldersOnCurrentPage(foldersItemsControl);
             });
             AddCoverImageOnCurrentPageCommand = ReactiveCommand.Create(async (ItemsControl folderItemsControl) => { 
                 await AddCoverImageOnCurrentPage(folderItemsControl);
@@ -392,6 +393,7 @@ namespace ImagePerfect.ViewModels
             set => this.RaiseAndSetIfChanged(ref _filterInCurrentDirectory, value);
         }
 
+        public ImportImagesViewModel ImportImagesVm { get; }
         public InitializeViewModel InitializeVm { get; }
         public SavedDirectoryViewModel SavedDirectoryVm { get; }
         public FavoriteFoldersViewModel FavoriteFoldersVm { get; }
@@ -886,36 +888,7 @@ namespace ImagePerfect.ViewModels
             }
             ShowLoading = false;
         }
-        private async Task ImportImages(FolderViewModel imageFolder)
-        {
-            string newPath = string.Empty;
-            string imageFolderPath = imageFolder.FolderPath;
-            int imageFolderId = imageFolder.FolderId;
-            ShowLoading = true;
-            //build csv
-            bool csvIsSet = await ImageCsvMethods.BuildImageCsv(imageFolderPath, imageFolderId);
-            //write csv to database and load folders and images at the location again
-            //load again so the import button will go away
-            if (csvIsSet) 
-            {
-                await _imageCsvMethods.AddImageCsv(imageFolderId);
-                //remove one folder from path
-                newPath = PathHelper.RemoveOneFolderFromPath(imageFolderPath);
-                //refresh UI
-                if(currentFilter == Filters.AllFoldersWithMetadataNotScanned || currentFilter == Filters.AllFoldersWithNoImportedImages)
-                {
-                    //have to call hard refresh for these two cases as they will not be returned from the query to update props
-                    await RefreshFolders();
-                }
-                else
-                {
-                    await RefreshFolderProps(newPath, imageFolder);
-                }
-            }
-            ShowLoading = false;
-        }
-
-
+        
         //think all three BackFolder methods can just be reduced to this one
         private async void BackFolderFromDirectoryOptionsPanel()
         {
@@ -1417,24 +1390,7 @@ namespace ImagePerfect.ViewModels
             }
             await RefreshFolders();
         }
-        private async Task ImportAllFoldersOnCurrentPage(ItemsControl foldersItemsControl)
-        {
-            var boxYesNo = MessageBoxManager.GetMessageBoxStandard("Import All Folders", "CAUTION this could take a long time are you sure?", ButtonEnum.YesNo);
-            var boxResult = await boxYesNo.ShowAsync();
-            if (boxResult == ButtonResult.Yes)
-            {
-                List<FolderViewModel> allFolders = foldersItemsControl.Items.OfType<FolderViewModel>().ToList();
-                foreach (FolderViewModel folder in allFolders) 
-                { 
-                    if(folder.HasFiles == true && folder.AreImagesImported == false)
-                    {
-                        await ImportImages(folder);
-                    }
-                }
-            }
-            ResetPagination();
-        }
-
+        
         private async Task ScanAllFoldersOnCurrentPage(ItemsControl foldersItemsControl)
         {
             var boxYesNo = MessageBoxManager.GetMessageBoxStandard("Scan All Folders", "CAUTION this could take a long time are you sure? Make sure to import images first.", ButtonEnum.YesNo);
