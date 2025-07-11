@@ -89,6 +89,7 @@ namespace ImagePerfect.ViewModels
             _imageMethods = new ImageMethods(_unitOfWork);
             _showLoading = false;
 
+            DirectoryNavigationVm = new DirectoryNavigationViewModel(this);
             ModifyFolderDataVm = new ModifyFolderDataViewModel(_unitOfWork, this);
             ModifyImageDataVm = new ModifyImageDataViewModel(_unitOfWork, this);
             ExternalProgramVm = new ExternalProgramViewModel(this);
@@ -104,16 +105,16 @@ namespace ImagePerfect.ViewModels
             CreateNewFolder = new CreateNewFolderViewModel(_unitOfWork, this);
 
             NextFolderCommand = ReactiveCommand.Create((FolderViewModel currentFolder) => {
-                NextFolder(currentFolder);
+                DirectoryNavigationVm.NextFolder(currentFolder);
             });
             BackFolderCommand = ReactiveCommand.Create((FolderViewModel currentFolder) => {
-                BackFolder(currentFolder);
+                DirectoryNavigationVm.BackFolder(currentFolder);
             });
             BackFolderFromImageCommand = ReactiveCommand.Create((ImageViewModel imageVm) => {
-                BackFolderFromImage(imageVm);
+                DirectoryNavigationVm.BackFolderFromImage(imageVm);
             });
             BackFolderFromDirectoryOptionsPanelCommand = ReactiveCommand.Create(() => {
-                BackFolderFromDirectoryOptionsPanel();
+                DirectoryNavigationVm.BackFolderFromDirectoryOptionsPanel();
             });
             ImportImagesCommand = ReactiveCommand.Create(async (FolderViewModel imageFolder) => {
                 await ImportImagesVm.ImportImages(imageFolder);
@@ -398,6 +399,7 @@ namespace ImagePerfect.ViewModels
             set => this.RaiseAndSetIfChanged(ref _filterInCurrentDirectory, value);
         }
 
+        public DirectoryNavigationViewModel DirectoryNavigationVm { get; }
         public ModifyFolderDataViewModel ModifyFolderDataVm { get; }
         public ModifyImageDataViewModel ModifyImageDataVm { get; }
         public ExternalProgramViewModel ExternalProgramVm { get; }
@@ -898,61 +900,6 @@ namespace ImagePerfect.ViewModels
             }
             ShowLoading = false;
         }
-        
-        //think all three BackFolder methods can just be reduced to this one
-        private async void BackFolderFromDirectoryOptionsPanel()
-        {
-            if(CurrentDirectory == InitializeVm.RootFolderLocation)
-            {
-                return;
-            }
-            //not ideal but keeps pagination to the folder your in. When you go back or next start from page 1
-            ResetPagination();
-            
-            string newPath = PathHelper.RemoveOneFolderFromPath(CurrentDirectory);
-            //set the current directory -- used to add new folder to location
-            CurrentDirectory = newPath;
-            //refresh UI
-            currentFilter = Filters.None;
-            await RefreshFolders();
-            await RefreshImages(newPath);
-        }
-        //opens the previous directory location -- from image button
-        private async void BackFolderFromImage(ImageViewModel imageVm)
-        {
-            //not ideal but keeps pagination to the folder your in. When you go back or next start from page 1
-            ResetPagination();
-            /*
-                Similar to Back folders except these buttons are on the image and we only need to remove one folder
-                Not every folder has a folder so this is the quickest way for now to back out of a folder that only has images
-             */
-            string newPath = PathHelper.RemoveOneFolderFromPath(imageVm.ImageFolderPath);
-            //set the current directory -- used to add new folder to location
-            CurrentDirectory = newPath;
-            //refresh UI
-            currentFilter = Filters.None;
-            await RefreshFolders();
-            await RefreshImages(newPath);
-        }
-
-        //opens the previous directory location
-        private async void BackFolder(FolderViewModel currentFolder)
-        {
-            ResetPagination();
-            /*
-                tough to see but basically you need to remove two folders to build the regexp string
-                example if you are in /pictures/hiking/bearmountian and bearmountain folder has another folder saturday_2025_05_25
-                you will be clicking on the back button of folder /pictures/hiking/bearmountian/saturday_2025_05_25 -- that wil be the FolderPath
-                but you want to go back to hiking so you must remove two folders to get /pictures/hiking/
-             */
-            string newPath = PathHelper.RemoveTwoFoldersFromPath(currentFolder.FolderPath);
-            //set the current directory -- used to add new folder to location
-            CurrentDirectory = newPath;
-            //refresh UI
-            currentFilter = Filters.None;
-            await RefreshFolders();
-            await RefreshImages(newPath);
-        }
 
         //loads the previous X elements in CurrentDirectory
         private async void PreviousPage()
@@ -967,31 +914,6 @@ namespace ImagePerfect.ViewModels
                 CurrentImagePage = CurrentImagePage - 1;
                 await RefreshImages(CurrentDirectory);
             }
-        }
-
-        //opens the next directory locaion
-        private async void NextFolder(FolderViewModel currentFolder)
-        {
-            ResetPagination();
-            bool hasChildren = currentFolder.HasChildren;
-            bool hasFiles = currentFolder.HasFiles;
-            //set the current directory -- used to add new folder to location
-            CurrentDirectory = currentFolder.FolderPath;
-            //two boolean varibale 4 combos TF TT FT and FF
-            if(hasChildren == false && hasFiles == false)
-            {
-                var box = MessageBoxManager.GetMessageBoxStandard("Empty Folder", "There are no Images in this folder.", ButtonEnum.Ok);
-                await box.ShowAsync();
-                CurrentDirectory = PathHelper.RemoveOneFolderFromPath(currentFolder.FolderPath);
-                return;
-            }
-            else
-            {
-                //refresh UI
-                currentFilter = Filters.None;
-                await RefreshFolders();
-                await RefreshImages("", currentFolder.FolderId);
-            }  
         }
 
         //loads the next X elements in CurrentDirectory
