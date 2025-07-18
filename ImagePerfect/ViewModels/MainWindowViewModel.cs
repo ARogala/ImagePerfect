@@ -272,15 +272,15 @@ namespace ImagePerfect.ViewModels
             RemoveAllFavoriteFoldersCommand = ReactiveCommand.Create(async () => {
                 await FavoriteFoldersVm.RemoveAllFavoriteFolders();
             });
-            MoveSelectedImagesToTrashCommand = ReactiveCommand.Create(async (ItemsControl imagesItemsControl) =>
+            MoveSelectedImagesToTrashCommand = ReactiveCommand.Create(async (ListBox imagesListBox) =>
             {
-                await MoveImages.MoveSelectedImagesToTrash(imagesItemsControl);
+                await MoveImages.MoveSelectedImagesToTrash(imagesListBox);
             });
-            SelectAllImagesCommand = ReactiveCommand.Create(() => {
-                MoveImages.SelectAllImages();
+            SelectAllImagesCommand = ReactiveCommand.Create((ListBox imagesListBox) => {
+                MoveImages.SelectAllImages(imagesListBox);
             });
-            MoveSelectedImagesToNewFolderCommand = ReactiveCommand.Create(async (ItemsControl imagesItemsControl) => {
-                await MoveImages.MoveSelectedImagesToNewFolder(imagesItemsControl);
+            MoveSelectedImagesToNewFolderCommand = ReactiveCommand.Create(async (ListBox imagesListBox) => {
+                await MoveImages.MoveSelectedImagesToNewFolder(imagesListBox);
             });
             ImportAllFoldersOnCurrentPageCommand = ReactiveCommand.Create(async (ItemsControl foldersItemsControl) => { 
                 await ImportImagesVm.ImportAllFoldersOnCurrentPage(foldersItemsControl);
@@ -524,11 +524,11 @@ namespace ImagePerfect.ViewModels
 
         public ReactiveCommand<Unit, Task> RemoveAllFavoriteFoldersCommand { get; }
 
-        public ReactiveCommand<ItemsControl, Task> MoveSelectedImagesToTrashCommand { get; }
+        public ReactiveCommand<ListBox, Task> MoveSelectedImagesToTrashCommand { get; }
 
-        public ReactiveCommand<Unit, Unit> SelectAllImagesCommand { get; }
+        public ReactiveCommand<ListBox, Unit> SelectAllImagesCommand { get; }
 
-        public ReactiveCommand<ItemsControl, Task> MoveSelectedImagesToNewFolderCommand { get; }
+        public ReactiveCommand<ListBox, Task> MoveSelectedImagesToNewFolderCommand { get; }
 
         public ReactiveCommand<ItemsControl, Task> ImportAllFoldersOnCurrentPageCommand { get; }
 
