@@ -73,9 +73,9 @@ namespace ImagePerfect.ViewModels
             }
         }
 
-        public async Task MoveSelectedImagesToTrash(ItemsControl imagesItemsControl)
+        public async Task MoveSelectedImagesToTrash(ListBox imagesListBox)
         {
-            List<ImageViewModel> allImages = imagesItemsControl.Items.OfType<ImageViewModel>().ToList();
+            List<ImageViewModel> allImages = imagesListBox.Items.OfType<ImageViewModel>().ToList();
             List<ImageViewModel> imagesToDelete = new List<ImageViewModel>();
             foreach (ImageViewModel image in allImages)
             {
@@ -133,9 +133,9 @@ namespace ImagePerfect.ViewModels
             }
         }
 
-        public async Task MoveSelectedImagesToNewFolder(ItemsControl imagesItemsControl)
+        public async Task MoveSelectedImagesToNewFolder(ListBox imagesListBox)
         {
-            List<ImageViewModel> allImages = imagesItemsControl.Items.OfType<ImageViewModel>().ToList();
+            List<ImageViewModel> allImages = imagesListBox.Items.OfType<ImageViewModel>().ToList();
             List<ImageViewModel> imagesToMove = new List<ImageViewModel>();
             Folder imagesCurrentFolder = await _folderMethods.GetFolderAtDirectory(allImages[0].ImageFolderPath);
 
@@ -235,17 +235,19 @@ namespace ImagePerfect.ViewModels
             }
         }
 
-        public void SelectAllImages()
+        public void SelectAllImages(ListBox imagesListBox)
         {
-            for (int i = 0; i < _mainWindowViewModel.Images.Count; i++)
+            imagesListBox.UnselectAll();
+            List<ImageViewModel> allImages = imagesListBox.Items.OfType<ImageViewModel>().ToList();
+            for (int i = 0; i < allImages.Count; i++)
             {
-                if (_mainWindowViewModel.Images[i].IsSelected == true)
+                if (allImages[i].IsSelected == true)
                 {
-                    _mainWindowViewModel.Images[i].IsSelected = false;
+                    allImages[i].IsSelected = false;
                 }
                 else
                 {
-                    _mainWindowViewModel.Images[i].IsSelected = true;
+                    allImages[i].IsSelected = true;
                 }
             }
         }
