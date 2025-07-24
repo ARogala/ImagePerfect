@@ -1,25 +1,19 @@
-﻿using Avalonia.Media.Imaging;
-using ImagePerfect.Helpers;
+﻿using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Threading;
 using ImagePerfect.Models;
+using ImagePerfect.ObjectMappers;
 using ImagePerfect.Repository.IRepository;
-using MsBox.Avalonia.Enums;
 using MsBox.Avalonia;
+using MsBox.Avalonia.Enums;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Reactive;
-using ImagePerfect.ObjectMappers;
-using System.Linq;
-using DynamicData;
-using System.IO;
-using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
-using Avalonia.Controls;
 using Image = ImagePerfect.Models.Image;
-using Avalonia;
-using Avalonia.Controls.ApplicationLifetimes;
 
 namespace ImagePerfect.ViewModels
 {
@@ -630,21 +624,19 @@ namespace ImagePerfect.ViewModels
         {
             try
             {
-                for (int i = 0; i < displayFolders.Count; i++)
+                await Parallel.ForEachAsync(displayFolders, new ParallelOptions { MaxDegreeOfParallelism = 4 }, async (folder, ct) =>
                 {
-                    //need to map tags to folders 
-                    displayFolders[i] = FolderMapper.MapTagsToFolder(displayFolders[i], displayFolderTags);
-                    FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(displayFolders[i]);
-                    LibraryFolders.Add(folderViewModel);
-                }
+                    Folder taggedFolder = FolderMapper.MapTagsToFolder(folder, displayFolderTags);
+                    FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(taggedFolder);
+                    await Dispatcher.UIThread.InvokeAsync(() => LibraryFolders.Add(folderViewModel));
+                });
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Something went wrong click ok to reload current directory. {ex}", ButtonEnum.Ok);
                 await box.ShowAsync();
                 await LoadCurrentDirectory();
             }
-            
         }
 
         //public so we can call from other view models
@@ -835,20 +827,19 @@ namespace ImagePerfect.ViewModels
             }
             ShowLoading = false;
         }
-
+        
         private async Task MapTagsToImagesAddToObservable()
         {
             try
             {
-                for (int i = 0; i < displayImages.Count; i++)
-                {
-                    //need to map tags to images
-                    displayImages[i] = ImageMapper.MapTagsToImage(displayImages[i], displayImageTags);
-                    ImageViewModel imageViewModel = await ImageMapper.GetImageVm(displayImages[i]);
-                    Images.Add(imageViewModel);
-                }
+                await Parallel.ForEachAsync(displayImages, new ParallelOptions { MaxDegreeOfParallelism = 4 }, async (image, ct) => {
+                    Image taggedImage = ImageMapper.MapTagsToImage(image, displayImageTags);
+                    ImageViewModel imageViewModel = await ImageMapper.GetImageVm(taggedImage);
+                    // This must be on the UI thread
+                    await Dispatcher.UIThread.InvokeAsync(() => Images.Add(imageViewModel));
+                });
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Something went wrong click ok to reload current directory. {ex}", ButtonEnum.Ok);
                 await box.ShowAsync();
