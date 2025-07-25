@@ -1,15 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Avalonia.Controls;
-using Image = ImagePerfect.Models.Image;
 using ImagePerfect.Helpers;
 using ImagePerfect.Models;
 using ImagePerfect.Repository.IRepository;
-using MsBox.Avalonia.Enums;
 using MsBox.Avalonia;
+using MsBox.Avalonia.Enums;
 using ReactiveUI;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
+using Image = ImagePerfect.Models.Image;
 
 namespace ImagePerfect.ViewModels
 {
@@ -44,6 +45,8 @@ namespace ImagePerfect.ViewModels
          */
         public async Task ScanFolderImagesForMetaData(FolderViewModel folderVm)
         {
+            //Stopwatch stopwatch = new Stopwatch();
+            //stopwatch.Start();
             _mainWindowViewModel.ShowLoading = true;
             //get all images at folder id
             (List<Image> images, List<ImageTag> tags) imageResultA = await _imageMethods.GetAllImagesInFolder(folderVm.FolderId);
@@ -81,6 +84,10 @@ namespace ImagePerfect.ViewModels
                 }
             }
             _mainWindowViewModel.ShowLoading = false;
+            //stopwatch.Stop();
+            //TimeSpan elapsed = stopwatch.Elapsed;
+            //Debug.WriteLine(elapsed.TotalMilliseconds);
+
         }
 
         public async Task ScanAllFoldersOnCurrentPage(ItemsControl foldersItemsControl)

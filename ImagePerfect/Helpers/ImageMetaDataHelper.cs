@@ -17,11 +17,10 @@ namespace ImagePerfect.Helpers
     {
         public static async Task<List<ImagePerfectImage>> ScanImagesForMetaData(List<ImagePerfectImage> images)
         {
-            foreach (var image in images)
-            {
-                ImageSharp.ImageInfo imageInfo = await ImageSharp.Image.IdentifyAsync(image.ImagePath);
-                UpdateMetadata(imageInfo, image);   
-            }
+            await Parallel.ForEachAsync(images, new ParallelOptions { MaxDegreeOfParallelism = 4 }, async(img, ct) => {
+                ImageSharp.ImageInfo imageInfo = await ImageSharp.Image.IdentifyAsync(img.ImagePath);
+                UpdateMetadata(imageInfo, img);
+            });
             return images;
         }
 
@@ -40,7 +39,8 @@ namespace ImagePerfect.Helpers
         //adds the image metadata to the ImagePerfect Image object
         private static void UpdateMetadata(ImageSharp.ImageInfo imageInfo, ImagePerfectImage image)
         {
-            image.Tags.Clear();
+            //thread safe bc/ each thread will make new List
+            List<ImageTag> newTags = new List<ImageTag>();
             if (imageInfo.Metadata.IptcProfile?.Values?.Any() == true)
             {
                 foreach (var prop in imageInfo.Metadata.IptcProfile.Values)
@@ -52,11 +52,11 @@ namespace ImagePerfect.Helpers
                             TagName = prop.Value,
                             ImageId = image.ImageId,
                         };
-                        image.Tags.Add(imageTag);
+                        newTags.Add(imageTag);
                     }
                 }
             }
-
+            image.Tags = newTags;
             //shotwell rating is in exifprofile
             if (imageInfo.Metadata.ExifProfile?.Values?.Any() == true)
             {
