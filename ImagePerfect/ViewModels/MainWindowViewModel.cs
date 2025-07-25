@@ -11,6 +11,8 @@ using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Linq;
 using System.Reactive;
 using System.Threading.Tasks;
 using Image = ImagePerfect.Models.Image;
@@ -624,11 +626,25 @@ namespace ImagePerfect.ViewModels
         {
             try
             {
-                await Parallel.ForEachAsync(displayFolders, new ParallelOptions { MaxDegreeOfParallelism = 4 }, async (folder, ct) =>
-                {
-                    Folder taggedFolder = FolderMapper.MapTagsToFolder(folder, displayFolderTags);
-                    FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(taggedFolder);
-                    await Dispatcher.UIThread.InvokeAsync(() => LibraryFolders.Add(folderViewModel));
+                //Parallel.ForEachAsync does not iterate in order. Need order preserved. 
+                //so iterate over the correct count and store the results in order -- correct slot/index.
+                //then re-iterate in order on the UIThread to display ordered results.
+                FolderViewModel[] results = new FolderViewModel[displayFolders.Count];
+                await Parallel.ForEachAsync(
+                        Enumerable.Range(0, displayFolders.Count),
+                        new ParallelOptions { MaxDegreeOfParallelism = 4 },
+                        async(i, ct) => {
+                            Folder taggedFolder = FolderMapper.MapTagsToFolder(displayFolders[i], displayFolderTags);
+                            FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(taggedFolder);
+                            results[i] = folderViewModel;
+                        });
+
+                // This must be on the UI thread
+                await Dispatcher.UIThread.InvokeAsync(() => {
+                    foreach (FolderViewModel folderViewModel in results) 
+                    { 
+                        LibraryFolders.Add(folderViewModel);
+                    }
                 });
             }
             catch (Exception ex)
@@ -832,11 +848,27 @@ namespace ImagePerfect.ViewModels
         {
             try
             {
-                await Parallel.ForEachAsync(displayImages, new ParallelOptions { MaxDegreeOfParallelism = 4 }, async (image, ct) => {
-                    Image taggedImage = ImageMapper.MapTagsToImage(image, displayImageTags);
-                    ImageViewModel imageViewModel = await ImageMapper.GetImageVm(taggedImage);
-                    // This must be on the UI thread
-                    await Dispatcher.UIThread.InvokeAsync(() => Images.Add(imageViewModel));
+                //DB pull displayImages in the correct order I want to keep it
+                //Parallel.ForEachAsync does not iterate in order. Need order preserved. 
+                //so iterate over the correct count and store the results in order -- correct slot/index.
+                //then re-iterate in order on the UIThread to display ordered results.
+                ImageViewModel[] results = new ImageViewModel[displayImages.Count];
+                await Parallel.ForEachAsync(
+                    Enumerable.Range(0, displayImages.Count),
+                    new ParallelOptions { MaxDegreeOfParallelism = 4 },
+                    async (i, ct) =>
+                    {
+                        Image taggedImage = ImageMapper.MapTagsToImage(displayImages[i], displayImageTags);
+                        ImageViewModel imageViewModel = await ImageMapper.GetImageVm(taggedImage);
+                        results[i] = imageViewModel;
+                    });
+                // This must be on the UI thread
+                await Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    foreach (ImageViewModel imageViewModel in results)
+                    {
+                        Images.Add(imageViewModel);
+                    }
                 });
             }
             catch (Exception ex)
