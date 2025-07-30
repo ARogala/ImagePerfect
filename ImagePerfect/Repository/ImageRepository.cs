@@ -214,69 +214,68 @@ namespace ImagePerfect.Repository
             return tags;
         }
 
-        public async Task<bool> UpdateImageRatingFromMetaData(string imageUpdateSql, int folderId)
-        {
-            string sql = @"UPDATE folders set FolderContentMetaDataScanned = 1 WHERE FolderId = @folderId";
-            int rowsEffectedA = 0;
-            int rowsEffectedB = 0;
-            await _connection.OpenAsync();
-            MySqlTransaction txn = await _connection.BeginTransactionAsync();
-            rowsEffectedA = await _connection.ExecuteAsync(imageUpdateSql, transaction: txn);
-            rowsEffectedB = await _connection.ExecuteAsync(sql, new { folderId }, transaction: txn);
-
-            await txn.CommitAsync();
-            await _connection.CloseAsync();
-            return rowsEffectedA > 0 && rowsEffectedB > 0 ? true : false;
-
-        }
-
-        public async Task<bool> UpdateImageTagFromMetaData(List<Image> imagesPlusUpdatedMetaData)
+        public async Task<bool> UpdateImageTagsAndRatingFromMetaData(List<Image> imagesPlusUpdatedMetaData, int folderId)
         {
             await _connection.OpenAsync();
             MySqlTransaction txn = await _connection.BeginTransactionAsync();
+          
+            string bulkImageRating = SqlStringBuilder.BuildSqlForBulkInsertImageRating(imagesPlusUpdatedMetaData);
+            string updateFolderContentMetaDataScanned = @"UPDATE folders set FolderContentMetaDataScanned = 1 WHERE FolderId = @folderId";
 
-            //get a list of distinct tags
-            List<string> allTags = imagesPlusUpdatedMetaData.SelectMany(img => img.Tags).Select(tag => tag.TagName).Distinct().ToList();
-            //no tags to insert
-            if (allTags.Count == 0)
+            try
             {
-                await txn.DisposeAsync();
+                await _connection.ExecuteAsync(bulkImageRating, transaction: txn);
+                await _connection.ExecuteAsync(updateFolderContentMetaDataScanned, new { folderId }, transaction: txn);
+
+                //get a list of distinct tags
+                List<string> allTags = imagesPlusUpdatedMetaData.SelectMany(img => img.Tags).Select(tag => tag.TagName).Distinct().ToList();
+                //no tags to insert -- commit Ratings close connection and return tags will not run and no commits will be made
+                if (allTags.Count == 0)
+                {
+                    await txn.CommitAsync();
+                    await _connection.CloseAsync();
+                    return true;
+                }
+
+                //bulk insert all distinct tags into tags table -- IGNORE duplicates
+                string bulkInsertTags = SqlStringBuilder.BuildSqlForBulkInsertImageTags(allTags);
+                await _connection.ExecuteAsync(bulkInsertTags, transaction: txn);
+
+                //get all tag id's 
+                string getAllTagIds = @"SELECT TagId, TagName FROM tags WHERE TagName IN @tagNames";
+                List<Tag> allTagsWithIds = (List<Tag>)await _connection.QueryAsync<Tag>(getAllTagIds, new { tagNames = allTags }, transaction: txn);
+
+                //build image tags join
+                List<(int imageId, int tagId)> imageTagsJoin = new List<(int imageId, int tagId)>();
+                foreach (Image image in imagesPlusUpdatedMetaData)
+                {
+                    foreach (ImageTag tag in image.Tags)
+                    {
+                        Tag? tagWithId = allTagsWithIds.Find(x => x.TagName == tag.TagName);
+                        if (tagWithId != null)
+                        {
+                            imageTagsJoin.Add((tag.ImageId, tagWithId.TagId));
+                        }
+                    }
+                }
+
+                //clear all tag joins in one shot -- no duplicates when rescan
+                string deleteTagJoins = @"DELETE FROM image_tags_join WHERE ImageId IN @imageIds";
+                await _connection.ExecuteAsync(deleteTagJoins, new { imageIds = imagesPlusUpdatedMetaData.Select(i => i.ImageId) }, transaction: txn);
+
+                //bulk insert all tag joins 
+                string bulkInsertTagJoin = SqlStringBuilder.BuildSqlForBulkInsertImageTagsJoin(imageTagsJoin);
+                await _connection.ExecuteAsync(bulkInsertTagJoin, transaction: txn);
+                await txn.CommitAsync();
+                await _connection.CloseAsync();
+                return true;
+            }
+            catch (Exception ex) 
+            {
+                await txn.RollbackAsync();
                 await _connection.CloseAsync();
                 return false;
             }
-               
-            //bulk insert all distinct tags into tags table -- IGNORE duplicates
-            string bulkInsertTags = SqlStringBuilder.BuildSqlForBulkInsertImageTags(allTags);
-            await _connection.ExecuteAsync(bulkInsertTags, transaction: txn);
-           
-            //get all tag id's 
-            string getAllTagIds = @"SELECT TagId, TagName FROM tags WHERE TagName IN @tagNames";
-            List<Tag> allTagsWithIds = (List<Tag>)await _connection.QueryAsync<Tag>(getAllTagIds, new { tagNames = allTags }, transaction: txn);
-            
-            //build image tags join
-            List<(int imageId, int tagId)> imageTagsJoin = new List<(int imageId, int tagId)>();
-            foreach (Image image in imagesPlusUpdatedMetaData) 
-            { 
-                foreach(ImageTag tag in image.Tags)
-                {
-                    Tag? tagWithId = allTagsWithIds.Find(x=>x.TagName==tag.TagName);
-                    if (tagWithId != null)
-                    {
-                        imageTagsJoin.Add((tag.ImageId, tagWithId.TagId));
-                    }
-                }
-            }
-
-            //clear all tag joins in one shot -- no duplicates when rescan
-            string deleteTagJoins = @"DELETE FROM image_tags_join WHERE ImageId IN @imageIds";
-            await _connection.ExecuteAsync(deleteTagJoins, new { imageIds = imagesPlusUpdatedMetaData.Select(i=>i.ImageId) }, transaction: txn);
-            
-            //bulk insert all tag joins 
-            string bulkInsertTagJoin = SqlStringBuilder.BuildSqlForBulkInsertImageTagsJoin(imageTagsJoin);
-            await _connection.ExecuteAsync(bulkInsertTagJoin, transaction: txn);
-            await txn.CommitAsync();
-            await _connection.CloseAsync();
-            return true;
         }
 
         public async Task<int> GetTotalImages()
