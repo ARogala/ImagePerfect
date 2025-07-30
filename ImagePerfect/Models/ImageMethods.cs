@@ -81,14 +81,9 @@ namespace ImagePerfect.Models
             return await _unitOfWork.Image.Delete(id);
         }
 
-        public async Task<bool> UpdateImageTagFromMetaData(List<Image> imagesPlusUpdatedMetaData)
+        public async Task<bool> UpdateImageTagsAndRatingFromMetaData(List<Image> imagesPlusUpdatedMetaData, int folderId)
         {
-            return await _unitOfWork.Image.UpdateImageTagFromMetaData(imagesPlusUpdatedMetaData);
-        }
-
-        public async Task<bool> UpdateImageRatingFromMetaData(string imageUpdateSql, int folderId)
-        {
-            return await _unitOfWork.Image.UpdateImageRatingFromMetaData(imageUpdateSql, folderId);
+            return await _unitOfWork.Image.UpdateImageTagsAndRatingFromMetaData(imagesPlusUpdatedMetaData, folderId);
         }
 
         public async Task<int> GetTotalImages()

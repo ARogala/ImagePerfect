@@ -60,9 +60,8 @@ namespace ImagePerfect.ViewModels
             List<Image> images = imageResultA.images;
             //scan images for metadata
             List<Image> imagesPlusUpdatedMetaData = await ImageMetaDataHelper.ScanImagesForMetaData(images);
-            string imageUpdateSql = SqlStringBuilder.BuildImageSqlForScanMetadata(imagesPlusUpdatedMetaData);
-            bool success = await _imageMethods.UpdateImageRatingFromMetaData(imageUpdateSql, folderVm.FolderId);
-            await _imageMethods.UpdateImageTagFromMetaData(imagesPlusUpdatedMetaData);
+
+            bool success = await _imageMethods.UpdateImageTagsAndRatingFromMetaData(imagesPlusUpdatedMetaData, folderVm.FolderId);
 
             //show data scanned success
             if (success)
@@ -89,6 +88,8 @@ namespace ImagePerfect.ViewModels
 
         public async Task ScanAllFoldersOnCurrentPage(ItemsControl foldersItemsControl)
         {
+            //Stopwatch stopwatch = new Stopwatch();
+            //stopwatch.Start();
             var boxYesNo = MessageBoxManager.GetMessageBoxStandard("Scan All Folders", "CAUTION this could take a long time are you sure? Make sure to import images first.", ButtonEnum.YesNo);
             var boxResult = await boxYesNo.ShowAsync();
             if (boxResult == ButtonResult.Yes)
@@ -102,6 +103,9 @@ namespace ImagePerfect.ViewModels
                     }
                 }
                 _mainWindowViewModel.ResetPagination();
+                //stopwatch.Stop();
+                //TimeSpan elapsed = stopwatch.Elapsed;
+                //Debug.WriteLine(elapsed.TotalMilliseconds);
             }
         }
 

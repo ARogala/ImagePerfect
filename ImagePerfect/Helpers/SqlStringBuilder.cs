@@ -149,7 +149,7 @@ namespace ImagePerfect.Helpers
             return sb.ToString();
         }
 
-        public static string BuildImageSqlForScanMetadata(List<Image> images)
+        public static string BuildSqlForBulkInsertImageRating(List<Image> images)
         {
             StringBuilder sb = new StringBuilder("UPDATE images SET ImageRating = CASE ");
             foreach (Image image in images) 
