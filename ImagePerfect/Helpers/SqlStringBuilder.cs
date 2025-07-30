@@ -177,6 +177,40 @@ namespace ImagePerfect.Helpers
             return sb.ToString();
         }
 
+        public static string BuildSqlForBulkInsertImageTags(List<string> allTags)
+        {
+            StringBuilder sb = new StringBuilder("INSERT IGNORE INTO tags (TagName) VALUES ");
+            for(int i = 0; i < allTags.Count; i++)
+            {
+                if(i < allTags.Count - 1)
+                {
+                    sb.Append($"('{allTags[i]}'),");
+                }
+                else
+                {
+                    sb.Append($"('{allTags[i]}');");
+                }
+            }
+            return sb.ToString();
+        }
+
+        public static string BuildSqlForBulkInsertImageTagsJoin(List<(int imageId, int tagId)> imageTagJoins)
+        {
+            StringBuilder sb = new StringBuilder("INSERT INTO image_tags_join (ImageId, TagId) VALUES ");
+            for(int i = 0; i < imageTagJoins.Count; i++)
+            {
+                if(i < imageTagJoins.Count - 1)
+                {
+                    sb.Append($"({imageTagJoins[i].imageId}, {imageTagJoins[i].tagId}),");
+                }
+                else
+                {
+                    sb.Append($"({imageTagJoins[i].imageId}, {imageTagJoins[i].tagId});");
+                }
+
+            }
+            return sb.ToString();
+        }
         public static string BuildSqlForAddMultipleImageTags(List<Tag> tagsToAdd, ImageViewModel imageVm)
         {
             StringBuilder sb = new StringBuilder("INSERT INTO image_tags_join (ImageId, TagId) VALUES ");
