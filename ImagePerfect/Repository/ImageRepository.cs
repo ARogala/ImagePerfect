@@ -229,13 +229,7 @@ namespace ImagePerfect.Repository
             return rowsEffectedA > 0 && rowsEffectedB > 0 ? true : false;
 
         }
-        public async Task ClearImageTagsJoinForMetaData(Image image)
-        {
-            string sql = @"DELETE FROM image_tags_join WHERE ImageId = @imageId";
-            await _connection.ExecuteAsync(sql, new { imageId = image.ImageId });
-            await _connection.CloseAsync();
-        }
-      
+
         public async Task<bool> UpdateImageTagFromMetaData(List<Image> imagesPlusUpdatedMetaData)
         {
             await _connection.OpenAsync();

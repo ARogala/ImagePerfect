@@ -91,11 +91,6 @@ namespace ImagePerfect.Models
             return await _unitOfWork.Image.UpdateImageRatingFromMetaData(imageUpdateSql, folderId);
         }
 
-        public async Task ClearImageTagsJoinForMetaData(Image image)
-        {
-            await _unitOfWork.Image.ClearImageTagsJoinForMetaData(image);
-        }
-
         public async Task<int> GetTotalImages()
         {
            return await _unitOfWork.Image.GetTotalImages();
