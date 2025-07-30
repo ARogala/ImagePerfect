@@ -36,8 +36,15 @@ namespace ImagePerfect.ViewModels
          * the tagId needed for the database also these metadata tags may or may not be in the tags table.
          * 
          * thus for now the most efficient thing i could think to do was to update the ratings in one shot
-         * then since not every image will even have a tag only update the ones that have tags -- least amout of db round trips
-         * Also for the images that do have tags clear the image_tag_join table 1st so we dont double up on tags in the db. 
+         *
+         * then do the following
+         * 1. get list of all distinct tags from the image meatadata
+         *      a. if none return
+         * 2. bulk insert all distinct tags into tags table -- IGNORE duplicates
+         * 3. get all the tag id's
+         * 4. build the image tags join List
+         * 5. Clear image tags join in database -- do this in one shot  -- done so no duplicates when rescan
+         * 6. Bulk insert image tags join from the built List in step 4
          * 
          * perfect heck no... But it works fine for a few hundred or maybe thousand images. 
          * Really how many images are going to be on one folder? I am assuming at most maybe a few thousand
@@ -55,18 +62,8 @@ namespace ImagePerfect.ViewModels
             List<Image> imagesPlusUpdatedMetaData = await ImageMetaDataHelper.ScanImagesForMetaData(images);
             string imageUpdateSql = SqlStringBuilder.BuildImageSqlForScanMetadata(imagesPlusUpdatedMetaData);
             bool success = await _imageMethods.UpdateImageRatingFromMetaData(imageUpdateSql, folderVm.FolderId);
-            foreach (Image image in imagesPlusUpdatedMetaData)
-            {
-                if (image.Tags.Count > 0)
-                {
-                    //avoid duplicates
-                    await _imageMethods.ClearImageTagsJoinForMetaData(image);
-                    foreach (ImageTag tag in image.Tags)
-                    {
-                        await _imageMethods.UpdateImageTagFromMetaData(tag);
-                    }
-                }
-            }
+            await _imageMethods.UpdateImageTagFromMetaData(imagesPlusUpdatedMetaData);
+
             //show data scanned success
             if (success)
             {
