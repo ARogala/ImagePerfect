@@ -50,11 +50,10 @@ namespace ImagePerfect.ViewModels
          * Really how many images are going to be on one folder? I am assuming at most maybe a few thousand
          * 
          */
-        public async Task ScanFolderImagesForMetaData(FolderViewModel folderVm)
+        public async Task ScanFolderImagesForMetaData(FolderViewModel folderVm, bool bulkScan)
         {
-            //Stopwatch stopwatch = new Stopwatch();
-            //stopwatch.Start();
-            _mainWindowViewModel.ShowLoading = true;
+            if (bulkScan == false)
+                _mainWindowViewModel.ShowLoading = true;
             //get all images at folder id
             (List<Image> images, List<ImageTag> tags) imageResultA = await _imageMethods.GetAllImagesInFolder(folderVm.FolderId);
             List<Image> images = imageResultA.images;
@@ -66,48 +65,47 @@ namespace ImagePerfect.ViewModels
             //show data scanned success
             if (success)
             {
-                //Update TagsList to show in UI AutoCompleteBox
-                await _mainWindowViewModel.GetTagsList();
-                //refresh UI
-                if (_mainWindowViewModel.currentFilter == MainWindowViewModel.Filters.AllFoldersWithMetadataNotScanned || _mainWindowViewModel.currentFilter == MainWindowViewModel.Filters.AllFoldersWithNoImportedImages)
+                if (bulkScan == false)
                 {
-                    //have to call hard refresh for these two cases as they will not be returned from the query to update props
-                    await _mainWindowViewModel.RefreshFolders();
-                }
-                else
-                {
-                    await _mainWindowViewModel.RefreshFolderProps(_mainWindowViewModel.CurrentDirectory, folderVm);
-                }
+                    //Update TagsList to show in UI AutoCompleteBox
+                    await _mainWindowViewModel.GetTagsList();
+                    //refresh UI
+                    if (_mainWindowViewModel.currentFilter == MainWindowViewModel.Filters.AllFoldersWithMetadataNotScanned || _mainWindowViewModel.currentFilter == MainWindowViewModel.Filters.AllFoldersWithNoImportedImages)
+                    {
+                        //have to call hard refresh for these two cases as they will not be returned from the query to update props
+                        await _mainWindowViewModel.RefreshFolders();
+                    }
+                    else
+                    {
+                        await _mainWindowViewModel.RefreshFolderProps(_mainWindowViewModel.CurrentDirectory, folderVm);
+                    }
+                } 
             }
-            _mainWindowViewModel.ShowLoading = false;
-            //stopwatch.Stop();
-            //TimeSpan elapsed = stopwatch.Elapsed;
-            //Debug.WriteLine(elapsed.TotalMilliseconds);
-
+            if (bulkScan == false)
+                _mainWindowViewModel.ShowLoading = false;
         }
 
         public async Task ScanAllFoldersOnCurrentPage(ItemsControl foldersItemsControl)
         {
-            //Stopwatch stopwatch = new Stopwatch();
-            //stopwatch.Start();
             var boxYesNo = MessageBoxManager.GetMessageBoxStandard("Scan All Folders", "CAUTION this could take a long time are you sure? Make sure to import images first.", ButtonEnum.YesNo);
             var boxResult = await boxYesNo.ShowAsync();
             if (boxResult == ButtonResult.Yes)
             {
-                List<FolderViewModel> allFolders = foldersItemsControl.Items.OfType<FolderViewModel>().ToList();
-                foreach (FolderViewModel folder in allFolders)
+                _mainWindowViewModel.ShowLoading = true;
+                List<FolderViewModel> allFolders = foldersItemsControl.Items.OfType<FolderViewModel>()
+                    .Where(folder => folder.HasFiles == true && folder.AreImagesImported == true && folder.FolderContentMetaDataScanned == false)
+                    .ToList();
+                await Parallel.ForEachAsync(allFolders, new ParallelOptions { MaxDegreeOfParallelism = 4 }, async (folder, ct) =>
                 {
-                    if (folder.HasFiles == true && folder.AreImagesImported == true && folder.FolderContentMetaDataScanned == false)
-                    {
-                        await ScanFolderImagesForMetaData(folder);
-                    }
-                }
+                    await ScanFolderImagesForMetaData(folder, true);
+                });
+
                 _mainWindowViewModel.ResetPagination();
-                //stopwatch.Stop();
-                //TimeSpan elapsed = stopwatch.Elapsed;
-                //Debug.WriteLine(elapsed.TotalMilliseconds);
+                //Update TagsList to show in UI AutoCompleteBox
+                await _mainWindowViewModel.GetTagsList();
+                await _mainWindowViewModel.RefreshFolders();
+                _mainWindowViewModel.ShowLoading = false;
             }
         }
-
     }
 }

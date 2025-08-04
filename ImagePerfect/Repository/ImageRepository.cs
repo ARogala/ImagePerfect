@@ -2,6 +2,7 @@
 using ImagePerfect.Helpers;
 using ImagePerfect.Models;
 using ImagePerfect.Repository.IRepository;
+using Microsoft.Extensions.Configuration;
 using MySqlConnector;
 using System;
 using System.Collections.Generic;
@@ -15,24 +16,27 @@ namespace ImagePerfect.Repository
     public class ImageRepository : Repository<Image>, IImageRepository
     {
         private readonly MySqlConnection _connection;
+        private readonly string _connectionString;
 
-        public ImageRepository(MySqlConnection db) : base(db) 
+        public ImageRepository(MySqlConnection db, IConfiguration config) : base(db) 
         { 
             _connection = db;
+            _connectionString = config.GetConnectionString("DefaultConnection");
         }
         //any Image model specific database methods here
         public async Task<(List<Image> images, List<ImageTag> tags)> GetAllImagesInFolder(int folderId)
         {
-            await _connection.OpenAsync();
-            MySqlTransaction txn = await _connection.BeginTransactionAsync();
+            await using MySqlConnection conn = new MySqlConnection(_connectionString); //need a new connection pre folder as this is a parallel method
+            await conn.OpenAsync();
+            await using MySqlTransaction txn = await conn.BeginTransactionAsync();
             string sql1 = @"SELECT * FROM images WHERE FolderId = @folderId ORDER BY FileName";
-            List<Image> allImagesInFolder = (List<Image>)await _connection.QueryAsync<Image>(sql1, new { folderId }, transaction: txn);
+            List<Image> allImagesInFolder = (List<Image>)await conn.QueryAsync<Image>(sql1, new { folderId }, transaction: txn);
             string sql2 = @"SELECT tags.TagId, tags.TagName, images.ImageId FROM images
                             JOIN image_tags_join ON image_tags_join.ImageId = images.ImageId
                             JOIN tags ON image_tags_join.TagId = tags.TagId WHERE images.FolderId = @folderId ORDER BY images.FileName;";
-            List<ImageTag> tags = (List<ImageTag>)await _connection.QueryAsync<ImageTag>(sql2, new { folderId }, transaction: txn);
+            List<ImageTag> tags = (List<ImageTag>)await conn.QueryAsync<ImageTag>(sql2, new { folderId }, transaction: txn);
             await txn.CommitAsync();
-            await _connection.CloseAsync();
+            await conn.CloseAsync();
             return (allImagesInFolder, tags);
         }
 
@@ -216,16 +220,17 @@ namespace ImagePerfect.Repository
 
         public async Task<bool> UpdateImageTagsAndRatingFromMetaData(List<Image> imagesPlusUpdatedMetaData, int folderId)
         {
-            await _connection.OpenAsync();
-            MySqlTransaction txn = await _connection.BeginTransactionAsync();
-          
+            await using MySqlConnection conn = new MySqlConnection(_connectionString); //need a new connection pre folder as this is a parallel method
+            await conn.OpenAsync();
+            await using MySqlTransaction txn = await conn.BeginTransactionAsync();
+
             string bulkImageRating = SqlStringBuilder.BuildSqlForBulkInsertImageRating(imagesPlusUpdatedMetaData);
             string updateFolderContentMetaDataScanned = @"UPDATE folders set FolderContentMetaDataScanned = 1 WHERE FolderId = @folderId";
 
             try
             {
-                await _connection.ExecuteAsync(bulkImageRating, transaction: txn);
-                await _connection.ExecuteAsync(updateFolderContentMetaDataScanned, new { folderId }, transaction: txn);
+                await conn.ExecuteAsync(bulkImageRating, transaction: txn);
+                await conn.ExecuteAsync(updateFolderContentMetaDataScanned, new { folderId }, transaction: txn);
 
                 //get a list of distinct tags
                 List<string> allTags = imagesPlusUpdatedMetaData.SelectMany(img => img.Tags).Select(tag => tag.TagName).Distinct().ToList();
@@ -233,17 +238,17 @@ namespace ImagePerfect.Repository
                 if (allTags.Count == 0)
                 {
                     await txn.CommitAsync();
-                    await _connection.CloseAsync();
+                    await conn.CloseAsync();
                     return true;
                 }
 
                 //bulk insert all distinct tags into tags table -- IGNORE duplicates
                 string bulkInsertTags = SqlStringBuilder.BuildSqlForBulkInsertImageTags(allTags);
-                await _connection.ExecuteAsync(bulkInsertTags, transaction: txn);
+                await conn.ExecuteAsync(bulkInsertTags, transaction: txn);
 
                 //get all tag id's 
                 string getAllTagIds = @"SELECT TagId, TagName FROM tags WHERE TagName IN @tagNames";
-                List<Tag> allTagsWithIds = (List<Tag>)await _connection.QueryAsync<Tag>(getAllTagIds, new { tagNames = allTags }, transaction: txn);
+                List<Tag> allTagsWithIds = (List<Tag>)await conn.QueryAsync<Tag>(getAllTagIds, new { tagNames = allTags }, transaction: txn);
 
                 //build image tags join
                 List<(int imageId, int tagId)> imageTagsJoin = new List<(int imageId, int tagId)>();
@@ -261,21 +266,21 @@ namespace ImagePerfect.Repository
 
                 //clear all tag joins in one shot -- no duplicates when rescan
                 string deleteTagJoins = @"DELETE FROM image_tags_join WHERE ImageId IN @imageIds";
-                await _connection.ExecuteAsync(deleteTagJoins, new { imageIds = imagesPlusUpdatedMetaData.Select(i => i.ImageId) }, transaction: txn);
+                await conn.ExecuteAsync(deleteTagJoins, new { imageIds = imagesPlusUpdatedMetaData.Select(i => i.ImageId) }, transaction: txn);
 
                 //bulk insert all tag joins 
                 string bulkInsertTagJoin = SqlStringBuilder.BuildSqlForBulkInsertImageTagsJoin(imageTagsJoin);
-                await _connection.ExecuteAsync(bulkInsertTagJoin, transaction: txn);
+                await conn.ExecuteAsync(bulkInsertTagJoin, transaction: txn);
                 await txn.CommitAsync();
-                await _connection.CloseAsync();
+                await conn.CloseAsync();
                 return true;
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 await txn.RollbackAsync();
-                await _connection.CloseAsync();
+                await conn.CloseAsync();
                 return false;
-            }
+            }   
         }
 
         public async Task<int> GetTotalImages()
