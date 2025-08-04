@@ -155,7 +155,7 @@ namespace ImagePerfect.ViewModels
                 await MoveFolderToTrash.MoveFolderToTrash(folderVm);
             });
             ScanFolderImagesForMetaDataCommand = ReactiveCommand.Create(async (FolderViewModel folderVm) => {
-                await ScanImagesForMetaDataVm.ScanFolderImagesForMetaData(folderVm);
+                await ScanImagesForMetaDataVm.ScanFolderImagesForMetaData(folderVm, false);
             });
             NextPageCommand = ReactiveCommand.Create(() => {
                 NextPage();

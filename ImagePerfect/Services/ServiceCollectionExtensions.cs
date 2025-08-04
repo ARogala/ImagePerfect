@@ -23,6 +23,7 @@ namespace ImagePerfect.Services
             collection.AddMySqlDataSource(section["DefaultConnection"]);
             collection.AddScoped<IUnitOfWork, UnitOfWork>();
             collection.AddTransient<MainWindowViewModel>();
+            collection.AddSingleton(config);
         }
     }
 }
