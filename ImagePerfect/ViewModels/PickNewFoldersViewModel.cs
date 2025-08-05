@@ -62,6 +62,15 @@ namespace ImagePerfect.ViewModels
                 await box.ShowAsync();
                 return;
             }
+            //check for parent folder -- must add parent folder 1st to prevent double import
+            string parentDirectory = PathHelper.RemoveOneFolderFromPath(PathHelper.FormatPathFromFolderPicker(_NewFolders[0]));
+            List<Folder> parentFolderDirTree = await _folderMethods.GetDirectoryTree(parentDirectory);
+            if (parentFolderDirTree.Count == 0)
+            {
+                var box = MessageBoxManager.GetMessageBoxStandard("Add Folders", "Add the parent folder first.", ButtonEnum.Ok);
+                await box.ShowAsync();
+                return;
+            }
             _mainWindowViewModel.ShowLoading = true;
             //check if any folders are already in db
             List<Folder> allFoldersInDb = await _folderMethods.GetAllFolders();
