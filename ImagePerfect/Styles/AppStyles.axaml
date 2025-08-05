@@ -39,5 +39,14 @@
 	<Style Selector="Button.main-btn:pointerover /template/ ContentPresenter#PART_ContentPresenter">
 		<Setter Property="Background" Value="#03346E" />
 	</Style>
+	<Style Selector="ScrollBar">
+		<Setter Property="Width" Value="22" />
+	</Style>
+	<Style Selector="ScrollBar Thumb">
+		<Setter Property="MinWidth" Value="22" />
+	</Style>
+	<Style Selector="ScrollBar RepeatButton">
+		<Setter Property="Width" Value="22" />
+	</Style>
 	
 </Styles>

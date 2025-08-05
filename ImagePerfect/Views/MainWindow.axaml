@@ -311,7 +311,7 @@
 		<!--Progress Bar-->
 		<ProgressBar Grid.Row="10" Margin="10" IsIndeterminate="True" IsVisible="{Binding ShowLoading}"/>		
 		<!--Folders and Images-->
-		<ScrollViewer Grid.Row="11" x:Name="FoldersAndImagesScrollViewer">
+		<ScrollViewer Grid.Row="11" x:Name="FoldersAndImagesScrollViewer" AllowAutoHide="False">
 			<StackPanel>
 				<ItemsControl ItemsSource="{Binding LibraryFolders}" x:Name="FoldersItemsControl">
 					<ItemsControl.ItemsPanel>
