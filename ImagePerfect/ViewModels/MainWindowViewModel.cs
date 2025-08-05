@@ -127,17 +127,17 @@ namespace ImagePerfect.ViewModels
             AddFolderRatingCommand = ReactiveCommand.Create((FolderViewModel folderVm) => {
                 ModifyFolderDataVm.UpdateFolder(folderVm, "Rating");
             });
-            AddImageTagsCommand = ReactiveCommand.Create((ImageViewModel imageVm) => {
-                ModifyImageDataVm.AddImageTag(imageVm);
+            AddImageTagsCommand = ReactiveCommand.Create(async (ImageViewModel imageVm) => {
+                await ModifyImageDataVm.AddImageTag(imageVm);
             });
-            AddMultipleImageTagsCommand = ReactiveCommand.Create((ListBox selectedTagsListBox) => {
-                ModifyImageDataVm.AddMultipleImageTags(selectedTagsListBox);
+            AddMultipleImageTagsCommand = ReactiveCommand.Create(async (ListBox selectedTagsListBox) => {
+                await ModifyImageDataVm.AddMultipleImageTags(selectedTagsListBox);
             });
-            EditImageTagsCommand = ReactiveCommand.Create((ImageViewModel imageVm) => {
-                ModifyImageDataVm.EditImageTag(imageVm);
+            EditImageTagsCommand = ReactiveCommand.Create(async (ImageViewModel imageVm) => {
+                await ModifyImageDataVm.EditImageTag(imageVm);
             });
-            AddImageRatingCommand = ReactiveCommand.Create((ImageViewModel imageVm) => {
-                ModifyImageDataVm.UpdateImage(imageVm, "Rating");
+            AddImageRatingCommand = ReactiveCommand.Create(async (ImageViewModel imageVm) => {
+                await ModifyImageDataVm.UpdateImage(imageVm, "Rating");
             });
             DeleteLibraryCommand = ReactiveCommand.Create(() => {
                 DeleteLibrary();
@@ -444,13 +444,13 @@ namespace ImagePerfect.ViewModels
 
         public ReactiveCommand<FolderViewModel, Unit> AddFolderRatingCommand { get; }
 
-        public ReactiveCommand<ImageViewModel, Unit> AddImageTagsCommand { get; }
+        public ReactiveCommand<ImageViewModel, Task> AddImageTagsCommand { get; }
 
-        public ReactiveCommand<ListBox, Unit> AddMultipleImageTagsCommand { get; }
+        public ReactiveCommand<ListBox, Task> AddMultipleImageTagsCommand { get; }
 
-        public ReactiveCommand<ImageViewModel, Unit> EditImageTagsCommand { get; }
+        public ReactiveCommand<ImageViewModel, Task> EditImageTagsCommand { get; }
 
-        public ReactiveCommand<ImageViewModel, Unit> AddImageRatingCommand { get; }
+        public ReactiveCommand<ImageViewModel, Task> AddImageRatingCommand { get; }
 
         public ReactiveCommand<Unit, Unit> DeleteLibraryCommand { get; }
 
