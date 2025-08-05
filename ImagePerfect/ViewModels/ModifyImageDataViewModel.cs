@@ -10,6 +10,7 @@ using ImagePerfect.Helpers;
 using System.Linq;
 using Avalonia.Controls;
 using Image = ImagePerfect.Models.Image;
+using System.Threading.Tasks;
 
 namespace ImagePerfect.ViewModels
 {
@@ -26,7 +27,7 @@ namespace ImagePerfect.ViewModels
         }
 
         //update image sql and metadata only. 
-        public async void UpdateImage(ImageViewModel imageVm, string fieldUpdated)
+        public async Task UpdateImage(ImageViewModel imageVm, string fieldUpdated)
         {
             Image image = ImageMapper.GetImageFromVm(imageVm);
             bool success = await _imageMethods.UpdateImage(image);
@@ -39,13 +40,13 @@ namespace ImagePerfect.ViewModels
             //write rating to image metadata
             if (fieldUpdated == "Rating")
             {
-                ImageMetaDataHelper.AddRatingToImage(image);
+                await ImageMetaDataHelper.AddRatingToImage(image);
             }
         }
 
         //remove the tag from the image_tag_join table 
         //Also need to remove imageMetaData
-        public async void EditImageTag(ImageViewModel imageVm)
+        public async Task EditImageTag(ImageViewModel imageVm)
         {
             if (imageVm.ImageTags == null || imageVm.ImageTags == "")
             {
@@ -78,7 +79,7 @@ namespace ImagePerfect.ViewModels
         }
 
         //update ImageTags in db, and update image metadata
-        public async void AddImageTag(ImageViewModel imageVm)
+        public async Task AddImageTag(ImageViewModel imageVm)
         {
             //click submit with empty input just return
             if (imageVm.NewTag == "" || imageVm.NewTag == null)
@@ -117,7 +118,7 @@ namespace ImagePerfect.ViewModels
             }
         }
 
-        public async void AddMultipleImageTags(ListBox selectedTagsListBox)
+        public async Task AddMultipleImageTags(ListBox selectedTagsListBox)
         {
             if (selectedTagsListBox.DataContext != null && selectedTagsListBox.SelectedItems != null)
             {

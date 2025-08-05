@@ -10,6 +10,7 @@ using SixLabors.ImageSharp.Metadata.Profiles.Exif;
 using System;
 using System.Threading.Tasks;
 using SixLabors.ImageSharp;
+using System.IO;
 //https://aaronbos.dev/posts/iptc-metadata-csharp-imagesharp
 namespace ImagePerfect.Helpers
 {
@@ -30,10 +31,10 @@ namespace ImagePerfect.Helpers
             await WriteKeywordToImage(imageSharpImage, imageVm);
         }
 
-        public static async void AddRatingToImage(ImagePerfectImage image)
+        public static async Task AddRatingToImage(ImagePerfectImage image)
         {
             ImageSharp.Image imageSharpImage = await ImageSharp.Image.LoadAsync(image.ImagePath);
-            WriteRatingToImage(imageSharpImage, image);
+            await WriteRatingToImage(imageSharpImage, image);
         }
 
         //adds the image metadata to the ImagePerfect Image object
@@ -60,6 +61,15 @@ namespace ImagePerfect.Helpers
             //shotwell rating is in exifprofile
             if (imageInfo.Metadata.ExifProfile?.Values?.Any() == true)
             {
+                //imageInfo.Metadata.ExifProfile.TryGetValue(ExifTag.DateTimeOriginal, out IExifValue<string>? date);
+                //if (date != null) 
+                //{
+                //    Debug.WriteLine(date);
+                //}
+                //else
+                //{
+                //    Debug.WriteLine("null no date");
+                //}
                 foreach (var prop in imageInfo.Metadata.ExifProfile.Values)
                 {
                     if (prop.Tag == ExifTag.Rating)
@@ -76,35 +86,96 @@ namespace ImagePerfect.Helpers
         {
             if (image.Metadata.IptcProfile == null)
                 image.Metadata.IptcProfile = new IptcProfile();
-            if (imagePerfectImage.ImageTags != "" && imagePerfectImage.ImageTags != null)
-            {
-                //remove all
-                image.Metadata.IptcProfile.RemoveValue(IptcTag.Keywords);
 
-                string[] tags = imagePerfectImage.ImageTags.Split(",");
-                foreach (string tag in tags)
-                {
-                    //re-add
-                    image.Metadata.IptcProfile.SetValue(IptcTag.Keywords, tag);
-                }
-                await image.SaveAsync($"{imagePerfectImage.ImagePath}");
-            }
-            //just remove all if that is what we want -- this will be the case if the user removes the entire string in the UI
-            else if (imagePerfectImage.ImageTags == "" || imagePerfectImage.ImageTags == null)
+            string originalPath = imagePerfectImage.ImagePath;
+            string backupPath = Path.ChangeExtension(originalPath, ".bak" + Path.GetExtension(originalPath));
+            //avoid possible corruption of original images on failed writes
+            try
             {
-                //remove all
-                image.Metadata.IptcProfile.RemoveValue(IptcTag.Keywords);
-                await image.SaveAsync($"{imagePerfectImage.ImagePath}");
+                //Create a backup
+                File.Copy(originalPath, backupPath, overwrite: true);
+
+                if (imagePerfectImage.ImageTags != "" && imagePerfectImage.ImageTags != null)
+                {
+                    //remove all
+                    image.Metadata.IptcProfile.RemoveValue(IptcTag.Keywords);
+
+                    string[] tags = imagePerfectImage.ImageTags.Split(",");
+                    foreach (string tag in tags)
+                    {
+                        //re-add
+                        image.Metadata.IptcProfile.SetValue(IptcTag.Keywords, tag);
+                    }
+                }
+                //just remove all if that is what we want -- this will be the case if the user removes the entire string in the UI
+                else if (imagePerfectImage.ImageTags == "" || imagePerfectImage.ImageTags == null)
+                {
+                    //remove all
+                    image.Metadata.IptcProfile.RemoveValue(IptcTag.Keywords);
+                }
+                await image.SaveAsync(originalPath);
+                //delete backup
+                if (File.Exists(backupPath))
+                    File.Delete(backupPath);
             }
+            catch (Exception ex) 
+            {
+                //Restore backup if save failed
+                if (File.Exists(backupPath))
+                {
+                    File.Copy(backupPath, originalPath, overwrite: true);
+                    File.Delete(backupPath);
+                }
+            }
+           
         }
 
-        private static async void WriteRatingToImage(ImageSharp.Image image, ImagePerfectImage imagePerfectImage)
+        private static async Task WriteRatingToImage(ImageSharp.Image image, ImagePerfectImage imagePerfectImage)
         {
             if(image.Metadata.ExifProfile == null)
                 image.Metadata.ExifProfile = new ExifProfile();
             ushort newRating = Convert.ToUInt16(imagePerfectImage.ImageRating);
             image.Metadata.ExifProfile.SetValue(ExifTag.Rating, newRating);
-            await image.SaveAsync($"{imagePerfectImage.ImagePath}");
+
+            string originalPath = imagePerfectImage.ImagePath;
+            string backupPath = Path.ChangeExtension(originalPath, ".bak" + Path.GetExtension(originalPath));
+            //avoid possible corruption of original images on failed writes
+            try
+            {
+                // Step 1: Create a backup
+                File.Copy(originalPath, backupPath, overwrite: true);
+
+                // Step 2: Save modified image to original path
+                await image.SaveAsync(originalPath);
+
+                // Step 3: If successful, delete backup
+                if (File.Exists(backupPath))
+                    File.Delete(backupPath);
+            }
+            catch (Exception ex)
+            {
+                // Step 4: Restore backup if save failed
+                if (File.Exists(backupPath))
+                {
+                    File.Copy(backupPath, originalPath, overwrite: true);
+                    File.Delete(backupPath);
+                }
+            }
+
+            //option 2 use temp -- keep for now
+            //string originalPath = imagePerfectImage.ImagePath;
+            //string directory = Path.GetDirectoryName(originalPath)!;
+            //string filenameWithoutExt = Path.GetFileNameWithoutExtension(originalPath);
+            //string ext = Path.GetExtension(originalPath);
+            ////imagename.temp.jpg
+            //string tempPath = Path.Combine(directory, $"{filenameWithoutExt}.temp{ext}");
+
+            //// Save to temp -- avoid possible corruption of original images on failed writes
+            //await image.SaveAsync(tempPath);
+
+            //// Replace original with temp
+            //File.Delete(originalPath);
+            //File.Move(tempPath, originalPath);
         }
     }
 }
