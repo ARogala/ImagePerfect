@@ -95,9 +95,10 @@ I created Image Perfect both as a way to learn desktop application development a
 		- Re-import images in a folder (so you can add images to a folder from the file system then re-scan)
 		
 	+ #### File System Issue/Bug/Limitations
-		- Known issue: folders imported containing only ZIP files cannot be opened
+		- Known limitation: folders imported containing only ZIP files cannot be opened
 			+ To fix delete the folder in app, unzip the files and then re-import it.
-		- On Ubuntu folders imported with the same name but different case will show all folders within each folder in both folders. 
+		- Known bug: on Ubuntu folders imported with the same name but different case will show all folders within each folder in both folders.
+			+ They way I fixed this for now was manually removing one folder from the database. Not sure on an actual fix yet.
 
 
 ### 📷 Shotwell Import
@@ -359,8 +360,8 @@ Then to run the application double click on ImagePerfect.exe or you could also r
 	- Target runtime: linux-x64
 	
 Copy the publish files from your Windows PC to your Linux one. Or just use JetBrains Rider in Linux. The steps will be almost the same.
-	
-Or just download and use the publish files from [here](https://github.com/ARogala/ImagePerfectLinuxX64Build)
+
+Publish files are not provided for Linux. Too many permissions issues trying to run from downloaded publish files. It is best to just compile yourself.
 
 Then to run just open terminal in the build folder and run this command
 ```
