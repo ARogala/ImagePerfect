@@ -94,11 +94,11 @@ I created Image Perfect both as a way to learn desktop application development a
 		- Rename folders and images
 		- Re-import images in a folder (so you can add images to a folder from the file system then re-scan)
 		
-	+ #### File System Issue/Bug/Limitations
-		- Known limitation: folders imported containing only ZIP files cannot be opened
+	+ #### File System Issue/Bug/Limitations (Limitations have no plan to be "Fixed". Workarounds will be provided)
+		- Known limitation: Folders imported containing only ZIP files cannot be opened.
 			+ To fix delete the folder in app, unzip the files and then re-import it.
-		- Known bug: on Ubuntu folders imported with the same name but different case will show all folders within each folder in both folders.
-			+ They way I fixed this for now was manually removing one folder from the database. Not sure on an actual fix yet.
+		- Known limitation: On Ubuntu/Linux, where the filesystem is case-sensitive, importing folders named e.g., Photos/BeachTrip and Photos/beachtrip causes both folders to show each other's contents.
+			+ When adding a library or new folders folders any folders with the same name but different case will not be imported. A log file "case_conflict_folders.txt" will list the date and folders not imported. From there users must rename the folders and then import them.  
 
 
 ### 📷 Shotwell Import
