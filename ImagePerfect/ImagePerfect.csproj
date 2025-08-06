@@ -55,6 +55,9 @@
     <None Update="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="case_conflict_folders.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="folders.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
