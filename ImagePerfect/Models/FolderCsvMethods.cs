@@ -101,6 +101,46 @@ namespace ImagePerfect.Models
             bool hasFolders = folders.Any();
             if (hasFolders)
             {
+                /*
+                On Ubuntu/Linux folders imported with the same name but different case will show all folders within each folder in both folders
+                Easiest fix it simply -- Don't allow this.
+
+                Find folder path duplicates differing only by case
+                key will be folder path and list will be list of folders with the same case insensitive path
+                */
+                Dictionary<string, List<FolderCsv>> pathConflicts = folders
+                    .GroupBy(f => f.FolderPath.ToLowerInvariant())
+                    .Where(g => g.Count() > 1)
+                    .ToDictionary(g => g.Key, g => g.ToList());
+
+                // Remove all conflicting folders from the list
+                if (pathConflicts.Any())
+                {
+                    
+                    foreach (var conflictGroup in pathConflicts.Values)
+                    {
+                        foreach (var folder in conflictGroup)
+                        {
+                            folders.Remove(folder); // Remove from import list
+                        }
+                    }
+
+                    //write a log file
+                    string logPath = GetCsvPath("case_conflict_folders.txt");
+                    List<string> logLines = new List<string>
+                    {
+                        $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] Case conflict detected:"
+                    };
+                    logLines.AddRange(pathConflicts
+                        .SelectMany(g => g.Value)
+                        .Select(f => $" - {f.FolderPath}"));
+
+                    logLines.Add(""); // add a newline between entries
+
+                    await File.AppendAllLinesAsync(logPath, logLines);
+                    
+                }
+
                 //write the folders list to the csv file
                 using (StreamWriter writer = new StreamWriter(folderCsvPath))
                 using (CsvWriter csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
