@@ -98,7 +98,7 @@ I created Image Perfect both as a way to learn desktop application development a
 		- Known limitation: Folders imported containing only ZIP files cannot be opened.
 			+ To fix delete the folder in app, unzip the files and then re-import it.
 		- Known limitation: On Ubuntu/Linux, where the filesystem is case-sensitive, importing folders named e.g., Photos/BeachTrip and Photos/beachtrip causes both folders to show each other's contents.
-			+ When adding a library or new folders folders any folders with the same name but different case will not be imported. A log file "case_conflict_folders.txt" will list the date and folders not imported. From there users must rename the folders and then import them.  
+			+ When adding a library or new folders; any folders with the same name but different case will not be imported. A log file "case_conflict_folders.txt" will list the date and folders not imported. From there users must rename the folders and then import them.  
 
 
 ### 📷 Shotwell Import
