@@ -43,18 +43,37 @@ ON DELETE CASCADE to delete all images if a folder is deleted
 */
 
 CREATE TABLE `images` (
-	`ImageId` bigint unsigned NOT NULL AUTO_INCREMENT,
-	`ImagePath` Varchar(2000) NOT NULL,
-	`FileName` Varchar(500) NOT NULL,
-	`ImageRating` tinyint unsigned,
-	`ImageFolderPath` Varchar(2000) NOT NULL,
-	`ImageMetaDataScanned` Bool,
-	`FolderId` bigint unsigned DEFAULT NULL,
-	PRIMARY KEY (`ImageId`),
-	KEY `FolderId` (`FolderId`),
-	FULLTEXT KEY `fulltext` (`ImagePath`),
-	CONSTRAINT `images_ibfk_1` FOREIGN KEY (`FolderId`) REFERENCES `folders` (`FolderId`) ON DELETE CASCADE ON UPDATE CASCADE
+    `ImageId` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `ImagePath` VARCHAR(2000) NOT NULL,
+    `FileName` VARCHAR(500) NOT NULL,
+    `ImageRating` TINYINT UNSIGNED,
+    `ImageFolderPath` VARCHAR(2000) NOT NULL,
+    `ImageMetaDataScanned` BOOL,
+    `FolderId` BIGINT UNSIGNED DEFAULT NULL,
+    
+    -- New columns for date taken and breakdown
+    `DateTaken` DATE DEFAULT NULL,
+    `DateTakenYear` SMALLINT GENERATED ALWAYS AS (YEAR(DateTaken)) STORED,
+    `DateTakenMonth` TINYINT GENERATED ALWAYS AS (MONTH(DateTaken)) STORED,
+    `DateTakenDay` TINYINT GENERATED ALWAYS AS (DAY(DateTaken)) STORED,
+
+    PRIMARY KEY (`ImageId`),
+    KEY `FolderId` (`FolderId`),
+    FULLTEXT KEY `fulltext` (`ImagePath`),
+    KEY `idx_date_parts` (`DateTakenYear`, `DateTakenMonth`, `DateTakenDay`),
+    CONSTRAINT `images_ibfk_1` FOREIGN KEY (`FolderId`) REFERENCES `folders` (`FolderId`) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+/*adding date to image on 8/7/25 -- use this to update live images table*/
+ALTER TABLE images
+  ADD COLUMN DateTaken DATE DEFAULT NULL,
+  ADD COLUMN DateTakenYear SMALLINT GENERATED ALWAYS AS (YEAR(DateTaken)) STORED,
+  ADD COLUMN DateTakenMonth TINYINT GENERATED ALWAYS AS (MONTH(DateTaken)) STORED,
+  ADD COLUMN DateTakenDay TINYINT GENERATED ALWAYS AS (DAY(DateTaken)) STORED;
+
+CREATE INDEX idx_date_parts ON images(DateTakenYear, DateTakenMonth, DateTakenDay);
+
+/**/
 
 CREATE TABLE `tags`(
 	`TagId` bigint unsigned NOT NULL AUTO_INCREMENT,
@@ -283,7 +302,7 @@ select distinct word from words order by word
 
 
 
-/*From table inspect 6-3-25*/
+/*From table inspect 8-7-25*/
 
 CREATE TABLE `folders` (
   `FolderId` bigint unsigned NOT NULL AUTO_INCREMENT,
@@ -309,8 +328,13 @@ CREATE TABLE `images` (
   `ImageFolderPath` varchar(2000) NOT NULL,
   `ImageMetaDataScanned` tinyint(1) DEFAULT NULL,
   `FolderId` bigint unsigned DEFAULT NULL,
+  `DateTaken` date DEFAULT NULL,
+  `DateTakenYear` smallint GENERATED ALWAYS AS (year(`DateTaken`)) STORED,
+  `DateTakenMonth` tinyint GENERATED ALWAYS AS (month(`DateTaken`)) STORED,
+  `DateTakenDay` tinyint GENERATED ALWAYS AS (dayofmonth(`DateTaken`)) STORED,
   PRIMARY KEY (`ImageId`),
   KEY `FolderId` (`FolderId`),
+  KEY `idx_date_parts` (`DateTakenYear`,`DateTakenMonth`,`DateTakenDay`),
   FULLTEXT KEY `fulltext` (`ImagePath`),
   CONSTRAINT `images_ibfk_1` FOREIGN KEY (`FolderId`) REFERENCES `folders` (`FolderId`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
@@ -355,4 +379,18 @@ CREATE TABLE `folder_saved_favorites` (
   `FolderId` bigint unsigned DEFAULT NULL,
   PRIMARY KEY (`SavedId`),
   UNIQUE KEY `folderid_uq` (`FolderId`)
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+
+CREATE TABLE `saved_directory` (
+  `SavedDirectoryId` enum('1') NOT NULL,
+  `SavedDirectory` varchar(2000) NOT NULL,
+  `SavedFolderPage` int unsigned NOT NULL,
+  `SavedTotalFolderPages` int unsigned NOT NULL,
+  `SavedImagePage` int unsigned NOT NULL,
+  `SavedTotalImagePages` int unsigned NOT NULL,
+  `XVector` double NOT NULL,
+  `YVector` double NOT NULL,
+  PRIMARY KEY (`SavedDirectoryId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+
+INSERT INTO saved_directory (SavedDirectory, SavedFolderPage, SavedTotalFolderPages, SavedImagePage, SavedTotalImagePages, XVector, YVector) VALUES ("",1,1,1,1,0,0);

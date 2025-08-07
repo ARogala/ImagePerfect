@@ -1,16 +1,17 @@
 ﻿using ImagePerfect.Models;
-using ImageSharp = SixLabors.ImageSharp;
-using System.Collections.Generic;
-using System.Linq;
-using ImagePerfectImage = ImagePerfect.Models.Image;
 using ImagePerfect.ViewModels;
-using System.Diagnostics;
-using SixLabors.ImageSharp.Metadata.Profiles.Iptc;
-using SixLabors.ImageSharp.Metadata.Profiles.Exif;
-using System;
-using System.Threading.Tasks;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Metadata.Profiles.Exif;
+using SixLabors.ImageSharp.Metadata.Profiles.Iptc;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
 using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using ImagePerfectImage = ImagePerfect.Models.Image;
+using ImageSharp = SixLabors.ImageSharp;
 //https://aaronbos.dev/posts/iptc-metadata-csharp-imagesharp
 namespace ImagePerfect.Helpers
 {
@@ -61,15 +62,18 @@ namespace ImagePerfect.Helpers
             //shotwell rating is in exifprofile
             if (imageInfo.Metadata.ExifProfile?.Values?.Any() == true)
             {
-                //imageInfo.Metadata.ExifProfile.TryGetValue(ExifTag.DateTimeOriginal, out IExifValue<string>? date);
-                //if (date != null) 
-                //{
-                //    Debug.WriteLine(date);
-                //}
-                //else
-                //{
-                //    Debug.WriteLine("null no date");
-                //}
+                if 
+                (
+                    imageInfo.Metadata.ExifProfile.TryGetValue(ExifTag.DateTimeOriginal, out IExifValue<string>? dateValue) &&
+                    DateTime.TryParseExact(dateValue?.Value, "yyyy:MM:dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsedDate)
+                )
+                {
+                    image.DateTaken = parsedDate;
+                }
+                else
+                {
+                    image.DateTaken = null;
+                }
                 foreach (var prop in imageInfo.Metadata.ExifProfile.Values)
                 {
                     if (prop.Tag == ExifTag.Rating)

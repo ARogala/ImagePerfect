@@ -161,7 +161,19 @@ namespace ImagePerfect.Helpers
             {
                 sb.Append($"WHEN ImageId = {image.ImageId} THEN 1 ");
             }
-            sb.Append("ELSE ImageMetaDataScanned END WHERE ImageId IN (");
+            sb.Append("ELSE ImageMetaDataScanned END, DateTaken = CASE ");
+            foreach(Image image in images)
+            {
+                if(image.DateTaken != null)
+                {
+                    sb.Append($"WHEN ImageId = {image.ImageId} THEN '{image.DateTaken?.ToString("yyyy-MM-dd HH:mm:ss")}' ");
+                }
+                else
+                {
+                    sb.Append($"WHEN ImageId = {image.ImageId} THEN NULL ");
+                }
+            }
+            sb.Append("ELSE DateTaken END WHERE ImageId IN (");
             for (int i = 0; i < images.Count; i++) 
             {
                 if (i < images.Count - 1)
