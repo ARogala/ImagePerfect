@@ -379,7 +379,7 @@ CREATE TABLE `folder_saved_favorites` (
   `FolderId` bigint unsigned DEFAULT NULL,
   PRIMARY KEY (`SavedId`),
   UNIQUE KEY `folderid_uq` (`FolderId`)
-) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
 
 CREATE TABLE `saved_directory` (
   `SavedDirectoryId` enum('1') NOT NULL,
