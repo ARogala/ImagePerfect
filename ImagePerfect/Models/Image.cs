@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -29,6 +30,18 @@ namespace ImagePerfect.Models
         [ForeignKey("FolderId")]
         [Column("FolderId")]
         public int FolderId { get; set; }
+
+        [Column("DateTaken")]
+        public DateTime? DateTaken { get; set; }
+
+        [Column("DateTakenYear")]
+        public int? DateTakenYear { get; set; }
+
+        [Column("DateTakenMonth")]
+        public int? DateTakenMonth { get; set; }
+
+        [Column("DateTakenDay")]
+        public int? DateTakenDay { get; set; }
 
         //for many to many relationship image_tags_join
         [NotMapped]
