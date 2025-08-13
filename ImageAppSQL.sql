@@ -73,6 +73,11 @@ ALTER TABLE images
 
 CREATE INDEX idx_date_parts ON images(DateTakenYear, DateTakenMonth, DateTakenDay);
 
+/*to reset the scann state on all folders and images use this*/
+UPDATE folders SET FolderContentMetaDataScanned = 0 WHERE FolderId >= 1;
+
+UPDATE images SET ImageMetaDataScanned = 0 WHERE ImageId >= 1;
+
 /**/
 
 CREATE TABLE `tags`(
