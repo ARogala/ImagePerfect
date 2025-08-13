@@ -283,6 +283,32 @@ namespace ImagePerfect.Repository
             }   
         }
 
+        public async Task<bool> RemoveTagOnAllImages(Tag selectedTag)
+        {
+            int rowsEffectedA = 0;
+            int rowsEffectedB = 0;
+            await _connection.OpenAsync();
+            MySqlTransaction txn = await _connection.BeginTransactionAsync();
+
+            //remove from image_tags_join 
+            string removeImageTagsJoin = @"DELETE FROM image_tags_join WHERE TagId = @tagId";
+            rowsEffectedA = await _connection.ExecuteAsync(removeImageTagsJoin, new { tagId = selectedTag.TagId }, transaction: txn);
+
+            //check for tag in folder_tags_join
+            string tagInFolderTagsJoin = @"SELECT COUNT(*) FROM folder_Tags_join WHERE TagId = @tagId";
+            int numTagInFolderTagsJoin = await _connection.QuerySingleAsync<int>(tagInFolderTagsJoin, new { tagId = selectedTag.TagId }, transaction: txn);
+
+            //if tag not present in folder_tags_join
+            //  --remove from tags table
+            if(numTagInFolderTagsJoin == 0)
+            {
+                string removeFromTagsTable = @"DELETE FROM tags WHERE TagId = @tagId";
+                rowsEffectedB = await _connection.ExecuteAsync(removeFromTagsTable, new { tagId = selectedTag.TagId }, transaction: txn);
+            }
+            await txn.CommitAsync();
+            await _connection.CloseAsync();
+            return rowsEffectedA + rowsEffectedB >= 1 ? true : false;
+        }
         public async Task<int> GetTotalImages()
         {
             string sql = @"SELECT COUNT(*) FROM images";

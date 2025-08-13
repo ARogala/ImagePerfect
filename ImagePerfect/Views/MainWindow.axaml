@@ -45,13 +45,14 @@
 		</StackPanel>
 		<!--Show All Tags-->
 		<StackPanel Grid.Row="1" IsVisible="{Binding ToggleUI.ShowAllTags}" Classes="menu-bg-color">
-			<ListBox Grid.Row="3" SelectionMode="Multiple" ItemsSource="{Binding TagsList}" Height="200" Width="500">
+			<ListBox x:Name="SelectedTag" Grid.Row="3" SelectionMode="Single" ItemsSource="{Binding TagsList}" Height="200" Width="500">
 				<ListBox.ItemTemplate>
 					<DataTemplate>
 						<TextBlock Text="{Binding TagName}" HorizontalAlignment="Center"/>
 					</DataTemplate>
 				</ListBox.ItemTemplate>
 			</ListBox>
+			<Button Command="{Binding RemoveTagOnAllImagesCommand}" CommandParameter="{Binding SelectedItem, ElementName=SelectedTag}">Remove Tag From All Images</Button>
 		</StackPanel>
 		<!--Show Total Images-->
 		<StackPanel Grid.Row="2" HorizontalAlignment="Stretch" IsVisible="{Binding ToggleUI.ShowTotalImages}" Classes="menu-bg-color">
