@@ -637,7 +637,7 @@ namespace ImagePerfect.ViewModels
                 FolderViewModel[] results = new FolderViewModel[displayFolders.Count];
                 await Parallel.ForEachAsync(
                         Enumerable.Range(0, displayFolders.Count),
-                        new ParallelOptions { MaxDegreeOfParallelism = 4 },
+                        new ParallelOptions { MaxDegreeOfParallelism = 3 },
                         async(i, ct) => {
                             Folder taggedFolder = FolderMapper.MapTagsToFolder(displayFolders[i], displayFolderTags);
                             FolderViewModel folderViewModel = await FolderMapper.GetFolderVm(taggedFolder);
@@ -860,7 +860,7 @@ namespace ImagePerfect.ViewModels
                 ImageViewModel[] results = new ImageViewModel[displayImages.Count];
                 await Parallel.ForEachAsync(
                     Enumerable.Range(0, displayImages.Count),
-                    new ParallelOptions { MaxDegreeOfParallelism = 4 },
+                    new ParallelOptions { MaxDegreeOfParallelism = 3 },
                     async (i, ct) =>
                     {
                         Image taggedImage = ImageMapper.MapTagsToImage(displayImages[i], displayImageTags);

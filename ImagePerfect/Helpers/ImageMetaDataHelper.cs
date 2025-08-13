@@ -20,7 +20,7 @@ namespace ImagePerfect.Helpers
     {
         public static async Task<List<ImagePerfectImage>> ScanImagesForMetaData(List<ImagePerfectImage> images)
         {
-            await Parallel.ForEachAsync(images, new ParallelOptions { MaxDegreeOfParallelism = 4 }, async(img, ct) => {
+            await Parallel.ForEachAsync(images, new ParallelOptions { MaxDegreeOfParallelism = 3 }, async(img, ct) => {
                 ImageSharp.ImageInfo imageInfo = await ImageSharp.Image.IdentifyAsync(img.ImagePath);
                 UpdateMetadata(imageInfo, img);
             });
