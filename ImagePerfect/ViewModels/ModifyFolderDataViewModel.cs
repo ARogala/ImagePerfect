@@ -7,6 +7,7 @@ using MsBox.Avalonia;
 using ReactiveUI;
 using ImagePerfect.ObjectMappers;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace ImagePerfect.ViewModels
 {
@@ -83,6 +84,37 @@ namespace ImagePerfect.ViewModels
             else
             {
                 folderVm.NewTag = "";
+            }
+        }
+
+        public async Task RemoveTagOnAllFolders(Tag selectedTag)
+        {
+            //nothing selected just return
+            if (selectedTag == null)
+                return;
+            var boxYesNo = MessageBoxManager.GetMessageBoxStandard("Remove Tag", "CAUTION you are about to remove a tag this could take a long time are you sure?", ButtonEnum.YesNo);
+            var boxResult = await boxYesNo.ShowAsync();
+            if (boxResult != ButtonResult.Yes)
+                return;
+
+            _mainWindowViewModel.ShowLoading = true;
+            try
+            {
+                //select all folders from db with tag as List<Folder>
+                (List<Folder> folders, List<FolderTag> tags) folderTagResult = await _folderMethods.GetAllFoldersWithTag(selectedTag.TagName, false, _mainWindowViewModel.CurrentDirectory);
+                List<Folder> taggedFolders = folderTagResult.folders;
+                //no taggedFolders returned just exit
+                if(taggedFolders == null || taggedFolders.Count == 0)
+                    return;
+
+                //remove tag from database
+                await _folderMethods.RemoveTagOnAllFolders(selectedTag);
+                //Update TagsList to show in UI
+                await _mainWindowViewModel.GetTagsList();
+            }
+            finally
+            {
+                _mainWindowViewModel.ShowLoading = false;
             }
         }
     }

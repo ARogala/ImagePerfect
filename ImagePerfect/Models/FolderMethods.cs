@@ -124,5 +124,10 @@ namespace ImagePerfect.Models
         {
             await _unitOfWork.Folder.DeleteAllFavoriteFolders();
         }
+
+        public async Task<bool> RemoveTagOnAllFolders(Tag selectedTag)
+        {
+            return await _unitOfWork.Folder.RemoveTagOnAllFolders(selectedTag);
+        }
     }
 }

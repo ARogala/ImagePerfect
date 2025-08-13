@@ -361,6 +361,33 @@ namespace ImagePerfect.Repository
             return rowsEffected > 0 ? true : false;
         }
 
+        public async Task<bool> RemoveTagOnAllFolders(Tag selectedTag)
+        {
+            int rowsEffectedA = 0;
+            int rowsEffectedB = 0;
+            await _connection.OpenAsync();
+            MySqlTransaction txn = await _connection.BeginTransactionAsync();
+
+            //remove from folder_tags_join
+            string removeFolderTagsJoin = @"DELETE FROM folder_tags_join WHERE TagId = @tagId";
+            rowsEffectedA = await _connection.ExecuteAsync(removeFolderTagsJoin, new { tagId = selectedTag.TagId }, transaction: txn);
+
+            //check for tag in image_tags_join
+            string tagInImageTagsJoin = @"SELECT COUNT(*) FROM image_tags_join WHERE TagId = @tagId";
+            int numTagInImageTagsJoin = await _connection.QuerySingleAsync<int>(tagInImageTagsJoin, new { tagId = selectedTag.TagId }, transaction: txn);
+
+            //if tag not present in image_tags_join
+            //  --remove from tags table
+            if (numTagInImageTagsJoin == 0)
+            {
+                string removeFromTagsTable = @"DELETE FROM tags WHERE TagId = @tagId";
+                rowsEffectedB = await _connection.ExecuteAsync(removeFromTagsTable, new { tagId = selectedTag.TagId }, transaction: txn);
+            }
+            await txn.CommitAsync();
+            await _connection.CloseAsync();
+            return rowsEffectedA + rowsEffectedB >= 1 ? true : false;
+        }
+
         public async Task SaveFolderToFavorites(int folderId)
         {
             string sql = @"INSERT IGNORE INTO folder_saved_favorites (FolderId) VALUES (@folderId)";

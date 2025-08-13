@@ -29,7 +29,7 @@
 				<MenuItem Header="_Settings">
 					<MenuItem Header="Settings" Command="{Binding ToggleSettingsCommand}" />
 					<MenuItem Header="Total Images" Command="{Binding ToggleGetTotalImagesCommand}" />
-					<MenuItem Header="Show All Tags" Command="{Binding ToggleListAllTagsCommand}" />
+					<MenuItem Header="Modify Tags" Command="{Binding ToggleListAllTagsCommand}" />
 				</MenuItem>
 				<MenuItem Header="_File Management">
 					<v:PickNewFoldersView DataContext="{Binding PickNewFolders}"/>
@@ -52,7 +52,22 @@
 					</DataTemplate>
 				</ListBox.ItemTemplate>
 			</ListBox>
-			<Button Command="{Binding RemoveTagOnAllImagesCommand}" CommandParameter="{Binding SelectedItem, ElementName=SelectedTag}">Remove Tag From All Images</Button>
+			<Grid RowDefinitions="Auto" ColumnDefinitions="*" HorizontalAlignment="Center" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
+				<StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0">
+					<Button Margin="5"
+						Command="{Binding RemoveTagOnAllImagesCommand}" 
+						CommandParameter="{Binding SelectedItem, ElementName=SelectedTag}"
+						Classes="btn-danger">
+						Remove Tag From All Images
+					</Button>
+					<Button Margin="5"
+						Command="{Binding RemoveTagOnAllFoldersCommand}" 
+						CommandParameter="{Binding SelectedItem, ElementName=SelectedTag}"
+						Classes="btn-danger">
+						Remove Tag From All Folders
+					</Button>
+				</StackPanel>
+			</Grid>
 		</StackPanel>
 		<!--Show Total Images-->
 		<StackPanel Grid.Row="2" HorizontalAlignment="Stretch" IsVisible="{Binding ToggleUI.ShowTotalImages}" Classes="menu-bg-color">

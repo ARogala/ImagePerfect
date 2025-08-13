@@ -25,6 +25,7 @@ namespace ImagePerfect.Repository.IRepository
         Task<bool> DeleteFolderTag(FolderTag tag);
         Task<bool> DeleteLibrary();
         Task SaveFolderToFavorites(int  folderId);
+        Task<bool> RemoveTagOnAllFolders(Tag selectedTag);
         Task DeleteAllFavoriteFolders();
     }
 }
