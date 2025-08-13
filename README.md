@@ -74,7 +74,7 @@ I created Image Perfect both as a way to learn desktop application development a
 - Folder tags/ratings, and description stored in the **database only**
 - Select **cover images** for folders
 - Add image tags individually or in bulk (folder bulk tagging planned)
-- Folder and image Tags can only be removed one at a time. (bulk remove planned)
+- Folder and image Tags can be removed one at a time or in bulk.
 
 ### 🗲 Speed with Large Libraries
 - **No long import times** thanks to MySqlBulkLoader (insert data from a csv file)
