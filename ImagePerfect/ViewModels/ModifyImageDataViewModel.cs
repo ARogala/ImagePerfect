@@ -11,6 +11,7 @@ using System.Linq;
 using Avalonia.Controls;
 using Image = ImagePerfect.Models.Image;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace ImagePerfect.ViewModels
 {
@@ -118,6 +119,42 @@ namespace ImagePerfect.ViewModels
             }
         }
 
+        public async Task RemoveTagOnAllImages(Tag selectedTag)
+        {
+            //nothing selected just return
+            if (selectedTag == null)
+                return;
+            var boxYesNo = MessageBoxManager.GetMessageBoxStandard("Remove Tag", "CAUTION you are about to remove a tag this could take a long time are you sure?", ButtonEnum.YesNo);
+            var boxResult = await boxYesNo.ShowAsync();
+            if (boxResult != ButtonResult.Yes)
+                return;
+            
+            _mainWindowViewModel.ShowLoading = true;
+            try
+            {
+                //select all images from db with tag get as List<Image>
+                (List<Image> images, List<ImageTag> tags) imageTagResult = await _imageMethods.GetAllImagesWithTag(selectedTag.TagName, false, _mainWindowViewModel.CurrentDirectory);
+                List<Image> taggedImags = imageTagResult.images;
+                //no taggedImages returned just exit
+                if (taggedImags == null || taggedImags.Count == 0)
+                    return;
+                        
+
+                //pass those images to method that removes the tag from physical image metadata
+                bool success = await ImageMetaDataHelper.RemoveTagFromAllImages(taggedImags, selectedTag);
+                //if thats a success remove from data base
+                if (success)
+                {
+                    await _imageMethods.RemoveTagOnAllImages(selectedTag);
+                    //Update TagsList to show in UI
+                    await _mainWindowViewModel.GetTagsList();
+                }
+            }
+            finally 
+            {
+                _mainWindowViewModel.ShowLoading = false;
+            }
+        }
         public async Task AddMultipleImageTags(ListBox selectedTagsListBox)
         {
             if (selectedTagsListBox.DataContext != null && selectedTagsListBox.SelectedItems != null)

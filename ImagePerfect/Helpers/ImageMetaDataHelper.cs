@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using ImagePerfectImage = ImagePerfect.Models.Image;
 using ImageSharp = SixLabors.ImageSharp;
@@ -36,6 +37,50 @@ namespace ImagePerfect.Helpers
         {
             ImageSharp.Image imageSharpImage = await ImageSharp.Image.LoadAsync(image.ImagePath);
             await WriteRatingToImage(imageSharpImage, image);
+        }
+
+        public static async Task<bool> RemoveTagFromAllImages(List<ImagePerfectImage> images, Tag selectedTag)
+        {
+            /*
+            assuming HHD with lots of data. Images with the selected tag will likely be from many different folders
+            sorting by the directory and filename will group them per folder and cut down oh physical HHD head movement
+
+            Without sorting:
+            Parallel threads request files in random order, causing the HDD head to constantly jump between distant tracks. Seek times pile up.
+
+            With sorting:
+            Because files from the same directory tend to be stored physically close to each other on disk, sorting like this means:
+                
+                The read/write head moves sequentially within a folder's cluster.
+
+                Only when that folder's files are done does the head jump to another folder.
+
+                That reduces "seek time," which is what kills HDD speed.
+
+            Consider for future commit and doing this in SQL then i can remove the C# sort
+            sql: ORDER BY images.ImageFolderPath, images.FileName
+
+            */
+            List<ImagePerfectImage> sortedImages = images
+               .OrderBy(img => Path.GetDirectoryName(img.ImagePath))
+               .ThenBy(img => Path.GetFileName(img.ImagePath))
+               .ToList();
+
+            int anyFail = 0;
+            await Parallel.ForEachAsync(sortedImages, new ParallelOptions { MaxDegreeOfParallelism = 3 }, async (img, ct) => {
+                try
+                {
+                    using ImageSharp.Image imageSharpImage = await ImageSharp.Image.LoadAsync(img.ImagePath, ct);
+                    bool success = await RemoveTag(imageSharpImage, img, selectedTag);
+                    if(!success)
+                        Interlocked.Exchange(ref anyFail, 1);
+                }
+                catch
+                {
+                    Interlocked.Exchange(ref anyFail, 1);
+                }
+            });
+            return anyFail == 0;
         }
 
         //adds the image metadata to the ImagePerfect Image object
@@ -180,6 +225,55 @@ namespace ImagePerfect.Helpers
             //// Replace original with temp
             //File.Delete(originalPath);
             //File.Move(tempPath, originalPath);
+        }
+
+        private static async Task<bool> RemoveTag(ImageSharp.Image image, ImagePerfectImage imagePerfectImage, Tag selectedTag)
+        {
+            if (image.Metadata.IptcProfile == null)
+                image.Metadata.IptcProfile = new IptcProfile();
+            ImageSharp.Metadata.ImageMetadata imageMetadata = image.Metadata;
+
+            string originalPath = imagePerfectImage.ImagePath;
+            string backupPath = Path.ChangeExtension(originalPath, ".bak" + Path.GetExtension(originalPath));
+            //avoid possible corruption of original images on failed writes
+            try
+            {
+                //Create a backup
+                File.Copy(originalPath, backupPath, overwrite: true);
+                // Remove the specific tag from the image without checking
+                // images passed from db will have the tag
+                imageMetadata.IptcProfile.RemoveValue(IptcTag.Keywords, selectedTag.TagName);
+
+                //to add a check see this. will slow things down if there are lots of tags
+                //if (imageMetadata.IptcProfile?.Values?.Any() == true)
+                //{
+                //    List<IptcValue> keywordProps = imageMetadata.IptcProfile.Values
+                //        .Where(v => v.Tag == IptcTag.Keywords && string.Equals(v.ToString()?.Trim(), selectedTag.TagName.Trim(), StringComparison.Ordinal))
+                //        .ToList();
+
+                //    if (keywordProps.Any()) 
+                //    {
+                //        //remove the specific tag from the image
+                //        image.Metadata.IptcProfile.RemoveValue(IptcTag.Keywords, selectedTag.TagName);
+                //    }
+                //}
+                await image.SaveAsync(originalPath);
+                //delete backup
+                if (File.Exists(backupPath))
+                    File.Delete(backupPath);
+                return true;
+            }
+            catch (Exception ex) 
+            {
+                //Restore backup if save failed
+                if (File.Exists(backupPath))
+                {
+                    File.Copy(backupPath, originalPath, overwrite: true);
+                    File.Delete(backupPath);
+                }
+                return false;
+            }
+
         }
     }
 }

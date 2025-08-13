@@ -85,6 +85,11 @@ namespace ImagePerfect.Models
         {
             return await _unitOfWork.Image.UpdateImageTagsAndRatingFromMetaData(imagesPlusUpdatedMetaData, folderId);
         }
+        
+        public async Task<bool> RemoveTagOnAllImages(Tag selectedTag)
+        {
+            return await _unitOfWork.Image.RemoveTagOnAllImages(selectedTag);
+        }
 
         public async Task<int> GetTotalImages()
         {
