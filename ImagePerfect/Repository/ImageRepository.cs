@@ -65,17 +65,17 @@ namespace ImagePerfect.Repository
             string sql2 = string.Empty;
             if (filterInCurrentDirectory) 
             {
-                sql1 = @"SELECT * FROM images WHERE ImageRating = @rating AND ImageFolderPath LIKE '" + path + "' ORDER BY FileName";
+                sql1 = @"SELECT * FROM images WHERE ImageRating = @rating AND ImageFolderPath LIKE '" + path + "' ORDER BY ImageFolderPath, FileName";
                 sql2 = @"SELECT tags.TagId, tags.TagName, images.ImageId FROM images
                             JOIN image_tags_join ON image_tags_join.ImageId = images.ImageId
-                            JOIN tags ON image_tags_join.TagId = tags.TagId WHERE images.ImageRating = @rating AND ImageFolderPath LIKE '" + path + "' ORDER BY images.FileName;";
+                            JOIN tags ON image_tags_join.TagId = tags.TagId WHERE images.ImageRating = @rating AND ImageFolderPath LIKE '" + path + "' ORDER BY images.ImageFolderPath, images.FileName;";
             }
             else
             {
-                sql1 = @"SELECT * FROM images WHERE ImageRating = @rating ORDER BY FileName";
+                sql1 = @"SELECT * FROM images WHERE ImageRating = @rating ORDER BY ImageFolderPath, FileName";
                 sql2 = @"SELECT tags.TagId, tags.TagName, images.ImageId FROM images
                             JOIN image_tags_join ON image_tags_join.ImageId = images.ImageId
-                            JOIN tags ON image_tags_join.TagId = tags.TagId WHERE images.ImageRating = @rating ORDER BY images.FileName;";
+                            JOIN tags ON image_tags_join.TagId = tags.TagId WHERE images.ImageRating = @rating ORDER BY images.ImageFolderPath, images.FileName;";
             }
             List<Image> allImagesAtRating = (List<Image>)await _connection.QueryAsync<Image>(sql1, new { rating }, transaction: txn);           
             List<ImageTag> tags = (List<ImageTag>)await _connection.QueryAsync<ImageTag>(sql2, new { rating }, transaction: txn);
@@ -95,19 +95,19 @@ namespace ImagePerfect.Repository
             {
                 sql1 = @"SELECT * FROM images 
                             JOIN image_tags_join ON image_tags_join.ImageId = images.ImageId
-                            JOIN tags ON image_tags_join.TagId = tags.TagId WHERE tags.TagName = @tag AND ImageFolderPath LIKE '" + path + "' ORDER BY images.FileName;";
+                            JOIN tags ON image_tags_join.TagId = tags.TagId WHERE tags.TagName = @tag AND ImageFolderPath LIKE '" + path + "' ORDER BY images.ImageFolderPath, images.FileName;";
                 sql2 = @"SELECT tags.TagId, tags.TagName, images.ImageId FROM images 
                             JOIN image_tags_join ON image_tags_join.ImageId = images.ImageId
-                            JOIN tags ON image_tags_join.TagId = tags.TagId WHERE ImageFolderPath LIKE '" + path + "' ORDER BY images.FileName;";
+                            JOIN tags ON image_tags_join.TagId = tags.TagId WHERE ImageFolderPath LIKE '" + path + "' ORDER BY images.ImageFolderPath, images.FileName;";
             }
             else
             {
                 sql1 = @"SELECT * FROM images 
                             JOIN image_tags_join ON image_tags_join.ImageId = images.ImageId
-                            JOIN tags ON image_tags_join.TagId = tags.TagId WHERE tags.TagName = @tag ORDER BY images.FileName;";
+                            JOIN tags ON image_tags_join.TagId = tags.TagId WHERE tags.TagName = @tag ORDER BY images.ImageFolderPath, images.FileName;";
                 sql2 = @"SELECT tags.TagId, tags.TagName, images.ImageId FROM images 
                             JOIN image_tags_join ON image_tags_join.ImageId = images.ImageId
-                            JOIN tags ON image_tags_join.TagId = tags.TagId ORDER BY images.FileName;";
+                            JOIN tags ON image_tags_join.TagId = tags.TagId ORDER BY images.ImageFolderPath, images.FileName;";
             }
 
             List<Image> allImagesWithTag = (List<Image>)await _connection.QueryAsync<Image>(sql1, new { tag }, transaction: txn);
