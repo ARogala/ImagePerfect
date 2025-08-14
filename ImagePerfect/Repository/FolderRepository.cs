@@ -90,17 +90,17 @@ namespace ImagePerfect.Repository
             string sql2 = string.Empty;
             if (filterInCurrentDirectory)
             {
-                sql1 = @"SELECT * FROM folders WHERE FolderRating = @rating AND FolderPath LIKE '" + path + "' ORDER BY FolderName";
+                sql1 = @"SELECT * FROM folders WHERE FolderRating = @rating AND FolderPath LIKE '" + path + "' ORDER BY FolderPath, FolderName";
                 sql2 = @"SELECT tags.TagId, tags.TagName, folders.FolderId FROM folders 
                             JOIN folder_tags_join ON folder_tags_join.FolderId = folders.FolderId 
-                            JOIN tags ON folder_tags_join.TagId = tags.TagId WHERE folders.FolderRating = @rating AND FolderPath LIKE '" + path + "' ORDER BY folders.FolderName;";
+                            JOIN tags ON folder_tags_join.TagId = tags.TagId WHERE folders.FolderRating = @rating AND FolderPath LIKE '" + path + "' ORDER BY folders.FolderPath, folders.FolderName;";
             }
             else
             {
-                sql1 = @"SELECT * FROM folders WHERE FolderRating = @rating ORDER BY FolderName";
+                sql1 = @"SELECT * FROM folders WHERE FolderRating = @rating ORDER BY FolderPath, FolderName";
                 sql2 = @"SELECT tags.TagId, tags.TagName, folders.FolderId FROM folders 
                             JOIN folder_tags_join ON folder_tags_join.FolderId = folders.FolderId 
-                            JOIN tags ON folder_tags_join.TagId = tags.TagId WHERE folders.FolderRating = @rating ORDER BY folders.FolderName;";
+                            JOIN tags ON folder_tags_join.TagId = tags.TagId WHERE folders.FolderRating = @rating ORDER BY folders.FolderPath, folders.FolderName;";
             }
             
             List<Folder> allFoldersAtRating = (List<Folder>)await _connection.QueryAsync<Folder>(sql1, new { rating }, transaction: txn);
@@ -119,17 +119,17 @@ namespace ImagePerfect.Repository
             string sql2 = string.Empty;
             if (filterInCurrentDirectory) 
             {
-                sql1 = @"SELECT * FROM folders WHERE AreImagesImported = false AND HasFiles = true AND FolderPath LIKE '" + path + "' ORDER BY FolderName";
+                sql1 = @"SELECT * FROM folders WHERE AreImagesImported = false AND HasFiles = true AND FolderPath LIKE '" + path + "' ORDER BY FolderPath, FolderName";
                 sql2 = @"SELECT tags.TagId, tags.TagName, folders.FolderId FROM folders 
                             JOIN folder_tags_join ON folder_tags_join.FolderId = folders.FolderId 
-                            JOIN tags ON folder_tags_join.TagId = tags.TagId WHERE folders.AreImagesImported = false AND FolderPath LIKE '" + path + "' ORDER BY folders.FolderName;";
+                            JOIN tags ON folder_tags_join.TagId = tags.TagId WHERE folders.AreImagesImported = false AND FolderPath LIKE '" + path + "' ORDER BY folders.FolderPath, folders.FolderName;";
             }
             else
             {
-                sql1 = @"SELECT * FROM folders WHERE AreImagesImported = false AND HasFiles = true ORDER BY FolderName";
+                sql1 = @"SELECT * FROM folders WHERE AreImagesImported = false AND HasFiles = true ORDER BY FolderPath, FolderName";
                 sql2 = @"SELECT tags.TagId, tags.TagName, folders.FolderId FROM folders 
                             JOIN folder_tags_join ON folder_tags_join.FolderId = folders.FolderId 
-                            JOIN tags ON folder_tags_join.TagId = tags.TagId WHERE folders.AreImagesImported = false ORDER BY folders.FolderName;";
+                            JOIN tags ON folder_tags_join.TagId = tags.TagId WHERE folders.AreImagesImported = false ORDER BY folders.FolderPath, folders.FolderName;";
             }
 
             List<Folder> allFoldersWithNoImportedImages = (List<Folder>)await _connection.QueryAsync<Folder>(sql1, transaction: txn);
@@ -148,17 +148,17 @@ namespace ImagePerfect.Repository
             string sql2 = string.Empty;
             if (filterInCurrentDirectory)
             {
-                sql1 = @"SELECT * FROM folders WHERE FolderContentMetaDataScanned = false AND HasFiles = true AND FolderPath LIKE '" + path + "' ORDER BY FolderName";
+                sql1 = @"SELECT * FROM folders WHERE FolderContentMetaDataScanned = false AND HasFiles = true AND FolderPath LIKE '" + path + "' ORDER BY FolderPath, FolderName";
                 sql2 = @"SELECT tags.TagId, tags.TagName, folders.FolderId FROM folders 
                             JOIN folder_tags_join ON folder_tags_join.FolderId = folders.FolderId 
-                            JOIN tags ON folder_tags_join.TagId = tags.TagId WHERE folders.FolderContentMetaDataScanned = false AND FolderPath LIKE '" + path + "' ORDER BY folders.FolderName;";
+                            JOIN tags ON folder_tags_join.TagId = tags.TagId WHERE folders.FolderContentMetaDataScanned = false AND FolderPath LIKE '" + path + "' ORDER BY folders.FolderPath, folders.FolderName;";
             }
             else
             {
-                sql1 = @"SELECT * FROM folders WHERE FolderContentMetaDataScanned = false AND HasFiles = true ORDER BY FolderName";
+                sql1 = @"SELECT * FROM folders WHERE FolderContentMetaDataScanned = false AND HasFiles = true ORDER BY FolderPath, FolderName";
                 sql2 = @"SELECT tags.TagId, tags.TagName, folders.FolderId FROM folders 
                             JOIN folder_tags_join ON folder_tags_join.FolderId = folders.FolderId 
-                            JOIN tags ON folder_tags_join.TagId = tags.TagId WHERE folders.FolderContentMetaDataScanned = false ORDER BY folders.FolderName;";
+                            JOIN tags ON folder_tags_join.TagId = tags.TagId WHERE folders.FolderContentMetaDataScanned = false ORDER BY folders.FolderPath, folders.FolderName;";
             }
 
             List<Folder> allFoldersWithMetadataNotScanned = (List<Folder>)await _connection.QueryAsync<Folder>(sql1, transaction: txn);
@@ -177,17 +177,17 @@ namespace ImagePerfect.Repository
             string sql2 = string.Empty;
             if (filterInCurrentDirectory)
             {
-                sql1 = @"SELECT * FROM folders WHERE AreImagesImported = true AND HasFiles = true AND CoverImagePath = '' AND FolderPath LIKE '" + path + "' ORDER BY FolderName";
+                sql1 = @"SELECT * FROM folders WHERE AreImagesImported = true AND HasFiles = true AND CoverImagePath = '' AND FolderPath LIKE '" + path + "' ORDER BY FolderPath, FolderName";
                 sql2 = @"SELECT tags.TagId, tags.TagName, folders.FolderId FROM folders 
                             JOIN folder_tags_join ON folder_tags_join.FolderId = folders.FolderId 
-                            JOIN tags ON folder_tags_join.TagId = tags.TagId WHERE folders.AreImagesImported = true AND folders.CoverImagePath = '' AND FolderPath LIKE '" + path + "' ORDER BY folders.FolderName;";
+                            JOIN tags ON folder_tags_join.TagId = tags.TagId WHERE folders.AreImagesImported = true AND folders.CoverImagePath = '' AND FolderPath LIKE '" + path + "' ORDER BY folders.FolderPath, folders.FolderName;";
             }
             else
             {
-                sql1 = @"SELECT * FROM folders WHERE AreImagesImported = true AND HasFiles = true AND CoverImagePath = '' ORDER BY FolderName";
+                sql1 = @"SELECT * FROM folders WHERE AreImagesImported = true AND HasFiles = true AND CoverImagePath = '' ORDER BY FolderPath, FolderName";
                 sql2 = @"SELECT tags.TagId, tags.TagName, folders.FolderId FROM folders 
                             JOIN folder_tags_join ON folder_tags_join.FolderId = folders.FolderId 
-                            JOIN tags ON folder_tags_join.TagId = tags.TagId WHERE folders.AreImagesImported = true AND folders.CoverImagePath = '' ORDER BY folders.FolderName;";
+                            JOIN tags ON folder_tags_join.TagId = tags.TagId WHERE folders.AreImagesImported = true AND folders.CoverImagePath = '' ORDER BY folders.FolderPath, folders.FolderName;";
             }
 
             List<Folder> allFoldersWithoutCovers = (List<Folder>)await _connection.QueryAsync<Folder>(sql1, transaction: txn);
@@ -207,19 +207,19 @@ namespace ImagePerfect.Repository
             {
                 sql1 = @"SELECT * FROM folders
                             JOIN folder_tags_join ON folder_tags_join.FolderId = folders.FolderId
-                            JOIN tags ON folder_tags_join.TagId = tags.TagId WHERE tags.TagName = @tag AND FolderPath LIKE '" + path + "' ORDER BY folders.FolderName;";
+                            JOIN tags ON folder_tags_join.TagId = tags.TagId WHERE tags.TagName = @tag AND FolderPath LIKE '" + path + "' ORDER BY folders.FolderPath, folders.FolderName;";
                 sql2 = @"SELECT tags.TagId, tags.TagName, folders.FolderId FROM folders
                             JOIN folder_tags_join ON folder_tags_join.FolderId = folders.FolderId
-                            JOIN tags ON folder_tags_join.TagId = tags.TagId WHERE FolderPath LIKE '" + path + "' ORDER BY folders.FolderName;";
+                            JOIN tags ON folder_tags_join.TagId = tags.TagId WHERE FolderPath LIKE '" + path + "' ORDER BY folders.FolderPath, folders.FolderName;";
             }
             else
             {
                 sql1 = @"SELECT * FROM folders
                             JOIN folder_tags_join ON folder_tags_join.FolderId = folders.FolderId
-                            JOIN tags ON folder_tags_join.TagId = tags.TagId WHERE tags.TagName = @tag ORDER BY folders.FolderName;";
+                            JOIN tags ON folder_tags_join.TagId = tags.TagId WHERE tags.TagName = @tag ORDER BY folders.FolderPath, folders.FolderName;";
                 sql2 = @"SELECT tags.TagId, tags.TagName, folders.FolderId FROM folders
                             JOIN folder_tags_join ON folder_tags_join.FolderId = folders.FolderId
-                            JOIN tags ON folder_tags_join.TagId = tags.TagId ORDER BY folders.FolderName;";
+                            JOIN tags ON folder_tags_join.TagId = tags.TagId ORDER BY folders.FolderPath, folders.FolderName;";
             }
             
             List<Folder> allFoldersWithTag = (List<Folder>)await _connection.QueryAsync<Folder>(sql1, new { tag }, transaction: txn);
@@ -238,17 +238,17 @@ namespace ImagePerfect.Repository
             string sql2 = string.Empty;
             if (filterInCurrentDirectory)
             {
-                sql1 = @"SELECT * FROM folders WHERE MATCH(FolderName, FolderPath, FolderDescription) AGAINST(@text) AND FolderPath LIKE '" + path + "' ORDER BY FolderName";
+                sql1 = @"SELECT * FROM folders WHERE MATCH(FolderName, FolderPath, FolderDescription) AGAINST(@text) AND FolderPath LIKE '" + path + "' ORDER BY FolderPath, FolderName";
                 sql2 = @"SELECT tags.TagId, tags.TagName, folders.FolderId FROM folders
                             JOIN folder_tags_join ON folder_tags_join.FolderId = folders.FolderId
-                            JOIN tags ON folder_tags_join.TagId = tags.TagId WHERE FolderPath LIKE '" + path + "' ORDER BY folders.FolderName;";
+                            JOIN tags ON folder_tags_join.TagId = tags.TagId WHERE FolderPath LIKE '" + path + "' ORDER BY folders.FolderPath, folders.FolderName;";
             }
             else 
             {
-                sql1 = @"SELECT * FROM folders WHERE MATCH(FolderName, FolderPath, FolderDescription) AGAINST(@text) ORDER BY FolderName";
+                sql1 = @"SELECT * FROM folders WHERE MATCH(FolderName, FolderPath, FolderDescription) AGAINST(@text) ORDER BY FolderPath, FolderName";
                 sql2 = @"SELECT tags.TagId, tags.TagName, folders.FolderId FROM folders
                             JOIN folder_tags_join ON folder_tags_join.FolderId = folders.FolderId
-                            JOIN tags ON folder_tags_join.TagId = tags.TagId ORDER BY folders.FolderName;";
+                            JOIN tags ON folder_tags_join.TagId = tags.TagId ORDER BY folders.FolderPath, folders.FolderName;";
             }
             
             List<Folder> allFoldersWithDescriptionText = (List<Folder>)await _connection.QueryAsync<Folder>(sql1, new { text }, transaction: txn);
@@ -262,10 +262,10 @@ namespace ImagePerfect.Repository
         {
             await _connection.OpenAsync();
             MySqlTransaction txn = await _connection.BeginTransactionAsync();
-            string sql1 = @"SELECT * FROM folders WHERE FolderId IN (SELECT FolderId FROM folder_saved_favorites) ORDER BY FolderName";
+            string sql1 = @"SELECT * FROM folders WHERE FolderId IN (SELECT FolderId FROM folder_saved_favorites) ORDER BY FolderPath, FolderName";
             string sql2 = @"SELECT tags.TagId, tags.TagName, folders.FolderId FROM folders
                                 JOIN folder_tags_join ON folder_tags_join.FolderId = folders.FolderId
-                                JOIN tags ON folder_tags_join.TagId = tags.TagId WHERE folders.FolderId IN (SELECT folder_saved_favorites.FolderId FROM folder_saved_favorites) ORDER BY FolderName";
+                                JOIN tags ON folder_tags_join.TagId = tags.TagId WHERE folders.FolderId IN (SELECT folder_saved_favorites.FolderId FROM folder_saved_favorites) ORDER BY FolderPath, FolderName";
             List<Folder> allFavoriteFolders = (List<Folder>)await _connection.QueryAsync<Folder>(sql1, transaction: txn);
             List<FolderTag> tags = (List<FolderTag>)await _connection.QueryAsync<FolderTag>(sql2, transaction: txn);
             await txn.CommitAsync();
