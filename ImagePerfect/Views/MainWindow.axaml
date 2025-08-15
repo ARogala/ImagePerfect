@@ -131,7 +131,7 @@
 		<!--Image Filters-->
 		<StackPanel Grid.Row="4" Orientation="Vertical" IsVisible="{Binding ToggleUI.ShowImageFilters}" Classes="menu-bg-color">
 			<Grid RowDefinitions="Auto" ColumnDefinitions="Auto, Auto, Auto, Auto" HorizontalAlignment="Center" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
-				<NumericUpDown Grid.Row="0" Grid.Column="0" Minimum="0" Value="1" Maximum="5" Width="200"
+				<NumericUpDown Grid.Row="0" Grid.Column="0" Minimum="0" Value="5" Maximum="5" Width="200"
 							   Margin="5" ParsingNumberStyle="Integer" FormatString="0"
 							   x:Name="FilterImageRating"/>
 				<Button Grid.Row="0" Grid.Column="1" Margin="5" Width="200" HorizontalContentAlignment="Center"
