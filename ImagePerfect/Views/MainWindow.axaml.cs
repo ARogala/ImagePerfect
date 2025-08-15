@@ -1,6 +1,8 @@
 using Avalonia.Controls;
+using Avalonia.Interactivity;
+using Avalonia.VisualTree;
+using ImagePerfect.Models;
 using ImagePerfect.ViewModels;
-using System;
 using System.Linq;
 
 namespace ImagePerfect.Views
@@ -12,23 +14,27 @@ namespace ImagePerfect.Views
             InitializeComponent();
         }
 
+        //keeps Vms IsSelected in sync with ListBox Selection
         private void ListBox_SelectionChanged(object? sender, SelectionChangedEventArgs e)
         {
-            //Cast will fail when you try to add tags there are list boxs within the list box..
-            //Maybe not the best way but this works for the current use case
-            try
-            {
-                foreach (var added in e.AddedItems.Cast<ImageViewModel>())
-                    added.IsSelected = true;
+            foreach (var added in e.AddedItems.OfType<ImageViewModel>())
+                added.IsSelected = true;
 
-                foreach (var removed in e.RemovedItems.Cast<ImageViewModel>())
-                    removed.IsSelected = false;
-            }
-            catch (Exception ex) 
-            {
-                return;
-            }
-           
+            foreach (var removed in e.RemovedItems.OfType<ImageViewModel>())
+                removed.IsSelected = false;
         }
+
+        //Sets Vms ImageRating to correct Star number before add rating command is called.
+        private void Star_Click(object? sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.DataContext is StarItem star &&
+                btn.FindAncestorOfType<ListBoxItem>()?.DataContext is ImageViewModel imgVm)
+            {
+                
+                imgVm.ImageRating = star.Number;
+                // Command will execute via binding in XAML
+            }
+        }
+
     }
 }

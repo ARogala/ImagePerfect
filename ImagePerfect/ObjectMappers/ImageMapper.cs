@@ -21,6 +21,10 @@ namespace ImagePerfect.ObjectMappers
                 ImageFolderPath = image.ImageFolderPath,
                 ImageMetaDataScanned = image.ImageMetaDataScanned,
                 FolderId = image.FolderId,
+                DateTaken = image.DateTaken,
+                DateTakenYear = image.DateTakenYear,
+                DateTakenMonth = image.DateTakenMonth,
+                DateTakenDay = image.DateTakenDay,
                 Tags = image.Tags,
             };
             return imageVm;
@@ -37,6 +41,10 @@ namespace ImagePerfect.ObjectMappers
                 ImageFolderPath = imageVm.ImageFolderPath,
                 ImageMetaDataScanned = imageVm.ImageMetaDataScanned,
                 FolderId = imageVm.FolderId,
+                DateTaken = imageVm.DateTaken,
+                DateTakenYear = imageVm.DateTakenYear,
+                DateTakenMonth = imageVm.DateTakenMonth,
+                DateTakenDay = imageVm.DateTakenDay,
                 Tags = imageVm.Tags,
             };
             return image;

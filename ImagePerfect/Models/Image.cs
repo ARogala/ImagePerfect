@@ -34,13 +34,14 @@ namespace ImagePerfect.Models
         [Column("DateTaken")]
         public DateTime? DateTaken { get; set; }
 
-        [Column("DateTakenYear")]
+        //DateTakenYear Month and Day are Generated SQL column values so dont map they cannot be directly inserted/updated
+        [NotMapped]
         public int? DateTakenYear { get; set; }
 
-        [Column("DateTakenMonth")]
+        [NotMapped]
         public int? DateTakenMonth { get; set; }
 
-        [Column("DateTakenDay")]
+        [NotMapped]
         public int? DateTakenDay { get; set; }
 
         //for many to many relationship image_tags_join
