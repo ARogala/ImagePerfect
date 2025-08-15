@@ -36,5 +36,14 @@ namespace ImagePerfect.Views
             }
         }
 
+        private void Folder_Star_Click(object? sender, RoutedEventArgs e)
+        {
+            if(sender is Button btn && btn.DataContext is StarItem star &&
+                btn.FindAncestorOfType<StackPanel>()?.DataContext is FolderViewModel folderVm)
+            {
+                folderVm.FolderRating = star.Number;    
+            }
+        }
+
     }
 }

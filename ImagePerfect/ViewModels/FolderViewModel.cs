@@ -1,7 +1,9 @@
 using Avalonia.Media.Imaging;
+using ImagePerfect.Models;
 using ReactiveUI;
 using System.Collections.Generic;
-using ImagePerfect.Models;
+using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace ImagePerfect.ViewModels
 {
@@ -23,7 +25,16 @@ namespace ImagePerfect.ViewModels
 		private bool _areImagesImported;
 		private bool _showImportImagesButton;
 
-		public int FolderId 
+        private void UpdateStars()
+        {
+            foreach (var star in Stars)
+                star.IsFilled = star.Number <= FolderRating;
+        }
+
+        public ObservableCollection<StarItem> Stars { get; } = new ObservableCollection<StarItem>(
+           Enumerable.Range(1, 10).Select(i => new StarItem(i))
+        );
+        public int FolderId 
 		{
 			get => _folderId;
 			set => this.RaiseAndSetIfChanged(ref _folderId, value);
@@ -81,7 +92,11 @@ namespace ImagePerfect.ViewModels
         public int FolderRating
 		{
 			get => _folderRating;
-			set => this.RaiseAndSetIfChanged(ref _folderRating, value);
+			set
+			{
+                this.RaiseAndSetIfChanged(ref _folderRating, value);
+				UpdateStars();
+            }
 		}
 		public bool HasFiles 
 		{
