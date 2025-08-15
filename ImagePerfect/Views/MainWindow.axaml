@@ -422,11 +422,11 @@
 						</DataTemplate>
 					</ItemsControl.ItemTemplate>
 				</ItemsControl>
-
+				
 				<!--See code behind for SelectionChanged used to toggle VM IsSelected with ListBox Selection-->
 				<ListBox ItemsSource="{Binding Images}" x:Name="ImagesListBox" 
 						 SelectionMode="Multiple" 
-						 KeyboardNavigation.TabNavigation="Continue" 
+						 KeyboardNavigation.TabNavigation="Continue"
 						 SelectionChanged="ListBox_SelectionChanged">
 					<ListBox.Styles>
 						<Style Selector="ListBoxItem">
@@ -440,11 +440,11 @@
 						<ItemsPanelTemplate>
 							<WrapPanel HorizontalAlignment="Center" />
 						</ItemsPanelTemplate>
-					</ListBox.ItemsPanel>
+					</ListBox.ItemsPanel>					
 					<ListBox.ItemTemplate>
 						<DataTemplate DataType="vm:ImageViewModel">
 							<!--One way Bind ListBox IsSelected to VM IsSelected used for Select and unSelect all images method-->
-							<ListBoxItem IsSelected="{Binding IsSelected}">
+							<ListBoxItem IsSelected="{Binding IsSelected}" x:Name="ImagesListBoxItem">
 								<StackPanel Margin="1" KeyboardNavigation.TabNavigation="Continue">
 									<Image MaxWidth="{Binding #Root.((vm:MainWindowViewModel)DataContext).SettingsVm.MaxImageWidth}" Source="{Binding ImageBitmap}" />
 									<Grid RowDefinitions="Auto" ColumnDefinitions="*,*,*,Auto" MaxWidth="600" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
@@ -501,6 +501,7 @@
 											Submit
 										</Button>
 									</Grid>
+									<!--
 									<Grid RowDefinitions="Auto" ColumnDefinitions="*,Auto" MaxWidth="600" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
 										<NumericUpDown Grid.Row="0" Grid.Column="0" Maximum="5" Minimum="0" Margin="5" Value="{Binding ImageRating}"/>
 										<Button Grid.Row="0" Grid.Column="1" Width="100" HorizontalContentAlignment="Center"
@@ -509,6 +510,35 @@
 											Submit
 										</Button>
 									</Grid>
+									-->
+									<!--See code behind-->
+									<ItemsControl ItemsSource="{Binding Stars}" HorizontalAlignment="Center">
+										<ItemsControl.ItemsPanel>
+											<ItemsPanelTemplate>
+												<StackPanel Orientation="Horizontal"/>
+											</ItemsPanelTemplate>
+										</ItemsControl.ItemsPanel>
+										<ItemsControl.ItemTemplate>
+											<DataTemplate>
+												<Button 
+													Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).AddImageRatingCommand}"
+													CommandParameter="{Binding #ImagesListBoxItem.((vm:ImageViewModel)DataContext)}"
+													Click="Star_Click">
+													<Image Width="20" Height="20" Classes.Empty="{Binding !IsFilled}" Classes.NotEmpty="{Binding IsFilled}">
+														<Image.Styles>
+															<Style Selector="Image.Empty">
+																<Setter Property="Source" Value="avares://ImagePerfect/Assets/star_empty.png" />
+															</Style>
+															<Style Selector="Image.NotEmpty">
+																<Setter Property="Source" Value="avares://ImagePerfect/Assets/star_filled.png" />
+															</Style>
+														</Image.Styles>
+													</Image>
+												</Button>
+											</DataTemplate>
+										</ItemsControl.ItemTemplate>
+									</ItemsControl>
+									
 								</StackPanel>
 							</ListBoxItem>
 						</DataTemplate>
