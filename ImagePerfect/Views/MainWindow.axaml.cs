@@ -14,6 +14,35 @@ namespace ImagePerfect.Views
             InitializeComponent();
         }
 
+        private void SelectAllButton_Click(object? sender, RoutedEventArgs e)
+        {
+
+            // check if any item is currently unselected
+            bool anyUnselected = ImagesListBox.Items
+                                  .OfType<ImageViewModel>()
+                                  .Any(i => !i.IsSelected);
+
+            if (anyUnselected)
+            {
+                // select all
+                ImagesListBox.SelectedItems.Clear();
+                foreach (ImageViewModel item in ImagesListBox.Items.OfType<ImageViewModel>())
+                {
+                    ImagesListBox.SelectedItems.Add(item);
+                    item.IsSelected = true;
+                }
+            }
+            else
+            {
+                // unselect all
+                foreach (ImageViewModel item in ImagesListBox.Items.OfType<ImageViewModel>())
+                {
+                    ImagesListBox.SelectedItems.Remove(item);
+                    item.IsSelected = false;
+                }
+            }   
+        }
+
         //keeps Vms IsSelected in sync with ListBox Selection
         private void ListBox_SelectionChanged(object? sender, SelectionChangedEventArgs e)
         {
