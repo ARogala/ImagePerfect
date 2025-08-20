@@ -291,6 +291,7 @@
 						Classes="btn-danger">
 						Trash Selected
 					</Button>
+					<CheckBox IsChecked="{Binding SuppressImageRefresh}">On Trash Suppress Image Refresh</CheckBox>
 				</StackPanel>
 			</Grid>
 		</StackPanel>

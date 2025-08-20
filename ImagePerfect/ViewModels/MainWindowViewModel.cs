@@ -27,6 +27,7 @@ namespace ImagePerfect.ViewModels
         private readonly ImageCsvMethods _imageCsvMethods;
         private readonly ImageMethods _imageMethods;
         private bool _showLoading;
+        private bool _suppressImageRefresh = false;
         private int _totalImages = 0;
         private string _currentDirectory = string.Empty;
         private string _savedDirectory = string.Empty;
@@ -378,7 +379,11 @@ namespace ImagePerfect.ViewModels
             get => _currentDirectory;
             set => this.RaiseAndSetIfChanged(ref _currentDirectory, value);
         }
-
+        public bool SuppressImageRefresh
+        {
+            get => _suppressImageRefresh;
+            set => this.RaiseAndSetIfChanged(ref _suppressImageRefresh, value);
+        }
         public string SelectedImagesNewDirectory
         {
             get => _selectedImagesNewDirectory;
