@@ -67,7 +67,8 @@ namespace ImagePerfect.ViewModels
                         File.Move(imageVm.ImagePath, newImagePath);
 
                         //refresh UI
-                        await _mainWindowViewModel.RefreshImages("", imageVm.FolderId);
+                        if(!_mainWindowViewModel.SuppressImageRefresh)
+                            await _mainWindowViewModel.RefreshImages("", imageVm.FolderId);
                         _mainWindowViewModel.ShowLoading = false;
                     }
                 }
@@ -121,7 +122,8 @@ namespace ImagePerfect.ViewModels
                         await _folderMethods.UpdateFolder(imagesFolder);
                     }
                     //refresh UI
-                    await _mainWindowViewModel.RefreshImages("", imagesToDelete[0].FolderId);
+                    if (!_mainWindowViewModel.SuppressImageRefresh)
+                        await _mainWindowViewModel.RefreshImages("", imagesToDelete[0].FolderId);
                     _mainWindowViewModel.ShowLoading = false;
                 }
                 _mainWindowViewModel.ShowLoading = false;
