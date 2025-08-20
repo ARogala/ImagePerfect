@@ -279,9 +279,6 @@ namespace ImagePerfect.ViewModels
             {
                 await MoveImages.MoveSelectedImagesToTrash(selectedImages);
             });
-            MoveSelectedImagesToNewFolderCommand = ReactiveCommand.Create(async (IList selectedImages) => {
-                await MoveImages.MoveSelectedImagesToNewFolder(selectedImages);
-            });
             ImportAllFoldersOnCurrentPageCommand = ReactiveCommand.Create(async (ItemsControl foldersItemsControl) => { 
                 await ImportImagesVm.ImportAllFoldersOnCurrentPage(foldersItemsControl);
             });
@@ -529,8 +526,6 @@ namespace ImagePerfect.ViewModels
         public ReactiveCommand<Unit, Task> RemoveAllFavoriteFoldersCommand { get; }
 
         public ReactiveCommand<IList, Task> MoveSelectedImagesToTrashCommand { get; }
-
-        public ReactiveCommand<IList, Task> MoveSelectedImagesToNewFolderCommand { get; }
 
         public ReactiveCommand<ItemsControl, Task> ImportAllFoldersOnCurrentPageCommand { get; }
 

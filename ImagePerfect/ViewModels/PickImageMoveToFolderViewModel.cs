@@ -10,6 +10,7 @@ using ImagePerfect.Helpers;
 using ImagePerfect.Models;
 using ImagePerfect.Repository.IRepository;
 using System.Diagnostics;
+using System.Collections;
 
 namespace ImagePerfect.ViewModels
 {
@@ -25,7 +26,7 @@ namespace ImagePerfect.ViewModels
             _folderMethods = new FolderMethods(_unitOfWork);
 
             _SelectMoveImagesToFolderInteration = new Interaction<string, List<string>?>();
-            SelectMoveImagesToFolderCommand = ReactiveCommand.CreateFromTask(()=>SelectMoveImagesToFolder());
+            SelectMoveImagesToFolderCommand = ReactiveCommand.Create(async (IList? selectedImages)=>await SelectMoveImagesToFolder(selectedImages));
         }
 
         private List<string>? _MoveImagesToFolderPath;
@@ -34,10 +35,17 @@ namespace ImagePerfect.ViewModels
 
         public Interaction<string, List<string>?> SelectMoveImagesToFolderInteration { get { return _SelectMoveImagesToFolderInteration; } }
 
-        public ReactiveCommand<Unit, Unit> SelectMoveImagesToFolderCommand { get; }
+        public ReactiveCommand<IList?, Task> SelectMoveImagesToFolderCommand { get; }
 
-        private async Task SelectMoveImagesToFolder()
+        private async Task SelectMoveImagesToFolder(IList? selectedImages)
         {
+            if (selectedImages is null || selectedImages.Count == 0)
+            {
+                var box = MessageBoxManager.GetMessageBoxStandard("Move Images", "You need to select images to move.", ButtonEnum.Ok);
+                await box.ShowAsync();
+                return;
+            }
+            
             Folder? rootFolder = await _folderMethods.GetRootFolder();
             _MoveImagesToFolderPath = await _SelectMoveImagesToFolderInteration.Handle(_mainWindowViewModel.CurrentDirectory);
             //list will be empty if Cancel is pressed exit method
@@ -55,6 +63,7 @@ namespace ImagePerfect.ViewModels
             }
             //set the move to directory
             _mainWindowViewModel.SelectedImagesNewDirectory = PathHelper.FormatPathFromFolderPicker(_MoveImagesToFolderPath[0]);
+            await _mainWindowViewModel.MoveImages.MoveSelectedImagesToNewFolder(selectedImages);
         }
     }
 }
