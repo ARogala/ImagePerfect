@@ -6,8 +6,11 @@
 			 xmlns:vm="using:ImagePerfect.ViewModels"
 			 x:DataType="vm:PickImageMoveToFolderViewModel"
              x:Class="ImagePerfect.Views.PickImageMoveToFolderView">
+	<!--Note: Tag is for SelectedImages see VM and MainWindow xml-->
 	<Button Margin="5" HorizontalAlignment="Center"
-		Command="{Binding SelectMoveImagesToFolderCommand}" Classes="menu-btn">
-		Select Move To Folder
+		Command="{Binding SelectMoveImagesToFolderCommand}"  
+		CommandParameter="{Binding Tag, RelativeSource={RelativeSource AncestorType=UserControl}}"
+		Classes="menu-btn">
+		Move Selected
 	</Button>
 </UserControl>
