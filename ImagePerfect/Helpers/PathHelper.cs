@@ -114,16 +114,43 @@ namespace ImagePerfect.Helpers
         public static List<ImageViewModel> ModifyImagePathsForMoveImagesToNewFolder(List<ImageViewModel> imagesToMove, Folder imagesNewFolder) 
         {
             List<ImageViewModel> imagesToMoveModifiedPaths = new List<ImageViewModel>();
+
+            //keep a hashset of used file names to avoid duplicates within this move
+            //hashset used to basically guard against renaming one file to a name that already exits.
+            //if dog.jpg is in dest and dog.jpg is in source then source becomes dog_1.jpg but if source already has dog_1.jpg this is a problem.
+            //safety net so we don't accidentally assign the same new name twice within this batch.
+            HashSet<string> usedFileNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
             foreach (ImageViewModel imgToMove in imagesToMove)
             {
-                //deep copy
-                imagesToMoveModifiedPaths.Add(new ImageViewModel(imgToMove));
-            }
-            foreach (ImageViewModel image in imagesToMoveModifiedPaths) 
-            {
-                image.ImagePath = imagesNewFolder.FolderPath + getPathSlash() + image.FileName;
-                image.ImageFolderPath = imagesNewFolder.FolderPath;
-                image.FolderId = imagesNewFolder.FolderId;
+                // deep copy
+                ImageViewModel newImg = new ImageViewModel(imgToMove);
+
+                string dir = imagesNewFolder.FolderPath;
+                string fileName = Path.GetFileNameWithoutExtension(newImg.FileName);
+                string ext = Path.GetExtension(newImg.FileName);
+                string candidateFileName = fileName + ext;
+                string candidatePath = Path.Combine(dir, candidateFileName);
+
+                int counter = 1;
+                // check both: existing files on disk + already renamed in this batch
+                while (File.Exists(candidatePath) || usedFileNames.Contains(candidateFileName))
+                {
+                    candidateFileName = $"{fileName}_({counter}){ext}";
+                    candidatePath = Path.Combine(dir, candidateFileName);
+                    counter++;
+                }
+
+                // update model with conflict-free path
+                newImg.FileName = candidateFileName;
+                newImg.ImagePath = candidatePath;
+                newImg.ImageFolderPath = dir;
+                newImg.FolderId = imagesNewFolder.FolderId;
+
+                // remember this file name
+                usedFileNames.Add(candidateFileName);
+
+                imagesToMoveModifiedPaths.Add(newImg);
             }
             return imagesToMoveModifiedPaths;
         }

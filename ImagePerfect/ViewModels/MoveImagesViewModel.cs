@@ -161,18 +161,7 @@ namespace ImagePerfect.ViewModels
                 _mainWindowViewModel.ShowLoading = true;
                 //modify ImagePath, ImageFolderPath and FolderId for each image in imagesToMove 
                 List<ImageViewModel> imagesToMoveModifiedPaths = PathHelper.ModifyImagePathsForMoveImagesToNewFolder(imagesToMove, imagesNewFolder);
-                for (int i = 0; i < imagesToMoveModifiedPaths.Count; i++)
-                {
-                    if (File.Exists(imagesToMoveModifiedPaths[i].ImagePath))
-                    {
-                        var box = MessageBoxManager.GetMessageBoxStandard("Move Images", "One or more images in the destination has the same file name. Pick a different folder", ButtonEnum.Ok);
-                        await box.ShowAsync();
-                        _mainWindowViewModel.ShowLoading = false;
-                        //reset SelectedImageNewDirectory
-                        _mainWindowViewModel.SelectedImagesNewDirectory = string.Empty;
-                        return;
-                    }
-                }
+                
                 //get image move sql
                 string imageMoveSql = SqlStringBuilder.BuildSqlForMoveImagesToNewFolder(imagesToMoveModifiedPaths);
                 //move images in db
