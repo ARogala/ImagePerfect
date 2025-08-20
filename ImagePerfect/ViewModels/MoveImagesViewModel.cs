@@ -77,18 +77,8 @@ namespace ImagePerfect.ViewModels
 
         public async Task MoveSelectedImagesToTrash(IList selectedImages)
         {
-            //technically no longer need allImages as selected are passed in. Should refactor this method a bit
-            List<ImageViewModel> allImages = selectedImages.OfType<ImageViewModel>().ToList();
-            if (allImages.Count == 0)
-                return;
-            List<ImageViewModel> imagesToDelete = new List<ImageViewModel>();
-            foreach (ImageViewModel image in allImages)
-            {
-                if (image.IsSelected && File.Exists(image.ImagePath))
-                {
-                    imagesToDelete.Add(image);
-                }
-            }
+            List<ImageViewModel> imagesToDelete = selectedImages.OfType<ImageViewModel>().ToList();
+
             if (imagesToDelete.Count == 0)
             {
                 var box = MessageBoxManager.GetMessageBoxStandard("Delete Images", "You need to select images to delete.", ButtonEnum.Ok);
@@ -100,7 +90,7 @@ namespace ImagePerfect.ViewModels
             if (boxResult == ButtonResult.Yes)
             {
                 _mainWindowViewModel.ShowLoading = true;
-                Folder imagesFolder = await _folderMethods.GetFolderAtDirectory(allImages[0].ImageFolderPath);
+                Folder imagesFolder = await _folderMethods.GetFolderAtDirectory(imagesToDelete[0].ImageFolderPath);
                 Folder? rootFolder = await _folderMethods.GetRootFolder();
                 string trashFolderPath = PathHelper.GetTrashFolderPath(rootFolder.FolderPath);
 
@@ -131,7 +121,7 @@ namespace ImagePerfect.ViewModels
                         await _folderMethods.UpdateFolder(imagesFolder);
                     }
                     //refresh UI
-                    await _mainWindowViewModel.RefreshImages("", allImages[0].FolderId);
+                    await _mainWindowViewModel.RefreshImages("", imagesToDelete[0].FolderId);
                     _mainWindowViewModel.ShowLoading = false;
                 }
                 _mainWindowViewModel.ShowLoading = false;
@@ -140,19 +130,12 @@ namespace ImagePerfect.ViewModels
 
         public async Task MoveSelectedImagesToNewFolder(IList selectedImages)
         {
-            //technically no longer need allImages as selected are passed in. Should refactor this method a bit
-            List<ImageViewModel> allImages = selectedImages.OfType<ImageViewModel>().ToList();
-            if(allImages.Count == 0)
+            List<ImageViewModel> imagesToMove = selectedImages.OfType<ImageViewModel>().ToList();
+            if (imagesToMove.Count == 0)
                 return;
-            List<ImageViewModel> imagesToMove = new List<ImageViewModel>();
-            Folder imagesCurrentFolder = await _folderMethods.GetFolderAtDirectory(allImages[0].ImageFolderPath);
+            
+            Folder imagesCurrentFolder = await _folderMethods.GetFolderAtDirectory(imagesToMove[0].ImageFolderPath);
 
-            if (_mainWindowViewModel.SelectedImagesNewDirectory == null || _mainWindowViewModel.SelectedImagesNewDirectory == "")
-            {
-                var box = MessageBoxManager.GetMessageBoxStandard("Move Images", "You need to select the move to folder first.", ButtonEnum.Ok);
-                await box.ShowAsync();
-                return;
-            }
             //get folder at SelectedImagesNewDirectory
             Folder imagesNewFolder = await _folderMethods.GetFolderAtDirectory(_mainWindowViewModel.SelectedImagesNewDirectory);
             if (imagesNewFolder.FolderPath == imagesCurrentFolder.FolderPath)
@@ -169,19 +152,6 @@ namespace ImagePerfect.ViewModels
                 return;
             }
 
-            foreach (ImageViewModel image in allImages)
-            {
-                if (image.IsSelected && File.Exists(image.ImagePath))
-                {
-                    imagesToMove.Add(image);
-                }
-            }
-            if (imagesToMove.Count == 0)
-            {
-                var box = MessageBoxManager.GetMessageBoxStandard("Move Images", "You need to select images to move.", ButtonEnum.Ok);
-                await box.ShowAsync();
-                return;
-            }
             var boxYesNo = MessageBoxManager.GetMessageBoxStandard("Move Images", $"Are you sure you want to move these images to {_mainWindowViewModel.SelectedImagesNewDirectory}?", ButtonEnum.YesNo);
             var boxResult = await boxYesNo.ShowAsync();
             if (boxResult == ButtonResult.Yes)
@@ -235,7 +205,7 @@ namespace ImagePerfect.ViewModels
                     //reset SelectedImageNewDirectory
                     _mainWindowViewModel.SelectedImagesNewDirectory = string.Empty;
                     //refresh UI
-                    await _mainWindowViewModel.RefreshImages("", allImages[0].FolderId);
+                    await _mainWindowViewModel.RefreshImages("", imagesToMove[0].FolderId);
                     await _mainWindowViewModel.RefreshFolders(imagesCurrentFolder.FolderPath);
                     _mainWindowViewModel.ShowLoading = false;
                 }
