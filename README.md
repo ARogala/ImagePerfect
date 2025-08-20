@@ -112,7 +112,6 @@ I created Image Perfect both as a way to learn desktop application development a
 - Image enhancement tools
 - Improved UI design
 - Scan for new folders in file system
-- Smarter image move operations (handle duplicate filenames)
 - Tagging improvements (bulk edit)
 - GIF creation support
 
