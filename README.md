@@ -213,6 +213,19 @@ CREATE TABLE `images` (
   CONSTRAINT `images_ibfk_1` FOREIGN KEY (`FolderId`) REFERENCES `folders` (`FolderId`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+-- Image dates table
+CREATE TABLE `image_dates` (
+  `DateTaken` date NOT NULL,
+  `Year` smallint NOT NULL,
+  `Month` tinyint NOT NULL,
+  `Day` tinyint NOT NULL,
+  `YearMonth` char(7) GENERATED ALWAYS AS (concat(`Year`,_utf8mb4'-',lpad(`Month`,2,_utf8mb4'0'))) STORED,
+  PRIMARY KEY (`DateTaken`),
+  KEY `idx_year` (`Year`),
+  KEY `idx_month` (`Month`),
+  KEY `idx_year_month` (`YearMonth`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 -- Tags table
 CREATE TABLE `tags` (
   `TagId` bigint unsigned NOT NULL AUTO_INCREMENT,
