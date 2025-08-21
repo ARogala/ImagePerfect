@@ -64,7 +64,7 @@ CREATE TABLE `images` (
     CONSTRAINT `images_ibfk_1` FOREIGN KEY (`FolderId`) REFERENCES `folders` (`FolderId`) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-/*adding date to image on 8/7/25 -- use this to update live images table*/
+/*adding date to image on 8/7/25 -- use this to update live images table -- updated my home db with this already*/
 ALTER TABLE images
   ADD COLUMN DateTaken DATE DEFAULT NULL,
   ADD COLUMN DateTakenYear SMALLINT GENERATED ALWAYS AS (YEAR(DateTaken)) STORED,
@@ -73,10 +73,22 @@ ALTER TABLE images
 
 CREATE INDEX idx_date_parts ON images(DateTakenYear, DateTakenMonth, DateTakenDay);
 
-/*to reset the scann state on all folders and images use this*/
+/*to reset the scann state on all folders and images use this -- not done on my home db yet*/
 UPDATE folders SET FolderContentMetaDataScanned = 0 WHERE FolderId >= 1;
 
 UPDATE images SET ImageMetaDataScanned = 0 WHERE ImageId >= 1;
+
+/*will need to add to home db*/
+CREATE TABLE image_dates (
+    DateTaken DATE PRIMARY KEY,           
+    Year SMALLINT NOT NULL,            
+    Month TINYINT NOT NULL,         
+    Day TINYINT NOT NULL,            
+    YearMonth CHAR(7) GENERATED ALWAYS AS (CONCAT(Year, '-', LPAD(Month,2,'0'))) STORED,
+    INDEX idx_year (Year),
+    INDEX idx_month (Month),
+    INDEX idx_year_month (YearMonth)
+);
 
 /**/
 
