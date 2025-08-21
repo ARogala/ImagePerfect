@@ -148,14 +148,14 @@ namespace ImagePerfect.Repository
             string sql2 = string.Empty;
             if (filterInCurrentDirectory)
             {
-                sql1 = @"SELECT * FROM folders WHERE FolderContentMetaDataScanned = false AND HasFiles = true AND FolderPath LIKE '" + path + "' ORDER BY FolderPath, FolderName";
+                sql1 = @"SELECT * FROM folders WHERE FolderContentMetaDataScanned = false AND HasFiles = true AND AreImagesImported = true AND FolderPath LIKE '" + path + "' ORDER BY FolderPath, FolderName";
                 sql2 = @"SELECT tags.TagId, tags.TagName, folders.FolderId FROM folders 
                             JOIN folder_tags_join ON folder_tags_join.FolderId = folders.FolderId 
                             JOIN tags ON folder_tags_join.TagId = tags.TagId WHERE folders.FolderContentMetaDataScanned = false AND FolderPath LIKE '" + path + "' ORDER BY folders.FolderPath, folders.FolderName;";
             }
             else
             {
-                sql1 = @"SELECT * FROM folders WHERE FolderContentMetaDataScanned = false AND HasFiles = true ORDER BY FolderPath, FolderName";
+                sql1 = @"SELECT * FROM folders WHERE FolderContentMetaDataScanned = false AND HasFiles = true AND AreImagesImported = true ORDER BY FolderPath, FolderName";
                 sql2 = @"SELECT tags.TagId, tags.TagName, folders.FolderId FROM folders 
                             JOIN folder_tags_join ON folder_tags_join.FolderId = folders.FolderId 
                             JOIN tags ON folder_tags_join.TagId = tags.TagId WHERE folders.FolderContentMetaDataScanned = false ORDER BY folders.FolderPath, folders.FolderName;";
