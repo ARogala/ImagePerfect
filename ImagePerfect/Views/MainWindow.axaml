@@ -516,33 +516,44 @@
 								<StackPanel Margin="1" KeyboardNavigation.TabNavigation="Continue">
 									<Image MaxWidth="{Binding #Root.((vm:MainWindowViewModel)DataContext).SettingsVm.MaxImageWidth}" Source="{Binding ImageBitmap}" />
 									<!--See code behind-->
-									<ItemsControl ItemsSource="{Binding Stars}" HorizontalAlignment="Center">
-										<ItemsControl.ItemsPanel>
-											<ItemsPanelTemplate>
-												<StackPanel Orientation="Horizontal"/>
-											</ItemsPanelTemplate>
-										</ItemsControl.ItemsPanel>
-										<ItemsControl.ItemTemplate>
-											<DataTemplate>
-												<Button
-													Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).AddImageRatingCommand}"
-													CommandParameter="{Binding #ImagesListBoxItem.((vm:ImageViewModel)DataContext)}"
-													Click="Star_Click"
-													Background="Black">
-													<Image Width="20" Height="20" Classes.Empty="{Binding !IsFilled}" Classes.NotEmpty="{Binding IsFilled}">
-														<Image.Styles>
-															<Style Selector="Image.Empty">
-																<Setter Property="Source" Value="avares://ImagePerfect/Assets/star_empty.png" />
-															</Style>
-															<Style Selector="Image.NotEmpty">
-																<Setter Property="Source" Value="avares://ImagePerfect/Assets/star_filled.png" />
-															</Style>
-														</Image.Styles>
-													</Image>
-												</Button>
-											</DataTemplate>
-										</ItemsControl.ItemTemplate>
-									</ItemsControl>
+									<Grid RowDefinitions="Auto" ColumnDefinitions="Auto,Auto" HorizontalAlignment="Center">
+										<Button 
+											Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).AddImageRatingCommand}"
+											CommandParameter="{Binding}"
+											Click="Image_Rating_Zero"
+											Background="Black" 
+											Grid.Row="0" 
+											Grid.Column="0">
+											<Image Width="20" Height="20" Source="avares://ImagePerfect/Assets/DownArrowRed.png"></Image>
+										</Button>
+										<ItemsControl ItemsSource="{Binding Stars}" HorizontalAlignment="Center" Grid.Row="0" Grid.Column="1">
+											<ItemsControl.ItemsPanel>
+												<ItemsPanelTemplate>
+													<StackPanel Orientation="Horizontal"/>
+												</ItemsPanelTemplate>
+											</ItemsControl.ItemsPanel>
+											<ItemsControl.ItemTemplate>
+												<DataTemplate>
+													<Button
+														Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).AddImageRatingCommand}"
+														CommandParameter="{Binding #ImagesListBoxItem.((vm:ImageViewModel)DataContext)}"
+														Click="Star_Click"
+														Background="Black">
+														<Image Width="20" Height="20" Classes.Empty="{Binding !IsFilled}" Classes.NotEmpty="{Binding IsFilled}">
+															<Image.Styles>
+																<Style Selector="Image.Empty">
+																	<Setter Property="Source" Value="avares://ImagePerfect/Assets/star_empty.png" />
+																</Style>
+																<Style Selector="Image.NotEmpty">
+																	<Setter Property="Source" Value="avares://ImagePerfect/Assets/star_filled.png" />
+																</Style>
+															</Image.Styles>
+														</Image>
+													</Button>
+												</DataTemplate>
+											</ItemsControl.ItemTemplate>
+										</ItemsControl>
+									</Grid>
 									<Grid RowDefinitions="Auto" ColumnDefinitions="*,*,*" MaxWidth="600" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
 										<Button Grid.Row="0" Grid.Column="0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="2"
 										Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).BackFolderFromImageCommand}"

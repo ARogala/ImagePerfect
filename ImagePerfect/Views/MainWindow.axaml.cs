@@ -53,6 +53,13 @@ namespace ImagePerfect.Views
                 removed.IsSelected = false;
         }
 
+        private void Image_Rating_Zero(object? sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.FindAncestorOfType<ListBoxItem>()?.DataContext is ImageViewModel imgVm)
+            {
+                imgVm.ImageRating = 0;
+            }
+        }
         //Sets Vms ImageRating to correct Star number before add rating command is called.
         private void Star_Click(object? sender, RoutedEventArgs e)
         {
