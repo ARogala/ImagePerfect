@@ -171,7 +171,9 @@
 					Filter By Year
 				</Button>
 				<ComboBox x:Name="YearMonth" Grid.Row="0" Grid.Column="2" ItemsSource="{Binding ImageDatesVm.YearMonths}" Width="125" Margin="5" />
-				<Button Grid.Row="0" Grid.Column="3" Classes="menu-btn">
+				<Button Grid.Row="0" Grid.Column="3" Classes="menu-btn"
+						Command="{Binding FilterImagesOnYearMonthCommand}"
+						CommandParameter="{Binding SelectedItem, ElementName=YearMonth}">
 					Filter By Year And Month
 				</Button>
 			</Grid>
@@ -180,7 +182,11 @@
 					<DatePicker SelectedDate="{Binding ImageDatesVm.StartDate}" Margin="5"/>
 					<TextBlock Text="to" VerticalAlignment="Center"/>
 					<DatePicker SelectedDate="{Binding ImageDatesVm.EndDate}" Margin="5"/>
-					<Button Classes="menu-btn" Margin="5">Filter On Range</Button>
+					<Button Classes="menu-btn" Margin="5"
+							Command="{Binding FilterImagesOnDateRangeCommand}"
+							CommandParameter="{Binding ImageDatesVm}">
+						Filter On Range
+					</Button>
 				</StackPanel>
 			</Grid>
 			<Grid RowDefinitions="Auto" ColumnDefinitions="Auto, Auto, Auto" HorizontalAlignment="Center">
