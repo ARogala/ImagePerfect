@@ -213,12 +213,16 @@ namespace ImagePerfect.ViewModels
                 await RefreshImages();
             });
             FilterImagesOnYearCommand = ReactiveCommand.Create(async (int year) => { 
+                if(year == 0)
+                    return;
                 ResetPagination();
                 selectedYearForFilter = year;
                 currentFilter = Filters.ImageYearFilter;
                 await RefreshImages();
             });
             FilterImagesOnYearMonthCommand = ReactiveCommand.Create(async (string yearMonth) => {
+                if (yearMonth == null)
+                    return;
                 string[] parts = yearMonth.Split('-');
                 int year = int.Parse(parts[0]);
                 int month = int.Parse(parts[1]);
