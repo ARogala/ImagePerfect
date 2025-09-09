@@ -114,6 +114,62 @@ namespace ImagePerfect.Repository
             return (allImagesAtYear, tags);
         }
 
+        public async Task<(List<Image> images, List<ImageTag> tags)> GetAllImagesAtYearMonth(int year, int month, bool filterInCurrentDirectory, string currentDirectory)
+        {
+            await _connection.OpenAsync();
+            MySqlTransaction txn = await _connection.BeginTransactionAsync();
+            string path = PathHelper.FormatPathForLikeOperator(currentDirectory);
+            string sql1 = string.Empty;
+            string sql2 = string.Empty;
+            if (filterInCurrentDirectory)
+            {
+                sql1 = @"SELECT * FROM images WHERE DateTakenYear = @year AND DateTakenMonth = @month AND ImageFolderPath LIKE '" + path + "' ORDER BY ImageFolderPath, FileName";
+                sql2 = @"SELECT tags.TagId, tags.TagName, images.ImageId FROM images
+                            JOIN image_tags_join ON image_tags_join.ImageId = images.ImageId
+                            JOIN tags ON image_tags_join.TagId = tags.TagId WHERE images.DateTakenYear = @year AND images.DateTakenMonth = @month AND images.ImageFolderPath LIKE '" + path + "' ORDER BY images.ImageFolderPath, images.FileName;";
+            }
+            else
+            {
+                sql1 = @"SELECT * FROM images WHERE DateTakenYear = @year AND DateTakenMonth = @month ORDER BY ImageFolderPath, FileName";
+                sql2 = @"SELECT tags.TagId, tags.TagName, images.ImageId FROM images
+                            JOIN image_tags_join ON image_tags_join.ImageId = images.ImageId
+                            JOIN tags ON image_tags_join.TagId = tags.TagId WHERE images.DateTakenYear = @year AND images.DateTakenMonth = @month ORDER BY images.ImageFolderPath, images.FileName;";
+            }
+            List<Image> allImagesAtYearMonth = (List<Image>)await _connection.QueryAsync<Image>(sql1, new { year, month }, transaction: txn);
+            List<ImageTag> tags = (List<ImageTag>)await _connection.QueryAsync<ImageTag>(sql2, new { year, month }, transaction: txn);
+            await txn.CommitAsync();
+            await _connection.CloseAsync();
+            return (allImagesAtYearMonth, tags);
+        }
+
+        public async Task<(List<Image> images, List<ImageTag> tags)> GetAllImagesInDateRange(DateTimeOffset startDate, DateTimeOffset endDate, bool filterInCurrentDirectory, string currentDirectory)
+        {
+            await _connection.OpenAsync();
+            MySqlTransaction txn = await _connection.BeginTransactionAsync();
+            string path = PathHelper.FormatPathForLikeOperator(currentDirectory);
+            string sql1 = string.Empty;
+            string sql2 = string.Empty;
+            if (filterInCurrentDirectory)
+            {
+                sql1 = @"SELECT * FROM images WHERE DateTaken BETWEEN @startDate AND @endDate AND ImageFolderPath LIKE '" + path + "' ORDER BY ImageFolderPath, FileName";
+                sql2 = @"SELECT tags.TagId, tags.TagName, images.ImageId FROM images
+                            JOIN image_tags_join ON image_tags_join.ImageId = images.ImageId
+                            JOIN tags ON image_tags_join.TagId = tags.TagId WHERE images.DateTaken BETWEEN @startDate AND @endDate AND images.ImageFolderPath LIKE '" + path + "' ORDER BY images.ImageFolderPath, images.FileName;";
+            }
+            else
+            {
+                sql1 = @"SELECT * FROM images WHERE DateTaken BETWEEN @startDate AND @endDate ORDER BY ImageFolderPath, FileName";
+                sql2 = @"SELECT tags.TagId, tags.TagName, images.ImageId FROM images
+                            JOIN image_tags_join ON image_tags_join.ImageId = images.ImageId
+                            JOIN tags ON image_tags_join.TagId = tags.TagId WHERE images.DateTaken BETWEEN @startDate AND @endDate ORDER BY images.ImageFolderPath, images.FileName;";
+            }
+            List<Image> allImagesInDateRange = (List<Image>)await _connection.QueryAsync<Image>(sql1, new { startDate = startDate.Date, endDate = endDate.Date }, transaction: txn);
+            List<ImageTag> tags = (List<ImageTag>)await _connection.QueryAsync<ImageTag>(sql2, new { startDate = startDate.Date, endDate = endDate.Date }, transaction: txn);
+            await txn.CommitAsync();
+            await _connection.CloseAsync();
+            return (allImagesInDateRange, tags);
+        }
+
         public async Task<(List<Image> images, List<ImageTag> tags)> GetAllImagesWithTag(string tag, bool filterInCurrentDirectory, string currentDirectory)
         {
             await _connection.OpenAsync();

@@ -69,6 +69,8 @@ namespace ImagePerfect.ViewModels
             FolderTagFilter,
             FolderDescriptionFilter,
             ImageYearFilter,
+            ImageYearMonthFilter,
+            ImageDateRangeFilter,
             AllFavoriteFolders,
             AllFoldersWithNoImportedImages,
             AllFoldersWithMetadataNotScanned,
@@ -77,6 +79,9 @@ namespace ImagePerfect.ViewModels
         public Filters currentFilter = Filters.None;
         private int selectedRatingForFilter = 0;
         private int selectedYearForFilter = 0;
+        private int selectedMonthForFilter = 0;
+        private DateTimeOffset startDateForFilter;
+        private DateTimeOffset endDateForFilter;
         private string tagForFilter = string.Empty;
         private string textForFilter = string.Empty;
 
@@ -212,6 +217,26 @@ namespace ImagePerfect.ViewModels
                 selectedYearForFilter = year;
                 currentFilter = Filters.ImageYearFilter;
                 await RefreshImages();
+            });
+            FilterImagesOnYearMonthCommand = ReactiveCommand.Create(async (string yearMonth) => {
+                string[] parts = yearMonth.Split('-');
+                int year = int.Parse(parts[0]);
+                int month = int.Parse(parts[1]);
+                ResetPagination();
+                selectedYearForFilter = year;
+                selectedMonthForFilter = month;
+                currentFilter = Filters.ImageYearMonthFilter;
+                await RefreshImages();
+            });
+            FilterImagesOnDateRangeCommand = ReactiveCommand.Create(async (ImageDatesViewModel imageDatesVm) => {
+                if (imageDatesVm.StartDate != null && imageDatesVm.EndDate != null) 
+                {
+                    ResetPagination();
+                    startDateForFilter = (DateTimeOffset)imageDatesVm.StartDate;
+                    endDateForFilter = (DateTimeOffset)imageDatesVm.EndDate;
+                    currentFilter = Filters.ImageDateRangeFilter;
+                    await RefreshImages();
+                }
             });
             FilterFoldersOnRatingCommand = ReactiveCommand.Create(async (decimal rating) => {
                 ResetPagination();
@@ -515,6 +540,10 @@ namespace ImagePerfect.ViewModels
         public ReactiveCommand<decimal, Task> FilterImagesOnRatingCommand { get; }
 
         public ReactiveCommand<int, Task> FilterImagesOnYearCommand { get; }
+
+        public ReactiveCommand<string, Task> FilterImagesOnYearMonthCommand {  get; }
+
+        public ReactiveCommand<ImageDatesViewModel, Task> FilterImagesOnDateRangeCommand { get; }
 
         public ReactiveCommand<decimal, Task> FilterFoldersOnRatingCommand { get; }
 
@@ -952,6 +981,26 @@ namespace ImagePerfect.ViewModels
                     (List<Image> images, List<ImageTag> tags) imageYearResult = await _imageMethods.GetAllImagesAtYear(selectedYearForFilter, FilterInCurrentDirectory, CurrentDirectory);  
                     displayImages = imageYearResult.images;
                     displayImageTags = imageYearResult.tags;
+
+                    Images.Clear();
+                    LibraryFolders.Clear();
+                    displayImages = ImagePagination();
+                    await MapTagsToImagesAddToObservable();
+                    break;
+                case Filters.ImageYearMonthFilter:
+                    (List<Image> images, List<ImageTag> tags) imageYearMonthResult = await _imageMethods.GetAllImagesAtYearMonth(selectedYearForFilter, selectedMonthForFilter, FilterInCurrentDirectory, CurrentDirectory);
+                    displayImages = imageYearMonthResult.images;
+                    displayImageTags = imageYearMonthResult.tags;
+
+                    Images.Clear();
+                    LibraryFolders.Clear();
+                    displayImages = ImagePagination();
+                    await MapTagsToImagesAddToObservable();
+                    break;
+                case Filters.ImageDateRangeFilter:
+                    (List<Image> images, List<ImageTag> tags) imageDateRangeResult = await _imageMethods.GetAllImagesInDateRange(startDateForFilter, endDateForFilter, FilterInCurrentDirectory, CurrentDirectory);
+                    displayImages = imageDateRangeResult.images;
+                    displayImageTags= imageDateRangeResult.tags;
 
                     Images.Clear();
                     LibraryFolders.Clear();

@@ -37,6 +37,16 @@ namespace ImagePerfect.Models
             return await _unitOfWork.Image.GetAllImagesAtYear(year, filterInCurrentDirectory, currentDirectory);
         }
 
+        public async Task<(List<Image> images, List<ImageTag> tags)> GetAllImagesAtYearMonth(int year, int month, bool filterInCurrentDirectory, string currentDirectory)
+        {
+            return await _unitOfWork.Image.GetAllImagesAtYearMonth(year, month, filterInCurrentDirectory, currentDirectory);
+        }
+
+        public async Task<(List<Image> images, List<ImageTag> tags)> GetAllImagesInDateRange(DateTimeOffset startDate, DateTimeOffset endDate, bool filterInCurrentDirectory, string currentDirectory)
+        {
+            return await _unitOfWork.Image.GetAllImagesInDateRange(startDate, endDate, filterInCurrentDirectory, currentDirectory);
+        }
+
         public async Task<(List<Image> images, List<ImageTag> tags)> GetAllImagesWithTag(string tag, bool filterInCurrentDirectory, string currentDirectory)
         {
             return await _unitOfWork.Image.GetAllImagesWithTag(tag, filterInCurrentDirectory, currentDirectory);
