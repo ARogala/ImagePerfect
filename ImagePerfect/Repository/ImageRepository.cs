@@ -2,10 +2,12 @@
 using ImagePerfect.Helpers;
 using ImagePerfect.Models;
 using ImagePerfect.Repository.IRepository;
+using ImagePerfect.ViewModels;
 using Microsoft.Extensions.Configuration;
 using MySqlConnector;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -82,6 +84,34 @@ namespace ImagePerfect.Repository
             await txn.CommitAsync();
             await _connection.CloseAsync();
             return (allImagesAtRating, tags);
+        }
+
+        public async Task<(List<Image> images, List<ImageTag> tags)> GetAllImagesAtYear(int year, bool filterInCurrentDirectory, string currentDirectory)
+        {
+            await _connection.OpenAsync();
+            MySqlTransaction txn = await _connection.BeginTransactionAsync();
+            string path = PathHelper.FormatPathForLikeOperator(currentDirectory);
+            string sql1 = string.Empty;
+            string sql2 = string.Empty;
+            if (filterInCurrentDirectory)
+            {
+                sql1 = @"SELECT * FROM images WHERE DateTakenYear = @year AND ImageFolderPath LIKE '" + path + "' ORDER BY ImageFolderPath, FileName";
+                sql2 = @"SELECT tags.TagId, tags.TagName, images.ImageId FROM images
+                            JOIN image_tags_join ON image_tags_join.ImageId = images.ImageId
+                            JOIN tags ON image_tags_join.TagId = tags.TagId WHERE images.DateTakenYear = @year AND images.ImageFolderPath LIKE '" + path + "' ORDER BY images.ImageFolderPath, images.FileName;";
+            }
+            else
+            {
+                sql1 = @"SELECT * FROM images WHERE DateTakenYear = @year ORDER BY ImageFolderPath, FileName";
+                sql2 = @"SELECT tags.TagId, tags.TagName, images.ImageId FROM images
+                            JOIN image_tags_join ON image_tags_join.ImageId = images.ImageId
+                            JOIN tags ON image_tags_join.TagId = tags.TagId WHERE images.DateTakenYear = @year ORDER BY images.ImageFolderPath, images.FileName;";
+            }
+            List<Image> allImagesAtYear = (List<Image>)await _connection.QueryAsync<Image>(sql1, new { year }, transaction: txn);
+            List<ImageTag> tags = (List<ImageTag>)await _connection.QueryAsync<ImageTag>(sql2, new { year }, transaction: txn);
+            await txn.CommitAsync();
+            await _connection.CloseAsync();
+            return (allImagesAtYear, tags);
         }
 
         public async Task<(List<Image> images, List<ImageTag> tags)> GetAllImagesWithTag(string tag, bool filterInCurrentDirectory, string currentDirectory)
@@ -313,6 +343,60 @@ namespace ImagePerfect.Repository
         {
             string sql = @"SELECT COUNT(*) FROM images";
             return await _connection.QuerySingleAsync<int>(sql);
+        }
+
+        public async Task UpdateImageDates()
+        {
+            await _connection.OpenAsync();
+            MySqlTransaction txn = await _connection.BeginTransactionAsync();
+            //clear existing dates
+            string sql1 = @"TRUNCATE TABLE image_dates;";
+            //populate image_dates from images
+            string sql2 = @"INSERT INTO image_dates (DateTaken, Year, Month, Day)
+                                SELECT DISTINCT 
+                                       DateTaken, 
+                                       DateTakenYear, 
+                                       DateTakenMonth, 
+                                       DateTakenDay
+                                FROM images
+                                WHERE DateTaken IS NOT NULL;";
+
+            await _connection.ExecuteAsync(sql1, transaction: txn);
+            await _connection.ExecuteAsync(sql2 , transaction: txn);
+
+            await txn.CommitAsync();
+            await _connection.CloseAsync();
+        }
+
+        public async Task<ImageDatesViewModel> GetImageDates()
+        {
+            ImageDatesViewModel viewModel = new ImageDatesViewModel();
+
+            string sql = @"
+                SELECT DISTINCT Year FROM image_dates ORDER BY Year DESC;
+                SELECT DISTINCT YearMonth FROM image_dates ORDER BY YearMonth DESC;
+                SELECT MIN(DateTaken) FROM image_dates;
+                SELECT MAX(DateTaken) FROM image_dates;
+            ";
+
+            using (var multi = await _connection.QueryMultipleAsync(sql))
+            {
+                IEnumerable<int> years = (await multi.ReadAsync<int>()).ToList();
+                IEnumerable<string> yearMonths = (await multi.ReadAsync<string>()).ToList();
+                DateTime? minDateRaw = await multi.ReadFirstOrDefaultAsync<DateTime?>();
+                DateTime? maxDateRaw = await multi.ReadFirstOrDefaultAsync<DateTime?>();
+
+                DateTimeOffset? minDate = minDateRaw.HasValue ? new DateTimeOffset(minDateRaw.Value) : null;
+                DateTimeOffset? maxDate = maxDateRaw.HasValue ? new DateTimeOffset(maxDateRaw.Value) : null;
+
+                viewModel.Years = new ObservableCollection<int>(years);
+                viewModel.YearMonths = new ObservableCollection<string>(yearMonths);
+                viewModel.StartDate = minDate;
+                viewModel.EndDate = maxDate;
+            }
+
+            await _connection.CloseAsync();
+            return viewModel;
         }
     }
 }

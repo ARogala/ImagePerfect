@@ -12,6 +12,7 @@ namespace ImagePerfect.ViewModels
         private bool _showImportAndScan = false;
         private bool _showFolderFilters = false;
         private bool _showImageFilters = false;
+        private bool _showImageDateFilters = false;
         private bool _showSettings = false;
         private bool _showTotalImages = false;
         private bool _showCreateNewFolder = false;
@@ -35,6 +36,11 @@ namespace ImagePerfect.ViewModels
         {
             get => _showImageFilters;
             set => this.RaiseAndSetIfChanged(ref _showImageFilters, value);
+        }
+        public bool ShowImageDateFilters
+        {
+            get => _showImageDateFilters;
+            set => this.RaiseAndSetIfChanged(ref _showImageDateFilters, value);
         }
         public bool ShowSettings
         {
@@ -77,6 +83,11 @@ namespace ImagePerfect.ViewModels
             {
                 ShowImageFilters = !ShowImageFilters;
             }
+            if(showFilter == "ImageDateFilters")
+            {
+                ShowImageDateFilters = !ShowImageDateFilters;
+            }
+
         }
         public void ToggleSettings()
         {

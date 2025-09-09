@@ -1,4 +1,5 @@
 ﻿using ImagePerfect.Repository.IRepository;
+using ImagePerfect.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,6 +30,11 @@ namespace ImagePerfect.Models
         public async Task<(List<Image> images, List<ImageTag> tags)> GetAllImagesAtRating(int rating, bool filterInCurrentDirectory, string currentDirectory)
         {
             return await _unitOfWork.Image.GetAllImagesAtRating(rating, filterInCurrentDirectory, currentDirectory);
+        }
+
+        public async Task<(List<Image> images, List<ImageTag> tags)> GetAllImagesAtYear(int year, bool filterInCurrentDirectory, string currentDirectory)
+        {
+            return await _unitOfWork.Image.GetAllImagesAtYear(year, filterInCurrentDirectory, currentDirectory);
         }
 
         public async Task<(List<Image> images, List<ImageTag> tags)> GetAllImagesWithTag(string tag, bool filterInCurrentDirectory, string currentDirectory)
@@ -94,6 +100,16 @@ namespace ImagePerfect.Models
         public async Task<int> GetTotalImages()
         {
            return await _unitOfWork.Image.GetTotalImages();
+        }
+
+        public async Task UpdateImageDates()
+        {
+            await _unitOfWork.Image.UpdateImageDates(); 
+        }
+
+        public async Task<ImageDatesViewModel> GetImageDates()
+        {
+            return await _unitOfWork.Image.GetImageDates();
         }
     }
 }

@@ -68,6 +68,7 @@ namespace ImagePerfect.ViewModels
             ImageTagFilter,
             FolderTagFilter,
             FolderDescriptionFilter,
+            ImageYearFilter,
             AllFavoriteFolders,
             AllFoldersWithNoImportedImages,
             AllFoldersWithMetadataNotScanned,
@@ -75,6 +76,7 @@ namespace ImagePerfect.ViewModels
         }
         public Filters currentFilter = Filters.None;
         private int selectedRatingForFilter = 0;
+        private int selectedYearForFilter = 0;
         private string tagForFilter = string.Empty;
         private string textForFilter = string.Empty;
 
@@ -205,6 +207,12 @@ namespace ImagePerfect.ViewModels
                 currentFilter = Filters.ImageRatingFilter;
                 await RefreshImages();
             });
+            FilterImagesOnYearCommand = ReactiveCommand.Create(async (int year) => { 
+                ResetPagination();
+                selectedYearForFilter = year;
+                currentFilter = Filters.ImageYearFilter;
+                await RefreshImages();
+            });
             FilterFoldersOnRatingCommand = ReactiveCommand.Create(async (decimal rating) => {
                 ResetPagination();
                 selectedRatingForFilter = Decimal.ToInt32(rating);
@@ -228,6 +236,10 @@ namespace ImagePerfect.ViewModels
                 textForFilter = text;
                 currentFilter = Filters.FolderDescriptionFilter;
                 await RefreshFolders();
+            });
+            UpdateImageDatesCommand = ReactiveCommand.Create(async () => { 
+                await _imageMethods.UpdateImageDates();
+                ImageDatesVm = await _imageMethods.GetImageDates();
             });
             GetAllFoldersWithNoImportedImagesCommand = ReactiveCommand.Create(async () => {
                 ResetPagination();
@@ -401,6 +413,12 @@ namespace ImagePerfect.ViewModels
             set => this.RaiseAndSetIfChanged(ref _filterInCurrentDirectory, value);
         }
 
+        private ImageDatesViewModel _imageDatesVm = new ImageDatesViewModel();
+        public ImageDatesViewModel ImageDatesVm
+        {
+            get => _imageDatesVm;
+            set => this.RaiseAndSetIfChanged(ref _imageDatesVm, value);
+        }
         public DirectoryNavigationViewModel DirectoryNavigationVm { get; }
         public ModifyFolderDataViewModel ModifyFolderDataVm { get; }
         public ModifyImageDataViewModel ModifyImageDataVm { get; }
@@ -496,6 +514,8 @@ namespace ImagePerfect.ViewModels
 
         public ReactiveCommand<decimal, Task> FilterImagesOnRatingCommand { get; }
 
+        public ReactiveCommand<int, Task> FilterImagesOnYearCommand { get; }
+
         public ReactiveCommand<decimal, Task> FilterFoldersOnRatingCommand { get; }
 
         public ReactiveCommand<string, Task> FilterImagesOnTagCommand { get; }
@@ -503,6 +523,8 @@ namespace ImagePerfect.ViewModels
         public ReactiveCommand<string, Task> FilterFoldersOnTagCommand  { get; }
 
         public ReactiveCommand<string, Task> FilterFoldersOnDescriptionCommand { get; }
+
+        public ReactiveCommand<Unit, Task> UpdateImageDatesCommand { get; }
 
         public ReactiveCommand<Unit, Task> GetAllFoldersWithNoImportedImagesCommand { get; }
 
@@ -920,6 +942,16 @@ namespace ImagePerfect.ViewModels
                     (List<Image> images, List<ImageTag> tags) imageTagResult = await _imageMethods.GetAllImagesWithTag(tagForFilter, FilterInCurrentDirectory, CurrentDirectory);
                     displayImages = imageTagResult.images;
                     displayImageTags = imageTagResult.tags;
+
+                    Images.Clear();
+                    LibraryFolders.Clear();
+                    displayImages = ImagePagination();
+                    await MapTagsToImagesAddToObservable();
+                    break;
+                case Filters.ImageYearFilter:
+                    (List<Image> images, List<ImageTag> tags) imageYearResult = await _imageMethods.GetAllImagesAtYear(selectedYearForFilter, FilterInCurrentDirectory, CurrentDirectory);  
+                    displayImages = imageYearResult.images;
+                    displayImageTags = imageYearResult.tags;
 
                     Images.Clear();
                     LibraryFolders.Clear();

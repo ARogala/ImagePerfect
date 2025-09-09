@@ -14,7 +14,7 @@
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-	<Grid ColumnDefinitions="*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,*,Auto,Auto" x:Name="Root">
+	<Grid ColumnDefinitions="*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,*,Auto,Auto" x:Name="Root">
 		<!--File Menu-->
 		<StackPanel Grid.Row="0" Classes="menu-bg-color">
 			<Menu>
@@ -24,6 +24,7 @@
 				</MenuItem>
 				<MenuItem Header="_Filters">
 					<MenuItem Header="Image Filters" Command="{Binding ToggleFiltersCommand}" CommandParameter="ImageFilters" />
+					<MenuItem Header="Image Date Filters" Command="{Binding ToggleFiltersCommand}" CommandParameter="ImageDateFilters" />
 					<MenuItem Header="Folder Filters" Command="{Binding ToggleFiltersCommand}" CommandParameter="FolderFilters" />
 				</MenuItem>
 				<MenuItem Header="_Settings">
@@ -77,8 +78,8 @@
 			</Grid>
 		</StackPanel>
 		<!--Folder Filters-->
-		<StackPanel Grid.Row="3" Orientation="Vertical" IsVisible="{Binding ToggleUI.ShowFolderFilters}" Classes="menu-bg-color">
-			<Grid RowDefinitions="Auto, Auto" ColumnDefinitions="Auto, Auto, Auto, Auto" HorizontalAlignment="Center" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
+		<StackPanel Grid.Row="3" Orientation="Vertical" IsVisible="{Binding ToggleUI.ShowFolderFilters}" Classes="menu-bg-color" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
+			<Grid RowDefinitions="Auto, Auto" ColumnDefinitions="Auto, Auto, Auto, Auto" HorizontalAlignment="Center">
 				<NumericUpDown Grid.Row="0" Grid.Column="0" Minimum="0" Value="1" Maximum="10" Width="200"
 							   Margin="5" ParsingNumberStyle="Integer" FormatString="0"
 							   x:Name="FilterFolderRating"/>
@@ -129,8 +130,8 @@
 			</Grid>
 		</StackPanel>
 		<!--Image Filters-->
-		<StackPanel Grid.Row="4" Orientation="Vertical" IsVisible="{Binding ToggleUI.ShowImageFilters}" Classes="menu-bg-color">
-			<Grid RowDefinitions="Auto" ColumnDefinitions="Auto, Auto, Auto, Auto" HorizontalAlignment="Center" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
+		<StackPanel Grid.Row="4" Orientation="Vertical" IsVisible="{Binding ToggleUI.ShowImageFilters}" Classes="menu-bg-color" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
+			<Grid RowDefinitions="Auto" ColumnDefinitions="Auto, Auto, Auto, Auto" HorizontalAlignment="Center">
 				<NumericUpDown Grid.Row="0" Grid.Column="0" Minimum="0" Value="5" Maximum="5" Width="200"
 							   Margin="5" ParsingNumberStyle="Integer" FormatString="0"
 							   x:Name="FilterImageRating"/>
@@ -160,8 +161,44 @@
 				</Button>
 			</Grid>
 		</StackPanel>
+		<!--Image Date Filters-->
+		<StackPanel Grid.Row="5" Orientation="Vertical" IsVisible="{Binding ToggleUI.ShowImageDateFilters}" Classes="menu-bg-color" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
+			<Grid RowDefinitions="Auto" ColumnDefinitions="Auto, Auto, Auto, Auto" HorizontalAlignment="Center">
+				<ComboBox x:Name="Years" Grid.Row="0" Grid.Column="0" ItemsSource="{Binding ImageDatesVm.Years}" Width="125" Margin="5" />
+				<Button Grid.Row="0" Grid.Column="1" Margin="5" Classes="menu-btn"
+						Command="{Binding FilterImagesOnYearCommand}"
+						CommandParameter="{Binding SelectedItem, ElementName=Years}">
+					Filter By Year
+				</Button>
+				<ComboBox x:Name="YearMonth" Grid.Row="0" Grid.Column="2" ItemsSource="{Binding ImageDatesVm.YearMonths}" Width="125" Margin="5" />
+				<Button Grid.Row="0" Grid.Column="3" Classes="menu-btn">
+					Filter By Year And Month
+				</Button>
+			</Grid>
+			<Grid RowDefinitions="Auto" ColumnDefinitions="Auto" HorizontalAlignment="Center">
+				<StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Center">
+					<DatePicker SelectedDate="{Binding ImageDatesVm.StartDate}" Margin="5"/>
+					<TextBlock Text="to" VerticalAlignment="Center"/>
+					<DatePicker SelectedDate="{Binding ImageDatesVm.EndDate}" Margin="5"/>
+					<Button Classes="menu-btn" Margin="5">Filter On Range</Button>
+				</StackPanel>
+			</Grid>
+			<Grid RowDefinitions="Auto" ColumnDefinitions="Auto, Auto, Auto" HorizontalAlignment="Center">
+				<CheckBox Grid.Row="0" Grid.Column="0" Margin="5" IsChecked="{Binding FilterInCurrentDirectory}">
+					Filter in Current Directory
+				</CheckBox>
+				<Button Grid.Row="0" Grid.Column="1" Margin="5"
+						Command="{Binding LoadCurrentDirectoryCommand}" Classes="menu-btn">
+					Load Current Directory
+				</Button>
+				<Button Grid.Row="0" Grid.Column="2" Margin="5" 
+						Command="{Binding UpdateImageDatesCommand}" Classes="menu-btn">
+					Refresh Available Dates
+				</Button>
+			</Grid>
+		</StackPanel>
 		<!--Settings-->
-		<StackPanel Grid.Row="5" IsVisible="{Binding ToggleUI.ShowSettings}" Classes="menu-bg-color">
+		<StackPanel Grid.Row="6" IsVisible="{Binding ToggleUI.ShowSettings}" Classes="menu-bg-color">
 			<Grid RowDefinitions="Auto" ColumnDefinitions="Auto,Auto,Auto" Width="600" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
 				<StackPanel Grid.Row="0" Grid.Column="0" Width="200">
 					<TextBlock Margin="0 10 0 5">Pick Image Width</TextBlock>
@@ -238,7 +275,7 @@
 			</Grid>
 		</StackPanel>
 		<!--Directory Options-->
-		<StackPanel Grid.Row="6" Classes="menu-bg-color">
+		<StackPanel Grid.Row="7" Classes="menu-bg-color">
 			<Grid RowDefinitions="Auto" ColumnDefinitions="*" HorizontalAlignment="Center" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
 				<StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0">
 					<!--
@@ -261,7 +298,7 @@
 			</Grid>
 		</StackPanel>
 		<!--Create New Folder-->
-		<StackPanel Grid.Row="7" IsVisible="{Binding ToggleUI.ShowCreateNewFolder}" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}" Classes="menu-bg-color">
+		<StackPanel Grid.Row="8" IsVisible="{Binding ToggleUI.ShowCreateNewFolder}" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}" Classes="menu-bg-color">
 			<TextBlock Margin="0 5" MaxWidth="400">Create A New Folder:</TextBlock>
 			<TextBox  Watermark="Enter folder name" MaxWidth="400" Text="{Binding CreateNewFolder.NewFolderName}" />
 			<Button
@@ -274,7 +311,7 @@
 			</Button>
 		</StackPanel>
 		<!--Manage Images-->
-		<StackPanel Grid.Row="8" IsVisible="{Binding ToggleUI.ShowManageImages}" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}" Classes="menu-bg-color">
+		<StackPanel Grid.Row="9" IsVisible="{Binding ToggleUI.ShowManageImages}" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}" Classes="menu-bg-color">
 			<Grid RowDefinitions="Auto" ColumnDefinitions="*" HorizontalAlignment="Center">
 				<StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0">
 					<Button Margin="5" HorizontalAlignment="Center"
@@ -296,7 +333,7 @@
 			</Grid>
 		</StackPanel>
 		<!--Import and Scan Folders-->
-		<StackPanel Grid.Row="9" IsVisible="{Binding ToggleUI.ShowImportAndScan}" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}" Classes="menu-bg-color">
+		<StackPanel Grid.Row="10" IsVisible="{Binding ToggleUI.ShowImportAndScan}" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}" Classes="menu-bg-color">
 			<Grid RowDefinitions="Auto" ColumnDefinitions="*" HorizontalAlignment="Center">
 				<StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0">
 					<Button Margin="5" HorizontalAlignment="Center"
@@ -321,9 +358,9 @@
 			</Grid>
 		</StackPanel>
 		<!--Progress Bar-->
-		<ProgressBar Grid.Row="10" Margin="10" IsIndeterminate="True" IsVisible="{Binding ShowLoading}"/>		
+		<ProgressBar Grid.Row="11" Margin="10" IsIndeterminate="True" IsVisible="{Binding ShowLoading}"/>		
 		<!--Folders and Images-->
-		<ScrollViewer Grid.Row="11" x:Name="FoldersAndImagesScrollViewer" AllowAutoHide="False">
+		<ScrollViewer Grid.Row="12" x:Name="FoldersAndImagesScrollViewer" AllowAutoHide="False">
 			<StackPanel>
 				<ItemsControl ItemsSource="{Binding LibraryFolders}" x:Name="FoldersItemsControl">
 					<ItemsControl.ItemsPanel>
@@ -570,7 +607,7 @@
 			</StackPanel>
 		</ScrollViewer>
 		<!--Pagination-->
-		<StackPanel Grid.Row="12" Orientation="Vertical" HorizontalAlignment="Stretch" Classes="menu-bg-color">
+		<StackPanel Grid.Row="13" Orientation="Vertical" HorizontalAlignment="Stretch" Classes="menu-bg-color">
 			<Grid RowDefinitions="Auto" ColumnDefinitions="Auto, Auto, Auto, Auto, Auto" HorizontalAlignment="Center" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
 				<Button Margin="5" Grid.Row="0" Grid.Column="0"
 					Command="{Binding PreviousPageCommand}" Classes="menu-btn">
@@ -591,7 +628,7 @@
 				</Button>
 			</Grid>
 		</StackPanel>
-		<StackPanel Grid.Row="13" HorizontalAlignment="Stretch"  Classes="menu-bg-color">
+		<StackPanel Grid.Row="14" HorizontalAlignment="Stretch"  Classes="menu-bg-color">
 			<Grid RowDefinitions="Auto" ColumnDefinitions="Auto,Auto,Auto,Auto" HorizontalAlignment="Center" Margin="0 0 0 10">
 				<Label Grid.Row="0" Grid.Column="0">Total Pages:</Label>
 				<TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding MaxPage}" VerticalAlignment="Center"></TextBlock>

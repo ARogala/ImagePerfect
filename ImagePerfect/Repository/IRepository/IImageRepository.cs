@@ -1,4 +1,5 @@
 ﻿using ImagePerfect.Models;
+using ImagePerfect.ViewModels;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -11,6 +12,7 @@ namespace ImagePerfect.Repository.IRepository
         Task<(List<Image> images, List<ImageTag> tags)> GetAllImagesInFolder(string folderPath);
         Task<(List<Image> images, List<ImageTag> tags)> GetAllImagesAtRating(int rating, bool filterInCurrentDirectory, string currentDirectory);
         Task<(List<Image> images, List<ImageTag> tags)> GetAllImagesWithTag(string tag, bool filterInCurrentDirectory, string currentDirectory);
+        Task<(List<Image> images, List<ImageTag> tags)> GetAllImagesAtYear(int year, bool filterInCurrentDirectory, string currentDirectory);
         Task<List<Image>> GetAllImagesInDirectoryTree(string directoryPath);
         Task<bool> AddImageCsv(string filePath, int folderId);
         Task<bool> UpdateImageTags(Image image, string newTag);
@@ -22,5 +24,7 @@ namespace ImagePerfect.Repository.IRepository
         Task<bool> MoveSelectedImageToNewFolder(string sql);
         Task<bool> RemoveTagOnAllImages(Tag selectedTag);
         Task<int> GetTotalImages();
+        Task UpdateImageDates();
+        Task<ImageDatesViewModel> GetImageDates();
     }
 }

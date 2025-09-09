@@ -16,6 +16,7 @@ namespace ImagePerfect.ViewModels
         private readonly IUnitOfWork _unitOfWork;
         private readonly SaveDirectoryMethods _saveDirectoryMethods;
         private readonly FolderMethods _folderMethods;
+        private readonly ImageMethods _imageMethods;
         private readonly MainWindowViewModel _mainWindowViewModel;
         public InitializeViewModel(IUnitOfWork unitOfWork, MainWindowViewModel mainWindowViewModel) 
 		{
@@ -23,6 +24,7 @@ namespace ImagePerfect.ViewModels
             _mainWindowViewModel = mainWindowViewModel;
             _saveDirectoryMethods = new SaveDirectoryMethods(_unitOfWork);
             _folderMethods = new FolderMethods(_unitOfWork);
+            _imageMethods = new ImageMethods(_unitOfWork);
         }
 
         public string RootFolderLocation
@@ -48,6 +50,7 @@ namespace ImagePerfect.ViewModels
             await GetRootFolder();
             await _mainWindowViewModel.GetTagsList();
             await _mainWindowViewModel.SettingsVm.GetSettings();
+            _mainWindowViewModel.ImageDatesVm = await _imageMethods.GetImageDates();
 
             SaveDirectory saveDirectory = await _saveDirectoryMethods.GetSavedDirectory();
             if (saveDirectory.SavedDirectory != "")
