@@ -2,6 +2,7 @@
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Threading;
+using ImagePerfect.Helpers;
 using ImagePerfect.Models;
 using ImagePerfect.ObjectMappers;
 using ImagePerfect.Repository.IRepository;
@@ -321,6 +322,9 @@ namespace ImagePerfect.ViewModels
             {
                 await MoveImages.MoveSelectedImagesToTrash(selectedImages);
             });
+            MoveSelectedImagesUpOneDirectoryCommand = ReactiveCommand.Create(async (IList selectedImages) => {
+                await MoveImages.MoveSelectedImageUpOneDirectory(selectedImages);
+            });
             ImportAllFoldersOnCurrentPageCommand = ReactiveCommand.Create(async (ItemsControl foldersItemsControl) => { 
                 await ImportImagesVm.ImportAllFoldersOnCurrentPage(foldersItemsControl);
             });
@@ -586,6 +590,8 @@ namespace ImagePerfect.ViewModels
         public ReactiveCommand<Unit, Task> RemoveAllFavoriteFoldersCommand { get; }
 
         public ReactiveCommand<IList, Task> MoveSelectedImagesToTrashCommand { get; }
+
+        public ReactiveCommand<IList, Task> MoveSelectedImagesUpOneDirectoryCommand { get; }
 
         public ReactiveCommand<ItemsControl, Task> ImportAllFoldersOnCurrentPageCommand { get; }
 

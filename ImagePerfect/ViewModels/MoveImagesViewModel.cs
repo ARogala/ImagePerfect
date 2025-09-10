@@ -130,6 +130,20 @@ namespace ImagePerfect.ViewModels
             }
         }
 
+        public async Task MoveSelectedImageUpOneDirectory(IList selectedImages)
+        {
+            if (selectedImages is null || selectedImages.Count == 0)
+            {
+                var box = MessageBoxManager.GetMessageBoxStandard("Move Images", "You need to select images to move.", ButtonEnum.Ok);
+                await box.ShowAsync();
+                return;
+            }
+            _mainWindowViewModel.SelectedImagesNewDirectory = PathHelper.RemoveOneFolderFromPath(_mainWindowViewModel.CurrentDirectory);
+            if (_mainWindowViewModel.SelectedImagesNewDirectory == null || _mainWindowViewModel.SelectedImagesNewDirectory == "")
+                return;
+            await MoveSelectedImagesToNewFolder(selectedImages);
+        }
+
         public async Task MoveSelectedImagesToNewFolder(IList selectedImages)
         {
             List<ImageViewModel> imagesToMove = selectedImages.OfType<ImageViewModel>().ToList();

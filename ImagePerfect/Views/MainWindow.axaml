@@ -325,6 +325,11 @@
 					Classes="menu-btn">
 						Select All
 					</Button>
+					<Button Margin="5" HorizontalAlignment="Center" Classes="menu-btn"
+							Command="{Binding MoveSelectedImagesUpOneDirectoryCommand}"
+							CommandParameter="{Binding #ImagesListBox.SelectedItems}">
+						Move Selected Up One Directory
+					</Button>
 					<!-- NOTE: Tag is bound to SelectedImages from ImagesListBox. refactor to StyledPropery later-->
 					<v:PickImageMoveToFolderView DataContext="{Binding #Root.((vm:MainWindowViewModel)DataContext).PickImageMoveToFolder}" 
 												 Tag="{Binding SelectedItems, ElementName=ImagesListBox}"/>
