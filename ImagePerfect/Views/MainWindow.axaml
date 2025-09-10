@@ -379,33 +379,45 @@
 							<StackPanel Margin="1" x:Name="FoldersStackPanel">
 								<TextBlock MaxWidth="{Binding #Root.((vm:MainWindowViewModel)DataContext).SettingsVm.MaxImageWidth}" Text="{Binding FolderName}"/>
 								<Image MaxWidth="{Binding #Root.((vm:MainWindowViewModel)DataContext).SettingsVm.MaxImageWidth}" Source="{Binding CoverImageBitmap}" />
-								<ItemsControl ItemsSource="{Binding Stars}" HorizontalAlignment="Center">
-									<ItemsControl.ItemsPanel>
-										<ItemsPanelTemplate>
-											<StackPanel Orientation="Horizontal"/>
-										</ItemsPanelTemplate>
-									</ItemsControl.ItemsPanel>
-									<ItemsControl.ItemTemplate>
-										<DataTemplate>
-											<Button
-												Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).AddFolderRatingCommand}"
-												CommandParameter="{Binding #FoldersStackPanel.((vm:FolderViewModel)DataContext)}"
-												Click="Folder_Star_Click"
-												Background="Black">
-												<Image Width="18" Height="18" Classes.FolderStarEmpty="{Binding !IsFilled}" Classes.FolderStarNotEmpty="{Binding IsFilled}">
-													<Image.Styles>
-														<Style Selector="Image.FolderStarEmpty">
-															<Setter Property="Source" Value="avares://ImagePerfect/Assets/star_empty.png" />
-														</Style>
-														<Style Selector="Image.FolderStarNotEmpty">
-															<Setter Property="Source" Value="avares://ImagePerfect/Assets/star_filled.png" />
-														</Style>
-													</Image.Styles>
-												</Image>
-											</Button>
-										</DataTemplate>
-									</ItemsControl.ItemTemplate>
-								</ItemsControl>
+								
+								<Grid RowDefinitions="Auto" ColumnDefinitions="Auto,Auto" HorizontalAlignment="Center">
+									<Button
+											Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).AddFolderRatingCommand}"
+											CommandParameter="{Binding}"
+											Click="Folder_Rating_Zero"
+											Background="Black"
+											Grid.Row="0"
+											Grid.Column="0">
+										<Image Width="18" Height="18" Source="avares://ImagePerfect/Assets/DownArrowRed.png"></Image>
+									</Button>
+									<ItemsControl ItemsSource="{Binding Stars}" HorizontalAlignment="Center" Grid.Row="0" Grid.Column="1">
+										<ItemsControl.ItemsPanel>
+											<ItemsPanelTemplate>
+												<StackPanel Orientation="Horizontal"/>
+											</ItemsPanelTemplate>
+										</ItemsControl.ItemsPanel>
+										<ItemsControl.ItemTemplate>
+											<DataTemplate>
+												<Button
+													Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).AddFolderRatingCommand}"
+													CommandParameter="{Binding #FoldersStackPanel.((vm:FolderViewModel)DataContext)}"
+													Click="Folder_Star_Click"
+													Background="Black">
+													<Image Width="18" Height="18" Classes.FolderStarEmpty="{Binding !IsFilled}" Classes.FolderStarNotEmpty="{Binding IsFilled}">
+														<Image.Styles>
+															<Style Selector="Image.FolderStarEmpty">
+																<Setter Property="Source" Value="avares://ImagePerfect/Assets/star_empty.png" />
+															</Style>
+															<Style Selector="Image.FolderStarNotEmpty">
+																<Setter Property="Source" Value="avares://ImagePerfect/Assets/star_filled.png" />
+															</Style>
+														</Image.Styles>
+													</Image>
+												</Button>
+											</DataTemplate>
+										</ItemsControl.ItemTemplate>
+									</ItemsControl>
+								</Grid>
 								<Grid RowDefinitions="Auto" ColumnDefinitions="*,*,*,*" MaxWidth="600" IsEnabled="{Binding !#Root.((vm:MainWindowViewModel)DataContext).ShowLoading}">
 									<Button Grid.Row="0" Grid.Column="0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="2" IsEnabled="{Binding !IsRoot}"
 											Command="{Binding #Root.((vm:MainWindowViewModel)DataContext).BackFolderCommand}"
