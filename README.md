@@ -113,26 +113,28 @@ I created Image Perfect both as a way to learn desktop application development a
 - Improved UI design
 - Scan for new folders in file system
 - Tagging improvements (bulk edit)
+- GIF view support
 - GIF creation support
+- Restore images and folders from trash
 
 <a id="screen-shots"></a>
 ## 📷 Screen Shots
 
 ### Images Page
 
-![Image](AppScreenShotImageView2025-06-02.png)
+![Image](AppScreenShotImageView2025-09-10.png)
 
 ### Image Close Up
 
-![Image](AppScreenShotImageCloseUp2025-06-02.png)
+![Image](AppScreenShotImageCloseUp2025-09-10.png)
 
 ### Folders Page
 
-![Image](AppScreenShotFolderView2025-06-02.png)
+![Image](AppScreenShotFolderView2025-09-10.png)
 
 ### Folder Close Up
 
-![Image](AppScreenShotFolderCloseUp2025-06-02.png)
+![Image](AppScreenShotFolderCloseUp2025-09-10.png)
 
 <a id="mysql-server-setup"></a>
 ## 🖥️ MySQL Server Setup
