@@ -72,6 +72,13 @@ namespace ImagePerfect.Views
             }
         }
 
+        private void Folder_Rating_Zero(object? sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.FindAncestorOfType<StackPanel>()?.DataContext is FolderViewModel folderVm)
+            {
+                folderVm.FolderRating = 0;
+            }
+        }
         private void Folder_Star_Click(object? sender, RoutedEventArgs e)
         {
             if(sender is Button btn && btn.DataContext is StarItem star &&
