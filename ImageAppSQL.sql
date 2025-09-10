@@ -78,7 +78,7 @@ UPDATE folders SET FolderContentMetaDataScanned = 0 WHERE FolderId >= 1;
 
 UPDATE images SET ImageMetaDataScanned = 0 WHERE ImageId >= 1;
 
-/*will need to add to home db*/
+/*will need to add to home db -- updated my home db with this already*/
 CREATE TABLE image_dates (
     DateTaken DATE PRIMARY KEY,           
     Year SMALLINT NOT NULL,            
