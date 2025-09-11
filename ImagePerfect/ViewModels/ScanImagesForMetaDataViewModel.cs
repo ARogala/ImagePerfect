@@ -95,7 +95,7 @@ namespace ImagePerfect.ViewModels
                 List<FolderViewModel> allFolders = foldersItemsControl.Items.OfType<FolderViewModel>()
                     .Where(folder => folder.HasFiles == true && folder.AreImagesImported == true && folder.FolderContentMetaDataScanned == false)
                     .ToList();
-                await Parallel.ForEachAsync(allFolders, new ParallelOptions { MaxDegreeOfParallelism = 3 }, async (folder, ct) =>
+                await Parallel.ForEachAsync(allFolders, new ParallelOptions { MaxDegreeOfParallelism = 4 }, async (folder, ct) =>
                 {
                     await ScanFolderImagesForMetaData(folder, true);
                 });

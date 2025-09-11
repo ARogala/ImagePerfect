@@ -20,7 +20,7 @@ namespace ImagePerfect.Helpers
     {
         public static async Task<List<ImagePerfectImage>> ScanImagesForMetaData(List<ImagePerfectImage> images)
         {
-            await Parallel.ForEachAsync(images, new ParallelOptions { MaxDegreeOfParallelism = 3 }, async(img, ct) => {
+            await Parallel.ForEachAsync(images, new ParallelOptions { MaxDegreeOfParallelism = 4 }, async(img, ct) => {
                 ImageSharp.ImageInfo imageInfo = await ImageSharp.Image.IdentifyAsync(img.ImagePath);
                 UpdateMetadata(imageInfo, img);
             });
@@ -60,6 +60,8 @@ namespace ImagePerfect.Helpers
             Consider for future commit and doing this in SQL then i can remove the C# sort
             sql: ORDER BY images.ImageFolderPath, images.FileName
 
+            the sql ORDER BY has been added keeping below code for now
+
             */
             List<ImagePerfectImage> sortedImages = images
                .OrderBy(img => Path.GetDirectoryName(img.ImagePath))
@@ -67,7 +69,7 @@ namespace ImagePerfect.Helpers
                .ToList();
 
             int anyFail = 0;
-            await Parallel.ForEachAsync(sortedImages, new ParallelOptions { MaxDegreeOfParallelism = 3 }, async (img, ct) => {
+            await Parallel.ForEachAsync(sortedImages, new ParallelOptions { MaxDegreeOfParallelism = 4 }, async (img, ct) => {
                 try
                 {
                     using ImageSharp.Image imageSharpImage = await ImageSharp.Image.LoadAsync(img.ImagePath, ct);
