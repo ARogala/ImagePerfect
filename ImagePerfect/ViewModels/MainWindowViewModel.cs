@@ -65,6 +65,7 @@ namespace ImagePerfect.ViewModels
         {
             None,
             ImageRatingFilter,
+            AllImagesInFolderAndSubFolders,
             FiveStarImagesInCurrentDirectory,
             FolderRatingFilter,
             ImageTagFilter,
@@ -207,6 +208,12 @@ namespace ImagePerfect.ViewModels
             });
             ToggleListAllTagsCommand = ReactiveCommand.Create(() => {
                 ToggleUI.ToggleListAllTags();
+            });
+            FilterGetAllImagesInFolderAndSubFoldersCommand = ReactiveCommand.Create(async () =>
+            {
+                ResetPagination();
+                currentFilter = Filters.AllImagesInFolderAndSubFolders;
+                await RefreshImages();
             });
             FilterImagesOnRatingCommand = ReactiveCommand.Create(async (decimal rating) => {
                 ResetPagination();
@@ -552,6 +559,7 @@ namespace ImagePerfect.ViewModels
 
         public ReactiveCommand<Unit, Unit> ToggleListAllTagsCommand { get; }
 
+        public ReactiveCommand<Unit, Task> FilterGetAllImagesInFolderAndSubFoldersCommand {  get; }
         public ReactiveCommand<decimal, Task> FilterImagesOnRatingCommand { get; }
 
         public ReactiveCommand<decimal, Task> FilterFiveStarImagesInCurrentDirectoryCommand { get; }
@@ -973,6 +981,16 @@ namespace ImagePerfect.ViewModels
                     displayImageTags = imageResult.tags;
 
                     Images.Clear();
+                    displayImages = ImagePagination();
+                    await MapTagsToImagesAddToObservable();
+                    break;
+                case Filters.AllImagesInFolderAndSubFolders:
+                    (List<Image> images, List<ImageTag> tags) allImagesInFolderAndSubFoldersResult = await _imageMethods.GetAllImagesInFolderAndSubFolders(CurrentDirectory);
+                    displayImages = allImagesInFolderAndSubFoldersResult.images;
+                    displayImageTags = allImagesInFolderAndSubFoldersResult.tags;
+
+                    Images.Clear();
+                    LibraryFolders.Clear();
                     displayImages = ImagePagination();
                     await MapTagsToImagesAddToObservable();
                     break;
