@@ -4,6 +4,7 @@
 		xmlns:v="using:ImagePerfect.Views"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:sys="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="ImagePerfect.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
@@ -299,6 +300,18 @@
 					</Button>
 					<Button Margin="5" Command="{Binding SaveDirectoryCommand}" CommandParameter="{Binding #FoldersAndImagesScrollViewer}" Classes="btn-danger">
 						Save Directory
+					</Button>
+					<Button 
+						Command="{Binding FilterFiveStarImagesInCurrentDirectoryCommand}"
+						Margin="5" Classes="menu-btn">
+						<Button.CommandParameter>
+							<sys:Decimal>5.00</sys:Decimal>
+						</Button.CommandParameter>
+						<StackPanel Orientation="Horizontal" Spacing="5">
+							<TextBlock>5</TextBlock>
+							<Image Width="18" Height="18" Source="avares://ImagePerfect/Assets/star_filled.png"></Image>
+							<TextBlock>Images</TextBlock>
+						</StackPanel>
 					</Button>
 				</StackPanel>
 			</Grid>
