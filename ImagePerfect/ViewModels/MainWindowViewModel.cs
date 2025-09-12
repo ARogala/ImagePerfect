@@ -65,6 +65,7 @@ namespace ImagePerfect.ViewModels
         {
             None,
             ImageRatingFilter,
+            FiveStarImagesInCurrentDirectory,
             FolderRatingFilter,
             ImageTagFilter,
             FolderTagFilter,
@@ -211,6 +212,12 @@ namespace ImagePerfect.ViewModels
                 ResetPagination();
                 selectedRatingForFilter = Decimal.ToInt32(rating);
                 currentFilter = Filters.ImageRatingFilter;
+                await RefreshImages();
+            });
+            FilterFiveStarImagesInCurrentDirectoryCommand = ReactiveCommand.Create(async (decimal rating) => {
+                ResetPagination();
+                selectedRatingForFilter = Decimal.ToInt32(rating);
+                currentFilter = Filters.FiveStarImagesInCurrentDirectory;
                 await RefreshImages();
             });
             FilterImagesOnYearCommand = ReactiveCommand.Create(async (int year) => { 
@@ -546,6 +553,8 @@ namespace ImagePerfect.ViewModels
         public ReactiveCommand<Unit, Unit> ToggleListAllTagsCommand { get; }
 
         public ReactiveCommand<decimal, Task> FilterImagesOnRatingCommand { get; }
+
+        public ReactiveCommand<decimal, Task> FilterFiveStarImagesInCurrentDirectoryCommand { get; }
 
         public ReactiveCommand<int, Task> FilterImagesOnYearCommand { get; }
 
@@ -971,6 +980,16 @@ namespace ImagePerfect.ViewModels
                     (List<Image> images, List<ImageTag> tags) imageRatingResult = await _imageMethods.GetAllImagesAtRating(selectedRatingForFilter, FilterInCurrentDirectory, CurrentDirectory);
                     displayImages = imageRatingResult.images;
                     displayImageTags = imageRatingResult.tags;
+
+                    Images.Clear();
+                    LibraryFolders.Clear();
+                    displayImages = ImagePagination();
+                    await MapTagsToImagesAddToObservable();
+                    break;
+                case Filters.FiveStarImagesInCurrentDirectory:
+                    (List<Image> images, List<ImageTag> tags) fiveStarImageRatingResult = await _imageMethods.GetAllImagesAtRating(selectedRatingForFilter, true, CurrentDirectory);
+                    displayImages = fiveStarImageRatingResult.images;
+                    displayImageTags = fiveStarImageRatingResult.tags;
 
                     Images.Clear();
                     LibraryFolders.Clear();
