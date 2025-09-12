@@ -27,6 +27,11 @@ namespace ImagePerfect.Models
             return await _unitOfWork.Image.GetAllImagesInFolder(folderPath);
         }
 
+        public async Task<(List<Image> images, List<ImageTag> tags)> GetAllImagesInFolderAndSubFolders(string folderPath)
+        {
+            return await _unitOfWork.Image.GetAllImagesInFolderAndSubFolders(folderPath);
+        }
+
         public async Task<(List<Image> images, List<ImageTag> tags)> GetAllImagesAtRating(int rating, bool filterInCurrentDirectory, string currentDirectory)
         {
             return await _unitOfWork.Image.GetAllImagesAtRating(rating, filterInCurrentDirectory, currentDirectory);

@@ -58,6 +58,23 @@ namespace ImagePerfect.Repository
             return (allImagesInFolder, tags);
         }
 
+        public async Task<(List<Image> images, List<ImageTag> tags)> GetAllImagesInFolderAndSubFolders(string folderPath)
+        {
+            await _connection.OpenAsync();
+            MySqlTransaction txn = await _connection.BeginTransactionAsync();
+            string path = PathHelper.FormatPathForLikeOperator(folderPath);
+
+            string sql1 = @"SELECT * FROM images WHERE ImageFolderPath = @folderPath OR ImageFolderPath LIKE '" + path + "' ORDER BY ImageFolderPath, FileName";
+            List<Image> allImagesInFolder = (List<Image>)await _connection.QueryAsync<Image>(sql1, new { folderPath }, transaction: txn);
+            string sql2 = @"SELECT tags.TagId, tags.TagName, images.ImageId FROM images
+                            JOIN image_tags_join ON image_tags_join.ImageId = images.ImageId
+                            JOIN tags ON image_tags_join.TagId = tags.TagId WHERE images.ImageFolderPath = @folderPath OR images.ImageFolderPath LIKE '" + path + "' ORDER BY images.ImageFolderPath, images.FileName;";
+            List<ImageTag> tags = (List<ImageTag>)await _connection.QueryAsync<ImageTag>(sql2, new { folderPath }, transaction: txn);
+            await txn.CommitAsync();
+            await _connection.CloseAsync();
+            return (allImagesInFolder, tags);
+        }
+
         public async Task<(List<Image> images, List<ImageTag> tags)> GetAllImagesAtRating(int rating, bool filterInCurrentDirectory, string currentDirectory)
         {
             await _connection.OpenAsync();

@@ -11,6 +11,7 @@ namespace ImagePerfect.Repository.IRepository
         //any Image model sepecific database methods here
         Task<(List<Image> images, List<ImageTag> tags)> GetAllImagesInFolder(int folderId);
         Task<(List<Image> images, List<ImageTag> tags)> GetAllImagesInFolder(string folderPath);
+        Task<(List<Image> images, List<ImageTag> tags)> GetAllImagesInFolderAndSubFolders(string folderPath);
         Task<(List<Image> images, List<ImageTag> tags)> GetAllImagesAtRating(int rating, bool filterInCurrentDirectory, string currentDirectory);
         Task<(List<Image> images, List<ImageTag> tags)> GetAllImagesWithTag(string tag, bool filterInCurrentDirectory, string currentDirectory);
         Task<(List<Image> images, List<ImageTag> tags)> GetAllImagesAtYear(int year, bool filterInCurrentDirectory, string currentDirectory);

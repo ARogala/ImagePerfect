@@ -295,6 +295,9 @@
 					<Button Margin="5" Command="{Binding BackFolderFromDirectoryOptionsPanelCommand}" Classes="menu-btn">
 						Back Directory
 					</Button>
+					<Button Margin="5" Command="{Binding LoadCurrentDirectoryCommand}" Classes="menu-btn">
+						Load Current Directory
+					</Button>
 					<Button Margin="5" Command="{Binding OpenCurrentDirectoryWithExplorerCommand}" Classes="menu-btn">
 						Open Current Directory
 					</Button>
@@ -313,6 +316,7 @@
 							<TextBlock>Images</TextBlock>
 						</StackPanel>
 					</Button>
+					<Button Command="{Binding FilterGetAllImagesInFolderAndSubFoldersCommand}" Margin="5" Classes="menu-btn">All Images In SubFolders</Button>
 				</StackPanel>
 			</Grid>
 		</StackPanel>
