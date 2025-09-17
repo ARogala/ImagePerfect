@@ -119,6 +119,18 @@ namespace ImagePerfect.ViewModels
                 case "100":
                     FolderPageSize = 100;
                     break;
+                case "125":
+                    FolderPageSize = 125;
+                    break;
+                case "150":
+                    FolderPageSize = 150;
+                    break;
+                case "175":
+                    FolderPageSize = 175;
+                    break;
+                case "200":
+                    FolderPageSize = 200;
+                    break;
             }
             await UpdateSettings();
             _mainWindowViewModel.ResetPagination();
