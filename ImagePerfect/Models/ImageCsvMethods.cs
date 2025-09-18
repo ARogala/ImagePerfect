@@ -1,6 +1,7 @@
 ﻿using CsvHelper;
 using ImagePerfect.Helpers;
 using ImagePerfect.Repository.IRepository;
+using ImagePerfect.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -24,28 +25,35 @@ namespace ImagePerfect.Models
 
         public async Task<bool> AddImageCsv(int imageFolderId)
         {
-            string filePath = GetCsvPath("images.csv");
+            string filePath = GetCsvFilePath(imageFolderId);
             return await _unitOfWork.Image.AddImageCsv(filePath, imageFolderId);
+        }
+
+        public static void CopyMasterCsv(FolderViewModel folderVm)
+        {
+            string masterCsvPath = Path.Combine(appDirectory, "images.csv");
+            if(!File.Exists(masterCsvPath))
+                return;
+
+            string targetCsvPath = GetCsvFilePath(folderVm.FolderId);
+
+            // Overwrite if it already exists (safe for re-runs)
+            File.Copy(masterCsvPath, targetCsvPath, overwrite: true);
+        }
+
+        public static void DeleteCsvCopy(int folderId)
+        {
+            string filePath = GetCsvFilePath(folderId);
+            if (File.Exists(filePath))
+            {
+                File.Delete(filePath);
+            }
         }
         public static async Task<bool> BuildImageCsv(string imageFolderPath, int imageFolderId)
         {
-            string imageCsvPath = GetCsvPath("images.csv");
+            string imageCsvPath = GetCsvFilePath(imageFolderId);
 
-            //1st empty the csv
-            List<ImageCsv> records;
-            using (StreamReader reader = new StreamReader(imageCsvPath))
-            using (CsvReader csv = new CsvReader(reader, CultureInfo.InvariantCulture))
-            {
-                records = await csv.GetRecordsAsync<ImageCsv>().ToListAsync();
-                records.Clear();
-            }
-            using (StreamWriter writer = new StreamWriter(imageCsvPath))
-            using (CsvWriter csvWriter = new CsvWriter(writer, CultureInfo.InvariantCulture))
-            {
-                await csvWriter.WriteRecordsAsync(records);
-            }
-
-            DirectoryInfo imageFolderInfo = new DirectoryInfo(imageFolderPath);
+            //DirectoryInfo imageFolderInfo = new DirectoryInfo(imageFolderPath);
             IEnumerable<string> imageFolderFiles = Directory.EnumerateFiles(imageFolderPath).Where(s => s.ToLower().EndsWith(".jpeg") || s.ToLower().EndsWith(".jpg") || s.ToLower().EndsWith(".png") || s.ToLower().EndsWith(".gif"));
             List<ImageCsv> images = new List<ImageCsv>();
             foreach (string imagePath in imageFolderFiles)
@@ -79,9 +87,9 @@ namespace ImagePerfect.Models
                 return false;
             }
         }
-        private static string GetCsvPath(string fileName)
+        private static string GetCsvFilePath(int folderId)
         {
-            return Directory.GetFiles(appDirectory, $"{fileName}").First();
+            return Path.Combine(appDirectory, $"images{folderId}.csv");
         }
     }
 }

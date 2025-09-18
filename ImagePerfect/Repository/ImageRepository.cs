@@ -230,12 +230,15 @@ namespace ImagePerfect.Repository
 
         public async Task<bool> AddImageCsv(string filePath, int folderId)
         {
+            await using MySqlConnection conn = new MySqlConnection(_connectionString); //need a new connection pre folder as this is a parallel method
+            await conn.OpenAsync();
+
             int rowsEffectedA = 0;
             int rowsEffectedB = 0;
-            await _connection.OpenAsync();
-            using (MySqlTransaction txn = await _connection.BeginTransactionAsync())
+            //await _connection.OpenAsync();
+            using (MySqlTransaction txn = await conn.BeginTransactionAsync())
             {
-                MySqlBulkLoader bulkLoader = new MySqlBulkLoader(_connection)
+                MySqlBulkLoader bulkLoader = new MySqlBulkLoader(conn)
                 {
                     FileName = filePath,
                     TableName = "images",
@@ -248,15 +251,15 @@ namespace ImagePerfect.Repository
                 };
                 rowsEffectedA = await bulkLoader.LoadAsync();
                 string sql = @"UPDATE folders SET AreImagesImported = true WHERE FolderId = @folderId";
-                rowsEffectedB = await _connection.ExecuteAsync(sql, new { folderId }, transaction: txn);
+                rowsEffectedB = await conn.ExecuteAsync(sql, new { folderId }, transaction: txn);
                 if (rowsEffectedA > 0 && rowsEffectedB > 0)
                 {
                     await txn.CommitAsync();
-                    await _connection.CloseAsync();
+                    await conn.CloseAsync();
                     return true;
                 }
                 await txn.RollbackAsync();
-                await _connection.CloseAsync();
+                await conn.CloseAsync();
                 return false;
             }
         }

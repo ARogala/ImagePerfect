@@ -30,7 +30,11 @@ namespace ImagePerfect.ViewModels
             string imageFolderPath = imageFolder.FolderPath;
             int imageFolderId = imageFolder.FolderId;
             if(bulkScan == false)
+            {
                 _mainWindowViewModel.ShowLoading = true;
+                ImageCsvMethods.CopyMasterCsv(imageFolder);
+            }
+               
             //build csv
             bool csvIsSet = await ImageCsvMethods.BuildImageCsv(imageFolderPath, imageFolderId);
             //write csv to database and load folders and images at the location again
@@ -55,7 +59,10 @@ namespace ImagePerfect.ViewModels
                 }
             }
             if(bulkScan == false)
+            {
                 _mainWindowViewModel.ShowLoading = false;
+                ImageCsvMethods.DeleteCsvCopy(imageFolderId);
+            }
         }
 
         public async Task ImportAllFoldersOnCurrentPage(ItemsControl foldersItemsControl)
@@ -70,9 +77,27 @@ namespace ImagePerfect.ViewModels
                 {
                     if (folder.HasFiles == true && folder.AreImagesImported == false)
                     {
-                        await ImportImages(folder, true);
+                        //make the csv file
+                        ImageCsvMethods.CopyMasterCsv(folder);
                     }
                 }
+                await Parallel.ForEachAsync(allFolders, new ParallelOptions { MaxDegreeOfParallelism = 4 }, async (folder, cancellationToken) =>
+                {
+                    if (folder.HasFiles == true && folder.AreImagesImported == false) 
+                    {
+                        try
+                        {
+                            // Each folder uses its own CSV
+                            await ImportImages(folder, bulkScan: true);
+                        }
+                        finally
+                        {
+                            // Delete folder-specific CSV after import
+                            ImageCsvMethods.DeleteCsvCopy(folder.FolderId);
+                        }
+                    }
+                });
+               
                 _mainWindowViewModel.ResetPagination();
                 await _mainWindowViewModel.RefreshFolders();
                 _mainWindowViewModel.ShowLoading = false;
