@@ -24,12 +24,13 @@ namespace ImagePerfect.ViewModels
             _imageCsvMethods = new ImageCsvMethods(_unitOfWork);
         }
 
-        public async Task ImportImages(FolderViewModel imageFolder)
+        public async Task ImportImages(FolderViewModel imageFolder, bool bulkScan)
         {
             string newPath = string.Empty;
             string imageFolderPath = imageFolder.FolderPath;
             int imageFolderId = imageFolder.FolderId;
-            _mainWindowViewModel.ShowLoading = true;
+            if(bulkScan == false)
+                _mainWindowViewModel.ShowLoading = true;
             //build csv
             bool csvIsSet = await ImageCsvMethods.BuildImageCsv(imageFolderPath, imageFolderId);
             //write csv to database and load folders and images at the location again
@@ -37,20 +38,24 @@ namespace ImagePerfect.ViewModels
             if (csvIsSet)
             {
                 await _imageCsvMethods.AddImageCsv(imageFolderId);
-                //remove one folder from path
-                newPath = PathHelper.RemoveOneFolderFromPath(imageFolderPath);
-                //refresh UI
-                if (_mainWindowViewModel.currentFilter == MainWindowViewModel.Filters.AllFoldersWithMetadataNotScanned || _mainWindowViewModel.currentFilter == MainWindowViewModel.Filters.AllFoldersWithNoImportedImages)
+                if(bulkScan == false)
                 {
-                    //have to call hard refresh for these two cases as they will not be returned from the query to update props
-                    await _mainWindowViewModel.RefreshFolders();
-                }
-                else
-                {
-                    await _mainWindowViewModel.RefreshFolderProps(newPath, imageFolder);
+                    //remove one folder from path
+                    newPath = PathHelper.RemoveOneFolderFromPath(imageFolderPath);
+                    //refresh UI
+                    if (_mainWindowViewModel.currentFilter == MainWindowViewModel.Filters.AllFoldersWithMetadataNotScanned || _mainWindowViewModel.currentFilter == MainWindowViewModel.Filters.AllFoldersWithNoImportedImages)
+                    {
+                        //have to call hard refresh for these two cases as they will not be returned from the query to update props
+                        await _mainWindowViewModel.RefreshFolders();
+                    }
+                    else
+                    {
+                        await _mainWindowViewModel.RefreshFolderProps(newPath, imageFolder);
+                    }
                 }
             }
-            _mainWindowViewModel.ShowLoading = false;
+            if(bulkScan == false)
+                _mainWindowViewModel.ShowLoading = false;
         }
 
         public async Task ImportAllFoldersOnCurrentPage(ItemsControl foldersItemsControl)
@@ -59,16 +64,19 @@ namespace ImagePerfect.ViewModels
             var boxResult = await boxYesNo.ShowAsync();
             if (boxResult == ButtonResult.Yes)
             {
+                _mainWindowViewModel.ShowLoading = true;
                 List<FolderViewModel> allFolders = foldersItemsControl.Items.OfType<FolderViewModel>().ToList();
                 foreach (FolderViewModel folder in allFolders)
                 {
                     if (folder.HasFiles == true && folder.AreImagesImported == false)
                     {
-                        await ImportImages(folder);
+                        await ImportImages(folder, true);
                     }
                 }
+                _mainWindowViewModel.ResetPagination();
+                await _mainWindowViewModel.RefreshFolders();
+                _mainWindowViewModel.ShowLoading = false;
             }
-            _mainWindowViewModel.ResetPagination();
         }
     }
 }

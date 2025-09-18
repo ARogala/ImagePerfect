@@ -125,7 +125,7 @@ namespace ImagePerfect.ViewModels
                 DirectoryNavigationVm.BackFolderFromDirectoryOptionsPanel();
             });
             ImportImagesCommand = ReactiveCommand.Create(async (FolderViewModel imageFolder) => {
-                await ImportImagesVm.ImportImages(imageFolder);
+                await ImportImagesVm.ImportImages(imageFolder, false);
             });
             AddFolderDescriptionCommand = ReactiveCommand.Create((FolderViewModel folderVm) => {
                 ModifyFolderDataVm.UpdateFolder(folderVm, "Description");
